@@ -5,6 +5,7 @@ let firstCard = null;
 let firstCardElement;
 let deck;
 let canClick = true;
+let currentGameTime = 180000
 
 const grid = [
   ['A', 'B'],
@@ -142,9 +143,25 @@ const initGame = () => {
   }
 
   const boardEl = buildBoardElements(board);
-
   document.body.appendChild(boardEl);
-};
+  //Run the setInterval as a time limit
+  const output = document.createElement('div');
+  output.innerText = currentGameTime;
+  document.body.appendChild(output);
+
+  const gameTimer = setInterval(() => {
+  output.innerText = currentGameTime
+  if (currentGameTime <= 0) {
+  document.body.innerHTML = ''
+  const loseMessage = document.createElement('h1')
+  loseMessage.innerText = 'Time has run out, you lost!'
+  document.body.appendChild(loseMessage)
+  clearInterval(gameTimer)
+  }
+  currentGameTime -=1
+  , 1
+});
+}
 
 const squareClick = (cardElement, column, row) => {
 
