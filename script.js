@@ -4,6 +4,7 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let canClick = true;
 
 const grid = [
   ['A', 'B'],
@@ -161,7 +162,7 @@ const squareClick = (cardElement, column, row) => {
     }
 
     // first turn
-    if (firstCard === null) {
+    if (firstCard === null && canClick === true) {
       console.log('first turn');
       firstCard = clickedCard;
       // turn this card over
@@ -174,25 +175,34 @@ const squareClick = (cardElement, column, row) => {
     } else {
     
       console.log('second turn');
+      if (canClick === true) {
       if (
         clickedCard.name === firstCard.name &&
         clickedCard.suit === firstCard.suit
       ) {
         console.log('match');
-    
+        canClick = false
         // turn this card over
         cardElement.innerText = clickedCard.name;
+        const winMessage = document.createElement('h1')
+        winMessage.innerText = "It's a match!"
+        document.body.appendChild(winMessage)
+        setTimeout (() =>{document.body.removeChild(winMessage)
+        canClick = true}, 3000)
       } else {
+        canClick = false
         cardElement.innerText = clickedCard.name;
         setTimeout (() => {console.log('NOT a match');
         // turn this card back over
         firstCardElement.innerText = '';
         cardElement.innerText = '';
+        canClick = true
       }, 3000);
       }
 
       // reset the first card
       firstCard = null;
     }
+  }
 };
 initGame()
