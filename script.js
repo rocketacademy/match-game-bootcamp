@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // boardSize has to be an even number
 const boardSize = 4;
 const board = [];
@@ -5,7 +6,13 @@ let firstCard = null;
 let firstCardElement;
 let deck;
 let canClick = true;
-let currentGameTime = 180000
+let currentGameTime = 180000;
+let username = '';
+let inputName;
+let boardElement;
+let boardEl;
+let matchCounter = 0;
+let winCounter = 0;
 
 const grid = [
   ['A', 'B'],
@@ -38,7 +45,7 @@ const shuffleCards = (cards) => {
   return cards;
 };
 
-const makeDeck = (cardAmount) => {
+const makeDeck = () => {
   // create the empty deck at the beginning
   const newDeck = [];
   const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
@@ -46,7 +53,6 @@ const makeDeck = (cardAmount) => {
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
     // make a variable of the current suit
     const currentSuit = suits[suitIndex];
-    console.log(`current suit: ${currentSuit}`);
 
     // loop to create all cards in this suit
     // rank 1-13
@@ -72,8 +78,6 @@ const makeDeck = (cardAmount) => {
         rank: rankCounter,
       };
 
-      console.log(`rank: ${rankCounter}`);
-
       // add the card to the deck
       newDeck.push(card); // add double the cards to the deck
       newDeck.push(card);
@@ -83,12 +87,86 @@ const makeDeck = (cardAmount) => {
   return newDeck;
 };
 
+const squareClick = (cardElement, column, row) => {
+  console.log(cardElement);
+
+  console.log('FIRST CARD DOM ELEMENT', firstCard);
+
+  console.log('BOARD CLICKED CARD', board[column][row]);
+
+  const clickedCard = board[column][row];
+
+  // the user already clicked on this square
+  if (cardElement.innerText !== '') {
+    return;
+  }
+
+  // first turn
+  if (firstCard === null && canClick === true) {
+    console.log('first turn');
+    firstCard = clickedCard;
+    // turn this card over
+    cardElement.innerText = firstCard.name;
+
+    // hold onto this for later when it may not match
+    firstCardElement = cardElement;
+
+    // second turn
+  } else {
+    console.log('second turn');
+    if (canClick === true) {
+      if (
+        clickedCard.name === firstCard.name
+        && clickedCard.suit === firstCard.suit
+      ) {
+        console.log('match');
+        canClick = false;
+        // turn this card over
+        cardElement.innerText = clickedCard.name;
+        matchCounter += 2;
+        if (matchCounter < 16) {
+          const winRoundMessage = document.createElement('h1');
+          winRoundMessage.innerText = "It's a match!";
+          document.body.appendChild(winRoundMessage);
+          setTimeout(() => { document.body.removeChild(winRoundMessage);
+            canClick = true; }, 3000);
+        }
+        // user wins if 16 cards are matched
+        else if (matchCounter === 16) {
+          document.body.innerHTML = '';
+          winCounter += 1;
+          const winGameMessage = document.createElement('h1');
+          winGameMessage.innerText = 'You have won the game!';
+          document.body.appendChild(winGameMessage);
+          setTimeout(() => { document.body.removeChild(winGameMessage);
+            board.length = 0;
+            canClick = true;
+            matchCounter = 0;
+            initGame(); }, 5000);
+        }
+      } else {
+        canClick = false;
+        cardElement.innerText = clickedCard.name;
+        setTimeout(() => { console.log('NOT a match');
+        // turn this card back over
+          firstCardElement.innerText = '';
+          cardElement.innerText = '';
+          canClick = true;
+        }, 3000);
+      }
+
+      // reset the first card
+      firstCard = null;
+    }
+  }
+};
 
 // create all the board elements that will go on the screen
 // return the built board
+// eslint-disable-next-line no-shadow
 const buildBoardElements = (board) => {
   // create the element that everything will go inside of
-  const boardElement = document.createElement('div');
+  boardElement = document.createElement('div');
 
   // give it a class for CSS purposes
   boardElement.classList.add('board');
@@ -97,7 +175,7 @@ const buildBoardElements = (board) => {
   for (let i = 0; i < board.length; i += 1) {
     // make a var for just this row of cards
     const row = board[i];
-
+    console.log(i);
     // make an element for this row of cards
     const rowElement = document.createElement('div');
     rowElement.classList.add('row');
@@ -128,10 +206,14 @@ const buildBoardElements = (board) => {
 };
 
 const initGame = () => {
+  currentGameTime = 180000;
+  // capture the value of the text box before emptying the HTML to display the boardgame
+  username = inputName.value;
+  document.body.innerHTML = '';
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
-  let doubleDeck = makeDeck();
-  let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  const doubleDeck = makeDeck();
+  const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
   deck = shuffleCards(deckSubset);
 
   // deal the cards out to the board data structure
@@ -141,85 +223,48 @@ const initGame = () => {
       board[i].push(deck.pop());
     }
   }
-
-  const boardEl = buildBoardElements(board);
+  // Show the board
+  boardEl = buildBoardElements(board);
   document.body.appendChild(boardEl);
-  //Run the setInterval as a time limit
   const output = document.createElement('div');
   output.innerText = currentGameTime;
   document.body.appendChild(output);
-
+  // Run the setInterval as a time limit
   const gameTimer = setInterval(() => {
-  output.innerText = currentGameTime
-  if (currentGameTime <= 0) {
-  document.body.innerHTML = ''
-  const loseMessage = document.createElement('h1')
-  loseMessage.innerText = 'Time has run out, you lost!'
-  document.body.appendChild(loseMessage)
-  clearInterval(gameTimer)
-  }
-  currentGameTime -=1
-  , 1
-});
-}
-
-const squareClick = (cardElement, column, row) => {
-
-    console.log(cardElement);
-    
-    console.log('FIRST CARD DOM ELEMENT', firstCard);
-    
-    console.log('BOARD CLICKED CARD', board[column][row]);
-    
-    const clickedCard = board[column][row]; 
-
-    // the user already clicked on this square
-    if( cardElement.innerText !== '' ){
-        return;
+    output.innerText = currentGameTime;
+    if (currentGameTime <= 0) {
+      document.body.innerHTML = '';
+      const loseMessage = document.createElement('h1');
+      loseMessage.innerText = 'Time has run out, you lost!';
+      document.body.appendChild(loseMessage);
+      clearInterval(gameTimer);
     }
-
-    // first turn
-    if (firstCard === null && canClick === true) {
-      console.log('first turn');
-      firstCard = clickedCard;
-      // turn this card over
-      cardElement.innerText = firstCard.name;
-  
-      // hold onto this for later when it may not match
-      firstCardElement = cardElement;
-
-    // second turn
-    } else {
-    
-      console.log('second turn');
-      if (canClick === true) {
-      if (
-        clickedCard.name === firstCard.name &&
-        clickedCard.suit === firstCard.suit
-      ) {
-        console.log('match');
-        canClick = false
-        // turn this card over
-        cardElement.innerText = clickedCard.name;
-        const winMessage = document.createElement('h1')
-        winMessage.innerText = "It's a match!"
-        document.body.appendChild(winMessage)
-        setTimeout (() =>{document.body.removeChild(winMessage)
-        canClick = true}, 3000)
-      } else {
-        canClick = false
-        cardElement.innerText = clickedCard.name;
-        setTimeout (() => {console.log('NOT a match');
-        // turn this card back over
-        firstCardElement.innerText = '';
-        cardElement.innerText = '';
-        canClick = true
-      }, 3000);
-      }
-
-      // reset the first card
-      firstCard = null;
-    }
-  }
+    currentGameTime -= 1;
+  }, 1);
+  // Reset Button
+  const resetButton = document.createElement('button');
+  resetButton.innerText = 'Reset';
+  resetButton.addEventListener('click', (() => {
+    board.length = 0;
+    initGame(); }));
+  document.body.appendChild(resetButton);
+  const winCounterOutput = document.createElement('h2');
+  winCounterOutput.innerText = 'Your current wins:';
+  const winCounterText = document.createElement('p');
+  winCounterText.innerText = winCounter;
+  winCounterOutput.appendChild(winCounterText);
+  document.body.appendChild(winCounterOutput);
 };
-initGame()
+
+const gameSetUp = () => {
+  // Input for name
+  inputName = document.createElement('input');
+  inputName.type = 'text';
+  document.body.appendChild(inputName);
+  // Submit name button to start game
+  const submitName = document.createElement('button');
+  submitName.innerText = 'Submit Name';
+  document.body.appendChild(submitName);
+  submitName.addEventListener('click', initGame);
+};
+gameSetUp();
