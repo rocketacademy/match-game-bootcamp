@@ -1,7 +1,12 @@
+let cardElement;
+let inputContainer;
+let resetBtnContainer;
 const getRandomIndex = (max) => Math.floor(Math.random() * max);
-// boardSize has to be an even number\
+let scoreIndex = 0;
+let playerScore = 0;
 const winMessage = document.createElement('div');
-const displayMsgCounter = false;
+let displayMsgCounter = false;
+// boardSize has to be an even number\
 const boardSize = 4;
 const board = [];
 let firstCard = null;
@@ -67,7 +72,17 @@ const makeDeck = (cardAmount) => {
 
   return newDeck;
 };
-
+const shortMessage = (displayMsgCounter) => {
+  winMessage.innerHTML = 'Match!';
+  if (displayMsgCounter === true) {
+    winMessage.innerText = '';
+  }
+  if (displayMsgCounter === false) {
+    winMessage.innerText = 'you win all cards';
+    console.log('test3');
+  }
+  document.body.appendChild(winMessage);
+};
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
 
@@ -100,20 +115,40 @@ const squareClick = (cardElement, column, row) => {
         && clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
-
-      let showMatch = shortMessage();
-      const displayMsgCounter = true;
-      showMatch = setTimeout(() => {
-        shortMessage(displayMsgCounter);
-      }, 1000);
-      // turn this card over
-      cardElement.innerText = clickedCard.name;
+      let showMatch = '';
+      scoreIndex += 1;
+      updateScore();
+      console.log(scoreIndex < 8);
+      console.log(scoreIndex === 1);
+      if (scoreIndex < 2) {
+        cardElement.innerText = clickedCard.name;
+        console.log('test');
+        showMatch = shortMessage();
+        displayMsgCounter = true;
+        showMatch = setTimeout(() => {
+          shortMessage(displayMsgCounter);
+        }, 3000);
+        // turn this card over
+      }
+      if (scoreIndex === 8) {
+        console.log('test2');
+        cardElement.innerText = clickedCard.name;
+        displayMsgCounter = false;
+        showMatch = shortMessage(displayMsgCounter);
+        displayMsgCounter = true;
+        showMatch = setTimeout(() => {
+          shortMessage(displayMsgCounter);
+        }, 5000);
+        console.log('1 point');
+        playerScore += 1;
+        scoreIndex = 0;
+      }
     } else {
       console.log('NOT a match');
       cardElement.innerText = clickedCard.name;
       setTimeout(() => {
         cardElement.innerText = '';
-      }, 1000);
+      }, 3000);
 
       // turn this card back over
 
@@ -156,7 +191,7 @@ const buildBoardElements = (board) => {
         // we will want to pass in the card element so
         // that we can change how it looks on screen, i.e.,
         // "turn the card over"
-        squareClick(event.currentTarget, i, j);
+        squareClick(event.currentTarget, i, j, scoreIndex);
       });
 
       rowElement.appendChild(square);
@@ -165,13 +200,6 @@ const buildBoardElements = (board) => {
   }
 
   return boardElement;
-};
-const shortMessage = (displayMsgCounter) => {
-  winMessage.innerHTML = 'Match!';
-  if (displayMsgCounter == true) {
-    winMessage.innerText = '';
-  }
-  document.body.appendChild(winMessage);
 };
 
 const initGame = () => {
@@ -192,6 +220,47 @@ const initGame = () => {
   const boardEl = buildBoardElements(board);
 
   document.body.appendChild(boardEl);
+  inputContainer = document.createElement('div');
+  document.body.appendChild(inputContainer);
+  resetBtnContainer = document.createElement('div');
+  document.body.appendChild(resetBtnContainer);
 };
-
+const resetGame = () => {
+  window.location.reload();
+};
 initGame();
+// const input = document.querySelector('#input-field');
+// const result = main(input.value);
+
+// // Display result in output element
+// const output = document.querySelector('#output-div');
+// output.innerHTML = result;
+const outputPlayername = () => {
+};
+const inputName = document.createElement('INPUT');
+inputName.setAttribute('type', 'text');
+const inputBtnName = document.createElement('button');
+inputBtnName.innerText = 'Submit Name';
+inputContainer.appendChild(inputName);
+inputContainer.appendChild(inputBtnName);
+inputBtnName.addEventListener('click', outputPlayername);
+
+const resetbuttom = document.createElement('button');
+resetbuttom.innerText = 'reset';
+resetbuttom.addEventListener('click', resetGame);
+resetBtnContainer.appendChild(resetbuttom);
+
+const timerMsg = () => {
+  const timeMsg = document.createElement('div');
+  timeMsg.innerText = 'TIMES UP!';
+  document.body.appendChild(timeMsg);
+};
+setTimeout(() => {
+  timerMsg();
+}, 6000);
+const msgWarming = document.createElement('div');
+updateScore = () => {
+  msgWarming.innerText = `You Have 3 minutes to complete the match! Your current score ${scoreIndex}`;
+};
+msgWarming.innerText = `You Have 3 minutes to complete the match! Your current score ${scoreIndex}`;
+document.body.appendChild(msgWarming);
