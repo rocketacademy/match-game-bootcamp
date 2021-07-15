@@ -58,6 +58,7 @@ const makeDeck = () => {
 
       // Add the new card to the deck
       newDeck.push(card);
+      newDeck.push(card);
     }
   }
 
@@ -83,22 +84,21 @@ const shuffleCards = (cards) => {
   // Return the shuffled deck
   return cards;
 };
-const createCard = (cardInfo) => {
-  const suit = document.createElement('div');
-  suit.classList.add('suit', cardInfo.colour);
-  suit.innerText = cardInfo.suitSymbol;
-
-  const name = document.createElement('div');
-  name.classList.add(cardInfo.displayName, cardInfo.colour);
-  name.innerText = cardInfo.displayName;
-
-  const card = document.createElement('div');
-  card.classList.add('card');
-
-  card.appendChild(name);
-  card.appendChild(suit);
-
-  return card;
+const outputContainer = document.createElement('span');
+const winContainer = document.createElement('span');
+let canClick = true;
+const timeLag = 1000;
+let winRecord = 0;
+const totalMatches = boardSize * boardSize / 2;
+const timer = document.createElement('div');
+let username = 'you';
+const output = (message) =>
+{
+  outputContainer.innerText = message;
+};
+const winsOutput = () =>
+{
+  winContainer.innerText = `Wins: ${winRecord}/${totalMatches}  `;
 };
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
@@ -115,38 +115,54 @@ const squareClick = (cardElement, column, row) => {
   }
 
   // first turn
-  if (firstCard === null) {
-    console.log('first turn');
+  if (firstCard === null && canClick) {
+    output('first turn');
     firstCard = clickedCard;
     // turn this card over
-    cardElement.innerText = firstCard.name;
-
+    cardElement.innerText = `${firstCard.displayName}\n${firstCard.suitSymbol}`;
+    cardElement.classList.add(firstCard.colour, 'openCard');
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
 
     // second turn
-  } else {
-    console.log('second turn');
+  } else if (canClick) {
+    cardElement.innerText = `${clickedCard.displayName}\n${clickedCard.suitSymbol}`;
+    cardElement.classList.add(clickedCard.colour, 'openCard');
+    output('second turn');
+
     if (
       clickedCard.name === firstCard.name
-    // && clickedCard.suit === firstCard.suit
+
     ) {
-      console.log('match');
+      output('match');
+      winRecord += 1;
+      winsOutput();
+      setTimeout(() => {
+        if (winRecord === totalMatches)
+        {
+          output('You Win! 🎉');
+          document.body.removeChild(timer);
+        }
+        else output('first turn'); }, timeLag);
 
       // turn this card over
-      cardElement.innerText = clickedCard.name;
     } else {
-      console.log('NOT a match');
+      canClick = false;
+      output('NOT a match');
+      setTimeout(() => { firstCardElement.classList.remove('openCard');
+        cardElement.classList.remove('openCard');
 
-      // turn this card back over
-      firstCardElement.innerText = '';
+        // turn this card back over
+        firstCardElement.innerText = '';
+        cardElement.innerText = '';
+        canClick = true;
+      }, timeLag);
     }
-
     // reset the first card
     firstCard = null;
   }
 };
-
+// Blank card
 // create all the board elements that will go on the screen
 // return the built board
 const buildBoardElements = (refBoard) => {
@@ -169,14 +185,15 @@ const buildBoardElements = (refBoard) => {
     for (let j = 0; j < row.length; j += 1) {
       // create the square element
       const square = document.createElement('div');
+      // const square = createCard(refCard);
 
       // set a class for CSS purposes
       square.classList.add('square');
+      // square.appendChild(createCard(refCard));
 
       // set the click event
       // eslint-disable-next-line
       square.addEventListener('click', (event) => {
-        // square.appendChild(createCard(refBoard[i][j]));
         // we will want to pass in the card element so
         // that we can change how it looks on screen, i.e.,
         // "turn the card over"
@@ -191,15 +208,15 @@ const buildBoardElements = (refBoard) => {
   return boardElement;
 };
 
-const initGame = () => {
+const startTable = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
+  console.log('a');
+  console.log(username);
+  output(`Game start: ${username} can start matching!`);
   const doubleDeck = makeDeck();
-  console.log(doubleDeck);
   const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
-  console.log(deckSubset);
   deck = shuffleCards(deckSubset);
-  console.log(deck[0]);
 
   // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
@@ -210,7 +227,63 @@ const initGame = () => {
   }
 
   const boardEl = buildBoardElements(board);
+  return boardEl;
+};
+const askForUsername = () => {
+  const inputName = document.createElement('input');
+  const inputButton = document.createElement('button');
+
+  inputName.type = 'text';
+  inputName.placeholder = 'Your name';
+  inputButton.innerText = 'Submit';
+  document.body.appendChild(inputName);
+  document.body.appendChild(inputButton);
+
+  inputButton.addEventListener('click', () =>
+  {
+    username = inputName.value;
+    console.log(username);
+    document.body.removeChild(inputName);
+    document.body.removeChild(inputButton);
+    return true;
+  });
+  return false;
+};
+const initGame = () => {
+  // ASK FOR USER
+  askForUsername();
+  const boardEl = startTable();
 
   document.body.appendChild(boardEl);
+  document.body.appendChild(outputContainer);
+  document.body.appendChild(winContainer);
+
+  // END GAME FUNCTION THAT ENDS GAME IN 3MIN
+  let seconds = 180;
+  const delayInMilliseconds = 1000;
+
+  timer.innerText = seconds;
+  document.body.appendChild(timer);
+
+  const ref = setInterval(() => {
+    timer.innerText = `${seconds}s left`;
+
+    if (seconds <= 0) {
+      clearInterval(ref);
+    }
+    seconds -= 1;
+  }, delayInMilliseconds);
+
+  const threeMinMs = 180000;
+  setTimeout(() => {
+    document.body.removeChild(boardEl);
+    if (winRecord === totalMatches)
+    {
+      output('You Win! 🎉');
+    }
+    else {
+      output('GAME OVER 👿');
+    }
+  }, threeMinMs);
 };
 initGame();
