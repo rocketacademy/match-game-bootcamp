@@ -117,7 +117,7 @@ const squareClick = (cardElement, column, row) => {
       console.log('match');
       let showMatch = '';
       scoreIndex += 1;
-      updateScore();
+      updatingScore();
       console.log(scoreIndex < 8);
       console.log(scoreIndex === 1);
       if (scoreIndex < 2) {
@@ -235,32 +235,42 @@ initGame();
 // // Display result in output element
 // const output = document.querySelector('#output-div');
 // output.innerHTML = result;
-const outputPlayername = () => {
-};
-const inputName = document.createElement('INPUT');
-inputName.setAttribute('type', 'text');
-const inputBtnName = document.createElement('button');
-inputBtnName.innerText = 'Submit Name';
-inputContainer.appendChild(inputName);
+
+const playerName = window.prompt('Enter your name');
+
+const inputBtnName = document.createElement('div');
+inputBtnName.innerText = `Welcome, ${playerName}!`;
+
 inputContainer.appendChild(inputBtnName);
-inputBtnName.addEventListener('click', outputPlayername);
 
 const resetbuttom = document.createElement('button');
 resetbuttom.innerText = 'reset';
 resetbuttom.addEventListener('click', resetGame);
 resetBtnContainer.appendChild(resetbuttom);
 
-const timerMsg = () => {
-  const timeMsg = document.createElement('div');
-  timeMsg.innerText = 'TIMES UP!';
-  document.body.appendChild(timeMsg);
-};
-setTimeout(() => {
-  timerMsg();
-}, 6000);
 const msgWarming = document.createElement('div');
-updateScore = () => {
-  msgWarming.innerText = `You Have 3 minutes to complete the match! Your current score ${scoreIndex}`;
+updatingScore = () => {
+  msgWarming.innerText = `${playerName}, you have 3 minutes(120 seconds) to complete the game match! Your current score ${scoreIndex}`;
 };
-msgWarming.innerText = `You Have 3 minutes to complete the match! Your current score ${scoreIndex}`;
+msgWarming.innerText = `${playerName}, you have 3 minutes to complete the game match(120 seconds)! Your current score ${scoreIndex}`;
 document.body.appendChild(msgWarming);
+//
+let milliseconds = 0;
+const delayInMilliseconds = 1000;
+const output = document.createElement('div');
+output.innerText = milliseconds;
+document.body.appendChild(output);
+
+const ref = setInterval(() => {
+  output.innerText = `${milliseconds} seconds`;
+
+  if (milliseconds >= 180) {
+    clearInterval(ref);
+    const timeMsg = document.createElement('div');
+    timeMsg.innerText = 'TIMES UP!';
+    document.body.appendChild(timeMsg);
+  }
+
+  milliseconds += 1;
+}, delayInMilliseconds);
+//
