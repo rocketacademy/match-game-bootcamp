@@ -1,3 +1,133 @@
+@import url("https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Roboto+Mono:wght@200;400;600&display=swap");
+
 body {
-  background-color: pink;
+  font-family: "Roboto Mono", monospace, sans-serif;
+  line-height: 1.3;
+  letter-spacing: -1px !important;
+  margin: auto 60px;
+  overflow: hidden;
+  height: 100vh;
+}
+
+header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.instructions {
+  padding-top: 32px;
+}
+
+.board {
+  padding: 32px;
+  width: 100%;
+  text-align: center;
+}
+
+/* square = the card face down */
+.square {
+  padding: 20px;
+  margin: 10px;
+  background-color: #000;
+  display: inline-block;
+  height: 150px;
+  width: 100px;
+}
+
+/*  card-reveal div is for the card-name & card-suit to be attached relative */
+.card-reveal {
+  background-color: #fff;
+  position: relative;
+  /* takes 100% space of square div */
+  height: 100%;
+  width: 100%;
+  font-family: ;
+}
+
+/* this is the class for card name that will be displayed inside square */
+.card-name {
+  position: absolute;
+  padding: 10px;
+  top: 0;
+  left: 0;
+}
+
+/* this is the class for card suit that will be dsiplayed inside square */
+.card-suit {
+  position: absolute;
+  padding: 10px;
+  bottom: 0;
+  right: 0;
+}
+
+h1,
+button,
+.card-reveal,
+.card {
+  font-family: "Dela Gothic One", cursive;
+  font-size: 32px;
+}
+
+h1 {
+  font-size: 48px;
+}
+
+button {
+  background-color: transparent;
+  outline: none;
+  padding: 8px 12px;
+  border: solid 2px #000;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #ecf842;
+}
+
+.game-controls {
+  height: 75vh;
+  max-width: 50vh;
+  direction: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.name-div {
+  display: flex;
+  width: 50%;
+  padding-bottom: 24px;
+}
+
+button.submit-btn,
+input {
+  font-family: "Roboto Mono", monospace, sans-serif;
+  font-size: 24px;
+  background-color: #fff;
+  outline: none;
+  border: none;
+  margin-bottom: 60px;
+}
+
+input {
+  border-bottom: solid 2px #000;
+  width: 100%;
+}
+
+button.submit-btn:hover {
+  background-color: #fff;
+  color: #757575;
+}
+
+.game-controls {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
 }

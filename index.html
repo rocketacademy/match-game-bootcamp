@@ -1,12 +1,35 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>SWE101</title>
+    <title>Match Game</title>
     <link rel="stylesheet" href="styles.css" />
+    <meta charset="utf-8" />
   </head>
 
   <body>
-    <h1 id="header">SWE101! 🚀</h1>
+    <header>
+      <div class="instructions">
+        <h2 class="instructions-text">Welcome! How do I address you?</h2>
+      </div>
+      <h1>Match Game</h1>
+    </header>
+
+    <div class="name-div">
+      <input placeholder="Enter your name" id="name" name="" type="text" />
+      <button class="submit-btn">Submit</button>
+    </div>
+
+    <div class="main-div">
+      <!-- Playing board goes here -->
+      <div class="board"></div>
+
+      <div class="game-controls">
+        <button class="start-btn">Start</button>
+        <button class="replay-btn">Replay</button>
+        <button class="end-btn">End Game</button>
+      </div>
+    </div>
+
     <!-- Import program logic -->
     <script src="script.js"></script>
   </body>
