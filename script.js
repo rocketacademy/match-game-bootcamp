@@ -259,14 +259,11 @@ const endGame=(domToRemove)=>{
     document.body.removeChild(domToRemove);
     if (winRecord === totalMatches)
     {
-      winFunc();
-      winGames+=1;
+      winFunc();   
     }
     else {
-      lostFunc();
-      lostGames+=1;
+      lostFunc();  
     }
-    winRecord=0;
     resetGame();
 }
 
@@ -287,6 +284,7 @@ const winsOutput = (winRecord,totalMatches) =>
 };
 const winFunc=()=>
 {
+   winGames+=1;
    output(`${username} Win! 🎉`);
    const splitTime=document.createElement('p');
    const splitTimeString= `${username} completed with ${document.getElementById('timerString').innerHTML}`
@@ -294,6 +292,7 @@ const winFunc=()=>
    splitTimes.appendChild(splitTime);
 }
 const lostFunc=()=>{
+  lostGames+=1;
    output('GAME OVER 👿');
    const splitTime=document.createElement('p');
    const splitTimeString= `${username} lost `
@@ -301,7 +300,7 @@ const lostFunc=()=>{
    splitTimes.appendChild(splitTime);
 
 }
-const hoursMinSecFromMs=(s)=>{
+const hoursMinSecFromS=(s)=>{
   let hours= Math.floor(s/3600);
   let minutes = Math.floor((s-hours*3600)/60);
   let secs = s-minutes*60-hours*3600;
@@ -309,6 +308,7 @@ const hoursMinSecFromMs=(s)=>{
   return `${hours}hours ${minutes}mins ${secs}s left`;
 }
 const resetGame=()=>{
+   winRecord=0;
   setTimeout(()=>{
     canClick=false;
     clearBody();
@@ -321,7 +321,7 @@ const pausableTimer=(duration, timerOutput,pauseButton, domToRemove)=>
   let isPaused=false;
   const delayInMilliseconds = 1000;
   timerInterval = setInterval(() => {
-  timerOutput.innerText =  hoursMinSecFromMs(duration);
+  timerOutput.innerText =  hoursMinSecFromS(duration);
     if (duration <= 0) {
       clearInterval(timerInterval);
       endGame(domToRemove);
@@ -351,7 +351,7 @@ const createTimerToEnd=(duration, domToRemove)=>{
  
   const timerOutput=document.createElement('span');
   timerOutput.id='timerString';
-  timerOutput.innerText = hoursMinSecFromMs(duration)
+  timerOutput.innerText = hoursMinSecFromS(duration)
 
   const pauseButton= document.createElement('button');
   pauseButton.innerText='pause';
