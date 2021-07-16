@@ -7,14 +7,20 @@ let firstCardElement;
 let deck;
 
 const outputContainer = document.createElement('div');
-const winContainer = document.createElement('span');
-let canClick = true;
-const timeLag = 1000;
+const winContainer = document.createElement('div');
+let timerSet = document.createElement('div');
+const splitTimes=document.createElement('div');
+let timerInterval;
+let boardEl;
+let splitTimeSec=0;
+
+let canClick = false;
+const timeLag = 500;
+
+const totalMatches = boardSize * boardSize / 2;
 let winRecord = 0;
 let winGames=0;
 let lostGames=0;
-const timer = document.createElement('div');
-const totalMatches = boardSize * boardSize / 2;
 
 let username = 'You';
 
@@ -102,27 +108,6 @@ const output = (message) =>
 {
   outputContainer.innerText = message;
 };
-const winsOutput = (winRecord,totalMatches) =>
-{
-  
-  console.log(`Wins: ${winRecord}/${totalMatches}  `)
-  winContainer.innerText = `Wins: ${winRecord}/${totalMatches}  Win games: ${winGames}  Loss games: ${lostGames}`;
-  setTimeout(() => {
-       
-        if (winRecord === totalMatches)
-        {
-          gameState='win';
-          winFunc();
-        }
-        // else output('first turn');
-       }, timeLag);
-
-};
-const winFunc=()=>
-{
-   output(`${username} Win! 🎉`);
-  //  document.body.removeChild(timer);
-}
 const flipCardClose=(card)=>{
   card.classList.remove('openCard');
   card.innerText = '';
@@ -155,13 +140,13 @@ const squareClick = (cardElement, column, row) => {
     ) {
       winRecord += 1;
       console.log(winRecord)
-      winsOutput(winRecord,totalMatches);
+     
        setTimeout(() => { 
-            output('match');
+       output('match');
       }, timeLag);
-  
-      
 
+       winsOutput(winRecord,totalMatches);
+  
       // turn this card over
     } else {
       canClick = false;
@@ -205,7 +190,6 @@ const buildBoardElements = (refBoard) => {
 
       // set a class for CSS purposes
       square.classList.add('square');
-      // square.appendChild(createCard(refCard));
       // set the click event
       // eslint-disable-next-line
       square.addEventListener('click', (event) => {
@@ -247,18 +231,20 @@ const startWithName = () => {
   const inputButton = document.createElement('button');
 
   inputName.type = 'text';
-  inputName.placeholder = 'Your name';
-  inputButton.innerText = 'Submit';
+  inputName.placeholder = username;
+  inputButton.innerText = 'Start';
   document.body.appendChild(inputName);
   document.body.appendChild(inputButton);
   output(`Please enter your name`);
   inputButton.addEventListener('click', () =>
   {
-    username = inputName.value;
+    username = inputName.value||username;
     console.log(username);
     document.body.removeChild(inputName);
     document.body.removeChild(inputButton);
+    canClick=true;
     output(`Game start: ${username} can start matching!`);
+    timerSet = createTimerToEnd(5, boardEl);
   });
   return startTable();
 };
@@ -277,11 +263,43 @@ const endGame=(domToRemove)=>{
       winGames+=1;
     }
     else {
-      output('GAME OVER 👿');
+      lostFunc();
       lostGames+=1;
     }
     winRecord=0;
     resetGame();
+}
+
+const winsOutput = (winRecord,totalMatches) =>
+{
+  console.log(`Wins: ${winRecord}/${totalMatches}  `)
+  winContainer.innerText = `Wins: ${winRecord}/${totalMatches}  Win games: ${winGames}  Loss games: ${lostGames}`;
+  setTimeout(() => {
+       
+        if (winRecord === totalMatches)
+        {
+          gameState='win';
+          clearInterval(timerInterval);
+          endGame(boardEl);
+        }
+        // else output('first turn');
+       }, timeLag);
+};
+const winFunc=()=>
+{
+   output(`${username} Win! 🎉`);
+   const splitTime=document.createElement('p');
+   const splitTimeString= `${username} completed with ${document.getElementById('timerString').innerHTML}`
+   splitTime.innerText=splitTimeString
+   splitTimes.appendChild(splitTime);
+}
+const lostFunc=()=>{
+   output('GAME OVER 👿');
+   const splitTime=document.createElement('p');
+   const splitTimeString= `${username} lost `
+   splitTime.innerText=splitTimeString
+   splitTimes.appendChild(splitTime);
+
 }
 const hoursMinSecFromMs=(s)=>{
   let hours= Math.floor(s/3600);
@@ -291,61 +309,59 @@ const hoursMinSecFromMs=(s)=>{
   return `${hours}hours ${minutes}mins ${secs}s left`;
 }
 const resetGame=()=>{
-  
   setTimeout(()=>{
-    canClick=true;
+    canClick=false;
     clearBody();
     initGame();
   },3000)
-      
-     
 }
-const createTimerToEnd=(duration, domToRemove)=>{
-  timer.innerHTML='';
-  const delayInMilliseconds = 1000;
-  const timerOutput=document.createElement('span');
-  timerOutput.innerText = hoursMinSecFromMs(duration)
-
-  const pauseButton= document.createElement('button');
-  pauseButton.innerText='pause';
+const pausableTimer=(duration, timerOutput,pauseButton, domToRemove)=>
+{ 
+  // splitTimeSec=duration;
   let isPaused=false;
-
-  const ref = setInterval(() => {
-    
-    timerOutput.innerText =  hoursMinSecFromMs(duration);
+  const delayInMilliseconds = 1000;
+  timerInterval = setInterval(() => {
+  timerOutput.innerText =  hoursMinSecFromMs(duration);
     if (duration <= 0) {
-      clearInterval(ref);
+      clearInterval(timerInterval);
       endGame(domToRemove);
     }
     duration -= 1;
   }, delayInMilliseconds);
 
-  pauseButton.addEventListener('click', ()=>{
-    
+  pauseButton.addEventListener('click', ()=>{   
     if(!isPaused){
-      clearInterval(ref)
+      clearInterval(timerInterval)
       isPaused=true;
+      canClick=false;
       pauseButton.innerText='un-pause';
     }
     else{
-        const ref2 = setInterval(() => {
-        timerOutput.innerText =  hoursMinSecFromMs(duration);
-        if (duration <= 0) {
-           clearInterval(ref2);
-           endGame(domToRemove);
-
-        }
-        duration -= 1;
-  }, delayInMilliseconds);
+      pausableTimer(duration, timerOutput,pauseButton, domToRemove);   
       pauseButton.innerText='pause';
       isPaused=false;
+      canClick=true;
     }
-    
-
   });
-  timer.appendChild(timerOutput);
-  timer.appendChild(pauseButton);
-  return timer;
+  // splitTimeSec-=duration;
+}
+
+const createTimerToEnd=(duration, domToRemove)=>{
+  timerSet.innerHTML='';
+ 
+  const timerOutput=document.createElement('span');
+  timerOutput.id='timerString';
+  timerOutput.innerText = hoursMinSecFromMs(duration)
+
+  const pauseButton= document.createElement('button');
+  pauseButton.innerText='pause';
+
+  //timer display
+  pausableTimer(duration, timerOutput,pauseButton, domToRemove)
+  
+  timerSet.appendChild(timerOutput);
+  timerSet.appendChild(pauseButton);
+  return timerSet;
 }
 const initGame = () => {
   // ASK FOR USERNAME
@@ -357,16 +373,16 @@ const initGame = () => {
   sweHeader.innerHTML='<h1 id="header">SWE101! 🚀</h1>'
  
   document.body.appendChild(sweHeader);
-  const boardEl = startWithName();
+  boardEl = startWithName();
   document.body.appendChild(boardEl);
   document.body.appendChild(outputContainer);
   console.log(winContainer)
   document.body.appendChild(winContainer);
-  const timer = createTimerToEnd(5, boardEl);
+  
   //upthere is functionality where timer is removed when player win on matching
   //However, if timer is created here and above, the document is able to remove the timer. is this like the issue of prototypes in C?
-  document.body.appendChild(timer);  
-
+  document.body.appendChild(timerSet);  
+  document.body.appendChild(splitTimes);
  
 };
 const clearBody=()=>{
