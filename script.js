@@ -1,7 +1,7 @@
 // ###### set global variables ######
 // #################################
 
-const boardSize = 4;
+const boardSize = 2;
 let board = [];
 let firstCard = null;
 let firstCardElement;
@@ -9,7 +9,9 @@ let deck;
 let userName;
 let score = 0;
 let numberOfMatches = 0;
-let gameTime;
+let gameTime = 180;
+const minutes = Number(Math.floor(gameTime / 60));
+const seconds = (Number(gameTime % 60));
 
 // define DOM elements with ID
 const gameInfo = document.createElement('div');
@@ -117,10 +119,10 @@ const getRandomIndex = (max) => Math.floor(Math.random() * max);
 
 // functions to help display messages
 const output = (message) => {
-  gameInfo.innerText = message;
+  gameInfo.innerHTML = message;
 };
 const output2 = (message) => {
-  gameInfo2.innerText = message;
+  gameInfo2.innerHTML = message;
 };
 
 // function to get DOM element by ID
@@ -153,7 +155,9 @@ const resetGame = () => {
 
 // function to set the Timer
 const ref = setInterval(() => {
-  timer.innerText = `You have ${gameTime}secs to complete this game`;
+  const minutes = Number(Math.floor(gameTime / 60));
+  const seconds = Number(gameTime % 60);
+  timer.innerHTML = `⏱ You have ${minutes}:${seconds} mins to complete this game⏱`;
   if (gameTime <= 0) {
     clearInterval(ref);
   }
@@ -168,7 +172,7 @@ const squareClick = (cardElement, column, row) => {
   const clickedCard = board[column][row];
 
   // the user already clicked on this square
-  if (cardElement.innerText !== '') {
+  if (cardElement.innerHTML !== '') {
     output('Please select your second square');
     return;
   }
@@ -177,7 +181,7 @@ const squareClick = (cardElement, column, row) => {
     console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
-    cardElement.innerText = cardDisplay(clickedCard);
+    cardElement.innerHTML = cardDisplay(clickedCard);
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
@@ -193,10 +197,10 @@ const squareClick = (cardElement, column, row) => {
     ) {
       console.log('match');
       // turn this card over
-      cardElement.innerText = cardDisplay(clickedCard);
+      cardElement.innerHTML = cardDisplay(clickedCard);
       // message to guide user
       output('Great! Lets go again!');
-      output2('You have a match!!🥳');
+      output2('YOU HAVE A MATCH!🥳');
       setTimeout(() => {
         output2('');
       }, 1000);
@@ -204,19 +208,19 @@ const squareClick = (cardElement, column, row) => {
       numberOfMatches += 1;
     } else {
       console.log('NOT a match');
-      cardElement.innerText = cardDisplay(clickedCard);
+      cardElement.innerHTML = cardDisplay(clickedCard);
       setTimeout(() => {
-        cardElement.innerText = '';
+        cardElement.innerHTML = '';
       }, 1000);
       // turn this card back over
-      firstCardElement.innerText = '';
+      firstCardElement.innerHTML = '';
       output('Sorry not a match. Lets try again!');
     }
 
     // when all matches are made, display message and score
     if (numberOfMatches === ((boardSize * boardSize) / 2)) {
       score += 1;
-      output(`You won🍾🎉! Your current score is ${score}`);
+      output(`🍾🎉 YOU WON 🍾🎉 <br><br> Your current score is ${score}`);
       output2('');
       console.log('score', score);
       setTimeout(() => {
@@ -280,17 +284,17 @@ const buildBoardElements = (board) => {
 // username funtion, for user to input their username
 const userNameGame = () => {
   // generate reset button
-  resetButton.innerText = 'Reset';
+  resetButton.innerHTML = 'Reset';
   document.body.appendChild(resetButton);
   resetButton.addEventListener('click', resetGame);
 
-  gameInfo.innerText = 'Let us know your name.';
+  gameInfo.innerHTML = 'Let us know your name.';
   document.body.appendChild(gameInfo);
 
   // input field to put name
   document.body.appendChild(field);
 
-  submitButton.innerText = 'Submit';
+  submitButton.innerHTML = 'Submit';
   document.body.appendChild(submitButton);
   submitButton.addEventListener('click', capture);
 };
@@ -317,17 +321,17 @@ const initGame = () => {
   gameTime = 180;
 
   // generate timer message that counts down
-  timer.innerText = `You have ${gameTime}secs to complete this game`;
+  timer.innerHTML = `⏱ You have ${minutes}:${seconds} mins to complete this game⏱`;
   document.body.appendChild(timer);
 
   const boardEl = buildBoardElements(board);
   boardEl.setAttribute('id', 'boardEl');
   document.body.appendChild(boardEl);
 
-  gameInfo.innerText = `Hello ${userName}. Click on a square to begin!`;
+  gameInfo.innerHTML = `Hello ${userName}. Click on a square to begin!`;
   document.body.appendChild(gameInfo);
 
-  gameInfo2.innerText = '';
+  gameInfo2.innerHTML = '';
   document.body.appendChild(gameInfo2);
 };
 
