@@ -1,3 +1,116 @@
 body {
-  background-color: pink;
+  background-color: rgb(12, 120, 170);
+}
+
+#header {
+  font-family: "Amatic SC", cursive;
+  color: white;
+  font-size: 4em;
+  text-align: center;
+}
+
+.board {
+  margin: 2px auto;
+  text-align: center;
+}
+
+.row {
+  position: relative;
+  max-width: 500px;
+  margin: 2px auto;
+}
+
+.square {
+  font-family: Impact;
+  font-size: 1.5rem;
+  padding: 15px;
+  margin: 12px;
+  height: 12px;
+  width: 12px;
+  position: relative;
+  background-color: white;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  border-style: ridge;
+}
+
+.cards-match {
+  font-family: Impact;
+  font-size: 1.5rem;
+  padding: 15px;
+  margin: 12px;
+  background-color: coral;
+  color: white;
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+  vertical-align: top;
+  text-align: center;
+  border-style: ridge;
+}
+
+.game-info {
+  font-family: "Amatic SC", cursive;
+  color: white;
+  letter-spacing: 0.2rem;
+  font-size: 2rem;
+  border: black solid;
+  height: 50px;
+  text-align: center;
+}
+
+#input-name {
+  font-family: "Amatic SC", cursive;
+  text-align: center;
+  height: auto;
+  width: 25%;
+  margin-right: 10px;
+}
+
+#submit-button {
+  font-family: "Amatic SC", cursive;
+  text-align: center;
+  height: auto;
+}
+
+.player-info {
+  color: gold;
+  text-align: left;
+}
+
+.start-msg {
+  color: rgb(12, 12, 12);
+  font-family: "Amatic SC", cursive;
+  text-align: center;
+  font-size: 2rem;
+}
+
+.match-msg {
+  color: rgb(251, 85, 24);
+  font-family: "Amatic SC", cursive;
+  font-size: 50px;
+  text-align: center;
+  text-shadow: 1px 1px 1px #000000;
+}
+
+.win-msg {
+  color: gold;
+  font-family: Impact;
+  font-size: 65px;
+  text-align: center;
+  text-shadow: 2px 2px 2px #000000;
+}
+
+.reset-button {
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.1rem;
+  color: white;
+  background-color: orangered;
+  border-radius: 20px;
+  display: block;
+  margin: 10px auto;
+  padding: 10px 40px;
+  border-style: dotted;
 }
