@@ -123,7 +123,11 @@ const squareClick = (cardElement, column, row) => {
       clickedCard.suit === firstCard.suit
     ) {
       console.log("match");
-      stateElement.innerText += ' Yay, it was a match! Click another card to start matching again.';
+    
+      stateElement.innerText = 'You clicked your second card. Yay, it was a match!';
+
+      //Remove the match message after 3 seconds
+      setTimeout(() => {stateElement.innerText = 'Click another card to start matching again.';}, 3000);
 
       // turn this card over
       cardElement.innerText = `${clickedCard.name} ${clickedCard.suitIcon}`;
@@ -135,7 +139,7 @@ const squareClick = (cardElement, column, row) => {
       firstCardElement.innerText = `${firstCard.name} ${firstCard.suitIcon}`;
       cardElement.innerText = `${clickedCard.name} ${clickedCard.suitIcon}`;
 
-      //show cards for only 3 seconds, then turn both cads over
+      //show cards for only 3 seconds, then turn both cards over
       setTimeout(() => {
       firstCardElement.innerText = "";
       cardElement.innerText = '';}, 3000);
