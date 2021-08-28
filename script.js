@@ -108,6 +108,8 @@ let firstCardElement;
 let deck;
 let canClick = true;
 
+const timer = document.createElement('div');
+
 // =============== GAMEPLAY LOGIC ==================
 const squareClick = (cardElement, column, row) => {
   // console.log(cardElement);
@@ -220,7 +222,9 @@ const buildBoardElements = () => {
 };
 
 const initGame = () => {
-  gameInfo.innerHTML = 'Find all matching pairs of cards in the board below!<br>Click on any of the cards below to begin.';
+  document.body.appendChild(timer);
+
+  gameInfo.innerHTML = 'You have 3 minutes to find all matching pairs of cards in the board below!<br>Click on any of the cards below to begin.';
   gameInfo.classList.add('info');
   document.body.appendChild(gameInfo);
 
@@ -247,3 +251,16 @@ const initGame = () => {
 
 buildBoardElements();
 initGame();
+
+// const countdown = () => {
+const delayInMs = 1000;
+let counter = 181;
+
+const ref = setInterval(() => {
+  counter -= 1;
+  timer.innerHTML = `Timer: ${counter}`;
+  timer.classList.add('countdown');
+
+  if (counter <= 0) {
+    clearInterval(ref); } }, delayInMs);
+// };

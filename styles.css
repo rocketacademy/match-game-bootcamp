@@ -61,3 +61,16 @@ body {
 
   vertical-align: middle;
 }
+
+.countdown {
+  margin: auto;
+  padding: 10px;
+  background-color: black;
+  color: white;
+  font-size: 20px;
+  height: fit-content;
+  border-radius: 8px;
+  width: fit-content;
+  display: block;
+  position: absolute;
+}
