@@ -107,6 +107,7 @@ let firstCard = null;
 let firstCardElement;
 let deck;
 let canClick = true;
+let numPairs = 0;
 
 const timer = document.createElement('div');
 
@@ -144,9 +145,16 @@ const squareClick = (cardElement, column, row) => {
         && clickedCard.suit === firstCard.suit
       ) {
         canClick = false;
+        numPairs += 1;
 
         setTimeout(() => {
-          output('Click on any card to continue pairing all cards in the board.');
+          if (numPairs === 8 && counter < 181) {
+            clearInterval(ref);
+            timer.remove();
+            output('Congratulations, you win!');
+            gameInfo.classList.add('outcome');
+          } else {
+            output('Click on any card to continue pairing all cards in the board.'); }
           canClick = true;
         }, 3000);
 
@@ -254,13 +262,22 @@ initGame();
 
 // const countdown = () => {
 const delayInMs = 1000;
-let counter = 181;
+let counter = 81;
 
 const ref = setInterval(() => {
   counter -= 1;
   timer.innerHTML = `Timer: ${counter}`;
   timer.classList.add('countdown');
 
-  if (counter <= 0) {
-    clearInterval(ref); } }, delayInMs);
+  if (counter <= 10) {
+    timer.style.backgroundColor = 'red';
+  }
+
+  if (counter <= 0 && canClick) {
+    clearInterval(ref);
+    timer.remove();
+    if (counter <= 0 && numPairs < 8) { output('TIME\'S UP. YOU LOSE!');
+      gameInfo.classList.add('outcome');
+      gameInfo.style.backgroundColor = 'red'; } } }, delayInMs);
+
 // };

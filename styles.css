@@ -74,3 +74,13 @@ body {
   display: block;
   position: absolute;
 }
+
+.outcome {
+  font-weight: bold;
+  background-color: chartreuse;
+  color: black;
+  font-size: 30px;
+  padding: 10px 0px 0px;
+  text-align: center;
+  vertical-align: middle;
+}
