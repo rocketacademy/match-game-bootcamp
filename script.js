@@ -106,6 +106,7 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let canClick = true;
 
 // =============== GAMEPLAY LOGIC ==================
 const squareClick = (cardElement, column, row) => {
@@ -120,42 +121,50 @@ const squareClick = (cardElement, column, row) => {
     return;
   }
 
-  // first turn
-  if (firstCard === null) {
-    console.log('first turn');
-    firstCard = clickedCard;
-    // turn this card over
-    cardElement.innerHTML = `${firstCard.displayName}<br>${firstCard.suitSymbol}`;
-    cardElement.classList.add('squareFace', firstCard.suitColour);
-    output('Click on another card to find its matching pair.');
+  if (canClick === true) {
+    // first turn
+    if (firstCard === null) {
+      console.log('first turn');
+      firstCard = clickedCard;
+      // turn this card over
+      cardElement.innerHTML = `${firstCard.displayName}<br>${firstCard.suitSymbol}`;
+      cardElement.classList.add('squareFace', firstCard.suitColour);
+      output('Click on another card to find its matching pair.');
 
-    // hold onto this for later when it may not match
-    firstCardElement = cardElement;
+      // hold onto this for later when it may not match
+      firstCardElement = cardElement;
 
     // second turn
-  } else {
-    console.log('second turn');
-    if (
-      clickedCard.displayName === firstCard.displayName
-        && clickedCard.suit === firstCard.suit
-    ) {
-      output('You\'ve got match!<br>Click on any card to continue pairing all cards in the board.');
-      console.log('match');
-
-      // turn this card over
-      cardElement.innerHTML = `${clickedCard.displayName}<br>${clickedCard.suitSymbol}`;
-      cardElement.classList.add('squareFace', firstCard.suitColour);
     } else {
-      output('Oops, that wasn\'t a match.<br>Click on any card to continue.');
-      console.log('NOT a match');
+      console.log('second turn');
+      if (
+        clickedCard.displayName === firstCard.displayName
+        && clickedCard.suit === firstCard.suit
+      ) {
+        output('You\'ve got match!<br>Click on any card to continue pairing all cards in the board.');
+        console.log('match');
 
-      // turn this card back over
-      firstCardElement.innerText = '';
-      firstCardElement.classList.remove('squareFace');
-    }
+        // turn this card over
+        cardElement.innerHTML = `${clickedCard.displayName}<br>${clickedCard.suitSymbol}`;
+        cardElement.classList.add('squareFace', firstCard.suitColour);
+      } else {
+        output('Oops, that wasn\'t a match.');
+        console.log('NOT a match');
+        canClick = false;
+        // turn this card over
+        cardElement.innerHTML = `${clickedCard.displayName}<br>${clickedCard.suitSymbol}`;
+        cardElement.classList.add('squareFace', firstCard.suitColour);
 
-    // reset the first card
-    firstCard = null;
+        setTimeout(() => {
+          // turn this card back over
+          firstCardElement.innerText = '';
+          firstCardElement.classList.remove('squareFace');
+          cardElement.innerText = '';
+          cardElement.classList.remove('squareFace');
+          output('Click on any card to continue.');
+          canClick = true; }, 3000); }
+      // reset the first card
+      firstCard = null; }
   }
 };
 
