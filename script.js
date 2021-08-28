@@ -7,7 +7,7 @@ let deck;
 
 //create element that displays the state of game
 const stateElement = document.createElement('p');
-stateElement.innerText = 'Welcome! Please click your first card.';
+stateElement.innerText = 'Welcome! You have 3 minutes to match all cards, your time starts now! Please click your first card.';
 
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
 const getRandomIndex = (max) => Math.floor(Math.random() * max);
@@ -210,9 +210,12 @@ const initGame = () => {
     }
   }
 
-  const boardEl = buildBoardElements(board);
+  let boardEl = buildBoardElements(board);
 
   document.body.appendChild(boardEl);
+  
+  //remove all board elements once 3 mins is up
+  setTimeout(() => boardEl.innerText = 'Oh no, 3 mins is up! You didnt complete the game in time :(', 1000*3*60);
 };
 
 initGame();
