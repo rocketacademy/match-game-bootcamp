@@ -141,7 +141,14 @@ const squareClick = (cardElement, column, row) => {
         clickedCard.displayName === firstCard.displayName
         && clickedCard.suit === firstCard.suit
       ) {
-        output('You\'ve got match!<br>Click on any card to continue pairing all cards in the board.');
+        canClick = false;
+
+        setTimeout(() => {
+          output('Click on any card to continue pairing all cards in the board.');
+          canClick = true;
+        }, 3000);
+
+        output('Nice! You\'ve got a match!');
         console.log('match');
 
         // turn this card over
