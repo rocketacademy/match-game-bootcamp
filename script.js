@@ -127,6 +127,7 @@ const squareClick = (cardElement, column, row) => {
     // turn this card over
     cardElement.innerHTML = `${firstCard.displayName}<br>${firstCard.suitSymbol}`;
     cardElement.classList.add('squareFace', firstCard.suitColour);
+    output('Click on another card to find its matching pair.');
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
@@ -138,12 +139,14 @@ const squareClick = (cardElement, column, row) => {
       clickedCard.displayName === firstCard.displayName
         && clickedCard.suit === firstCard.suit
     ) {
+      output('You\'ve got match!<br>Click on any card to continue pairing all cards in the board.');
       console.log('match');
 
       // turn this card over
       cardElement.innerHTML = `${clickedCard.displayName}<br>${clickedCard.suitSymbol}`;
       cardElement.classList.add('squareFace', firstCard.suitColour);
     } else {
+      output('Oops, that wasn\'t a match.<br>Click on any card to continue.');
       console.log('NOT a match');
 
       // turn this card back over
@@ -201,7 +204,7 @@ const buildBoardElements = () => {
 };
 
 const initGame = () => {
-  gameInfo.innerHTML = 'Find all matching pairs of cards in the board below!';
+  gameInfo.innerHTML = 'Find all matching pairs of cards in the board below!<br>Click on any of the cards below to begin.';
   gameInfo.classList.add('info');
   document.body.appendChild(gameInfo);
 
