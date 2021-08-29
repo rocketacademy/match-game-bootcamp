@@ -239,6 +239,12 @@ const initGame = () => {
 
   gameInfo.innerText = 'Select the first card to begin.';
   document.body.appendChild(gameInfo);
+
+  // Set up a timer for 3mins. Once 3mins is up, the board will disappear.
+  setTimeout(() => {
+    boardEl.innerHTML = '';
+    messageDisplay('Time\'s up! Better luck next time!');
+  }, 180000);
 };
 
 initGame();
