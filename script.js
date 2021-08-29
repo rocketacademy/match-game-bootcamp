@@ -157,7 +157,7 @@ const resetGame = () => {
 const ref = setInterval(() => {
   const minutes = Number(Math.floor(gameTime / 60));
   const seconds = Number(gameTime % 60);
-  timer.innerHTML = `⏱ You have ${minutes}:${seconds} mins to complete this game⏱`;
+  timer.innerHTML = `⏱ You have ${minutes}:${seconds} mins to complete this game ⏱`;
   if (gameTime <= 0) {
     clearInterval(ref);
   }
@@ -225,7 +225,7 @@ const squareClick = (cardElement, column, row) => {
       console.log('score', score);
       setTimeout(() => {
         output('');
-      }, 2000);
+      }, 5000);
     }
     // reset first card
     firstCard = null;
@@ -321,14 +321,14 @@ const initGame = () => {
   gameTime = 180;
 
   // generate timer message that counts down
-  timer.innerHTML = `⏱ You have ${minutes}:${seconds} mins to complete this game⏱`;
+  timer.innerHTML = `⏱ You have ${minutes}:${seconds} mins to complete this game ⏱`;
   document.body.appendChild(timer);
 
   const boardEl = buildBoardElements(board);
   boardEl.setAttribute('id', 'boardEl');
   document.body.appendChild(boardEl);
 
-  gameInfo.innerHTML = `Hello ${userName}. Click on a square to begin!`;
+  gameInfo.innerHTML = `Hello 👋🏻 ${userName}. Click on a square to begin!`;
   document.body.appendChild(gameInfo);
 
   gameInfo2.innerHTML = '';

@@ -1,5 +1,5 @@
 body {
-  background-color: pink;
+  background-color: rgb(192, 215, 255);
 }
 .square {
   padding: 10px;
@@ -19,7 +19,6 @@ body {
   margin: 5px;
   font-size: 24px;
   font-weight: bold;
-  font-family: sans-serif;
 }
 
 .red {
@@ -39,4 +38,29 @@ button {
 input {
   margin-top: 5px;
   margin-bottom: 5px;
+}
+
+#gameInfo {
+  font-family: Arial, Helvetica, sans-serif;
+}
+#gameInfo2 {
+  font-family: Arial, Helvetica, sans-serif;
+}
+#timer {
+  font-family: Arial, Helvetica, sans-serif;
+}
+#reset {
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 2px 4px 2px 4px;
+  font-size: 15px;
+}
+#submit {
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 2px 4px 2px 4px;
+  font-size: 15px;
+}
+#userInput {
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 2px 4px 2px 4px;
+  font-size: 15px;
 }
