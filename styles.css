@@ -14,7 +14,7 @@ body {
 }
 
 .card {
-  margin: 10px;
+  margin: auto;
   padding: 10px;
   background-color: grey;
   width: 50px;
@@ -37,4 +37,13 @@ body {
 
 .red {
   color: red;
+}
+
+.black {
+  color: black;
+}
+
+.message-display {
+  font-size: 20px;
+  font-family: monospace;
 }

@@ -1,23 +1,32 @@
 // ========================== VARIABLES DECLARATION ==========================
 
 // boardSize has to be an even number
-const boardSize = 4;
+const boardSize = 2;
 const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+const gameInfo = document.createElement('div');
+gameInfo.classList.add('message-display');
 
 // ========================== DECK CREATION FUNCTION ==========================
 
 const makeDeck = () => {
   // create the empty deck at the beginning
   const newDeck = [];
-  const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
+  const suits = ['❤️', '♦️', '♣️', '♠️'];
 
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
+    let cardColor;
     // make a variable of the current suit
     const currentSuit = suits[suitIndex];
-    console.log(`current suit: ${currentSuit}`);
+
+    // Assign color of the card according to the suits.
+    if (currentSuit === '❤️' || currentSuit === '♦️') {
+      cardColor = 'red';
+    } else {
+      cardColor = 'black';
+    }
 
     // loop to create all cards in this suit
     // rank 1-13
@@ -27,23 +36,22 @@ const makeDeck = () => {
 
       // 1, 11, 12 ,13
       if (cardName === '1') {
-        cardName = 'ace';
+        cardName = 'A';
       } else if (cardName === '11') {
-        cardName = 'jack';
+        cardName = 'J';
       } else if (cardName === '12') {
-        cardName = 'queen';
+        cardName = 'Q';
       } else if (cardName === '13') {
-        cardName = 'king';
+        cardName = 'K';
       }
 
       // make a single card object variable
       const card = {
-        name: cardName,
-        suit: currentSuit,
+        displayName: cardName,
+        suitSymbol: currentSuit,
         rank: rankCounter,
+        color: cardColor,
       };
-
-      console.log(`rank: ${rankCounter}`);
 
       // add the card to the deck
       newDeck.push(card); // add double the cards to the deck
@@ -75,7 +83,33 @@ const shuffleCards = (cards) => {
   return cards;
 };
 
+// Create DOM element with card visual
+const createCard = (cardInfo) => {
+  const suit = document.createElement('div');
+  suit.classList.add('suit');
+  suit.innerText = cardInfo.suitSymbol;
+
+  const name = document.createElement('div');
+  name.classList.add(cardInfo.displayName, cardInfo.color);
+  name.innerText = cardInfo.displayName;
+
+  const card = document.createElement('div');
+  card.classList.add('card');
+
+  card.appendChild(name);
+  card.appendChild(suit);
+
+  return card;
+};
+
 // ========================== GAMEPLAY LOGIC ==========================
+
+// Function to create game state message.
+const messageDisplay = (message) => {
+  gameInfo.innerText = message;
+};
+
+// Function to check card match and turn cards over.
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
 
@@ -95,27 +129,41 @@ const squareClick = (cardElement, column, row) => {
     console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
-    cardElement.innerText = firstCard.name;
+    cardElement.appendChild(createCard(firstCard));
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
 
+    // Update game state message after first card selected.
+    messageDisplay('Select the next card.');
+
     // second turn
   } else {
     console.log('second turn');
+
     if (
-      clickedCard.name === firstCard.name
-        && clickedCard.suit === firstCard.suit
+      clickedCard.displayName === firstCard.displayName
+        && clickedCard.suitSymbol === firstCard.suitSymbol
     ) {
       console.log('match');
+      messageDisplay('You found a match!');
 
       // turn this card over
-      cardElement.innerText = clickedCard.name;
+      cardElement.appendChild(createCard(clickedCard));
     } else {
       console.log('NOT a match');
+      messageDisplay('Oops, no match! Try again!');
 
-      // turn this card back over
-      firstCardElement.innerText = '';
+      // turn the second card over for 3s
+      cardElement.appendChild(createCard(clickedCard));
+      setTimeout(() => {
+        cardElement.innerText = '';
+      }, 3000);
+
+      // turn the first card back over after 3 s
+      setTimeout(() => {
+        firstCardElement.innerText = '';
+      }, 3000);
     }
 
     // reset the first card
@@ -185,6 +233,9 @@ const initGame = () => {
   const boardEl = buildBoardElements(board);
 
   document.body.appendChild(boardEl);
+
+  gameInfo.innerText = 'Select the first card to begin.';
+  document.body.appendChild(gameInfo);
 };
 
 initGame();
