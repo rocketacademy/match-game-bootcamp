@@ -2,12 +2,15 @@
 
 // boardSize has to be an even number
 const boardSize = 2;
-const board = [];
+let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
 const gameInfo = document.createElement('div');
 gameInfo.classList.add('message-display');
+let userName = '';
+let numMatches = 0;
+let totalWin = 0;
 
 // ========================== DECK CREATION FUNCTION ==========================
 
@@ -146,10 +149,21 @@ const squareClick = (cardElement, column, row) => {
         && clickedCard.suitSymbol === firstCard.suitSymbol
     ) {
       console.log('match');
-      messageDisplay('You found a match!');
-      setTimeout(() => {
-        messageDisplay('');
-      }, 3000);
+      numMatches += 1;
+
+      // If player has matched all cards, he has won this round, display a winning message.
+      if (numMatches === (boardSize ** 2) / 2) {
+        totalWin += 1;
+        messageDisplay(`${userName}!! You have matched all cards! You win!!`);
+        setTimeout(() => {
+          messageDisplay(`You have won the game ${totalWin} times. Click reset to play again!`);
+        }, 5000);
+      } else {
+        messageDisplay('You found a match!');
+        setTimeout(() => {
+          messageDisplay('');
+        }, 3000);
+      }
 
       // turn this card over
       cardElement.appendChild(createCard(clickedCard));
@@ -218,7 +232,28 @@ const buildBoardElements = (inpuBoard) => {
   return boardElement;
 };
 
-const initGame = () => {
+const getName = () => {
+  messageDisplay('Please input your name :)');
+
+  const userNameInput = document.createElement('input');
+  userNameInput.setAttribute('placeholder', 'Your Name');
+
+  const submitButton = document.createElement('button');
+  submitButton.innerText = 'Submit';
+  submitButton.addEventListener('click', () => {
+    userName = userNameInput.value;
+    // Remove the name input and submit buttons.
+    userNameInput.remove();
+    submitButton.remove();
+    initGame();
+  });
+
+  document.body.appendChild(gameInfo);
+  document.body.appendChild(userNameInput);
+  document.body.appendChild(submitButton);
+};
+
+const gamePlay = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   const doubleDeck = makeDeck();
@@ -234,17 +269,43 @@ const initGame = () => {
   }
 
   const boardEl = buildBoardElements(board);
+  boardEl.setAttribute('id', 'main-board');
 
   document.body.appendChild(boardEl);
 
-  gameInfo.innerText = 'Select the first card to begin.';
+  gameInfo.innerText = `Hello ${userName}! Select the first card to begin.`;
   document.body.appendChild(gameInfo);
 
   // Set up a timer for 3mins. Once 3mins is up, the board will disappear.
   setTimeout(() => {
-    boardEl.innerHTML = '';
-    messageDisplay('Time\'s up! Better luck next time!');
+    if (totalWin === 0) {
+      boardEl.innerHTML = '';
+      messageDisplay(`Sorry ${userName}... Time's up! Better luck next time!`);
+    } else {
+      boardEl.innerHTML = '';
+      messageDisplay(`Thanks for playing ${userName}! Time's up! You won ${totalWin} times! Nice!`);
+    }
   }, 180000);
+};
+
+const initGame = () => {
+  // Create a reset game button, will reset current grid on click.
+  const resetButton = document.createElement('button');
+  resetButton.innerText = 'Reset this game';
+  resetButton.addEventListener('click', () => {
+    document.querySelector('#main-board').remove();
+    board = [];
+    numMatches = 0;
+    gamePlay();
+  });
+
+  // If player name is not recorded, Get player to input their name.
+  if (userName === '') {
+    getName();
+  } else {
+    gamePlay();
+    document.body.appendChild(resetButton);
+  }
 };
 
 initGame();
