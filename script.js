@@ -112,6 +112,7 @@ let input;
 let playerName;
 let counter;
 let ref;
+const boardElement = document.createElement('div');
 
 const boardContainer = document.createElement('div');
 
@@ -131,7 +132,17 @@ const resetButton = document.createElement('button');
 resetButton.innerText = 'Reset Game';
 resetButton.classList.add('resetButton', 'wrapper');
 
+const timerCon = document.createElement('div');
+timerCon.classList.add('timerCon');
+
 const timer = document.createElement('div');
+
+const resetContainer = document.createElement('div');
+resetContainer.classList.add('wrapper');
+
+const reset = document.createElement('button');
+reset.innerText = 'Reset Game';
+reset.classList.add('resetButton');
 
 const countdown = () => {
   const delayInMs = 1000;
@@ -233,7 +244,6 @@ const squareClick = (cardElement, column, row) => {
 // return the built board
 const buildBoardElements = () => {
   // create the element that everything will go inside of
-  const boardElement = document.createElement('div');
 
   // give it a class for CSS purposes
   boardElement.classList.add('board');
@@ -272,13 +282,17 @@ const buildBoardElements = () => {
   return boardElement;
 };
 
-// const gameReset = () => {
-//   boardContainer.remove();
-//   clearInterval(ref);
-//   timer.remove();
-//   inputContainer.remove();
-//   initGame();
-// };
+const gameReset = () => {
+  if (canClick) {
+    clearInterval(ref);
+    timer.remove();
+    inputField.value = '';
+    boardElement.innerHTML = '';
+    board.splice(0, board.length);
+    reset.remove();
+    // inputContainer.remove();
+    initGame(); }
+};
 
 const submitClick = () => {
   input = inputField.value;
@@ -288,16 +302,16 @@ const submitClick = () => {
   countdown();
   gameInfo.innerHTML = `Hello ${playerName}!<br>You have 3 minutes to find all matching pairs of cards in the board below!<br>Click on any of the cards below to begin.`;
   const boardEl = buildBoardElements(board);
+  timerCon.appendChild(timer);
+  resetContainer.appendChild(reset);
   boardContainer.appendChild(boardEl);
-  // document.body.appendChild(resetButton);
-  // resetButton.addEventListener('click', gameReset);
+
+  reset.addEventListener('click', gameReset);
 };
 
 // =============== GAME INITIALIZATION ===================
 
 const initGame = () => {
-  document.body.appendChild(timer);
-
   gameInfo.innerHTML = 'Enter player name to begin game';
   gameInfo.classList.add('info');
   document.body.appendChild(gameInfo);
@@ -308,6 +322,8 @@ const initGame = () => {
   submitButton.addEventListener('click', submitClick);
 
   document.body.appendChild(boardContainer);
+  document.body.appendChild(timerCon);
+  document.body.appendChild(resetContainer);
 
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
