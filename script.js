@@ -5,6 +5,7 @@ let firstCard = null;
 let firstCardElement;
 let deck;
 let canClick = true;
+const gameMsg = document.createElement('div');
 
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
@@ -20,6 +21,7 @@ const squareClick = (cardElement, column, row) => {
 
   if (firstCard === null) {
     console.log('first turn');
+    gameMsg.innerText = 'Choose your second card!';
     firstCard = clickedCard;
     cardElement.innerText = `${firstCard.suit}${firstCard.name}`;
     firstCardElement = cardElement;
@@ -32,12 +34,15 @@ const squareClick = (cardElement, column, row) => {
         && clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
+      gameMsg.innerText = "It's a match! Choose another card!";
     } else {
       console.log('NOT a match');
+      gameMsg.innerText = 'Meh. No match.';
       setTimeout(() => {
         canClick = true;
         firstCardElement.innerText = '';
         cardElement.innerText = '';
+        gameMsg.innerText = 'Choose another card!';
       }, 3000);
     }
     firstCard = null;
@@ -132,6 +137,10 @@ const buildBoardElements = (board) => {
 };
 
 const initGame = () => {
+  gameMsg.classList.add('message');
+  gameMsg.innerText = 'Welcome to Match Game! Click any card to begin.';
+  document.body.appendChild(gameMsg);
+
   const doubleDeck = makeDeck();
   const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
   deck = shuffleCards(deckSubset);
