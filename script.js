@@ -1,13 +1,43 @@
 // boardSize has to be an even number
 const boardSize = 4;
-const board = [];
+let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let isNewRound = true;
+let userName = '';
+let boardEl;
+
+// const resetGame = () =>{
+//   board = [];
+//   boardEl.innerText = '';
+//   firstCard = null;
+//   isNewRound = true;
+//   userName = '';
+//   initGame();
+// }
 
 //create element that displays the state of game
 const stateElement = document.createElement('p');
-stateElement.innerText = 'Welcome! You have 3 minutes to match all cards, your time starts now! Please click your first card.';
+
+//create input field for user name
+const inputField = document.createElement('input');
+document.body.appendChild(inputField);
+
+//create submit button for user name
+const submitButton = document.createElement('button');
+submitButton.innerText = 'submit your name';
+submitButton.addEventListener("click", () => {
+  userName = inputField.value;
+  stateElement.innerText = `Welcome ${userName}! You have 3 minutes to match all cards, your time starts once your click your first card!`;
+})
+
+document.body.appendChild(submitButton);
+
+
+//create timer element 
+  const timer = document.createElement('p');
+
 
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
 const getRandomIndex = (max) => Math.floor(Math.random() * max);
@@ -90,6 +120,17 @@ const makeDeck = () => {
 };
 
 const squareClick = (cardElement, column, row) => {
+
+  //start the timer only when it is new round
+  if (isNewRound){
+  displayTimer();
+  
+  //remove all board elements once 3 mins is up
+  setTimeout(() => boardEl.innerText = 'Oh no, 3 mins is up! You didnt complete the game in time :(', 1000*3*60);
+
+  isNewRound = false;
+  }
+
   console.log(cardElement);
 
   console.log("FIRST CARD DOM ELEMENT", firstCard);
@@ -160,6 +201,7 @@ const buildBoardElements = (board) => {
   boardElement.classList.add("board");
 
   boardElement.appendChild(stateElement);
+  boardElement.appendChild(timer);
 
   // use the board data structure we passed in to create the correct size board
   for (let i = 0; i < board.length; i += 1) {
@@ -195,6 +237,22 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
+  //display the Timer
+const displayTimer = () =>{
+  let milliseconds = 1*3*60;
+  const delayInMilliseconds = 1000;
+  timer.innerText = `${milliseconds} seconds`;
+  const ref = setInterval(() => {
+  timer.innerText = `${milliseconds} seconds`;
+
+  if (milliseconds <= 0) {
+    clearInterval(ref);
+  }
+
+  milliseconds -= 1;
+}, delayInMilliseconds);
+}
+
 const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
@@ -210,12 +268,15 @@ const initGame = () => {
     }
   }
 
-  let boardEl = buildBoardElements(board);
-
+  boardEl = buildBoardElements(board);
   document.body.appendChild(boardEl);
   
-  //remove all board elements once 3 mins is up
-  setTimeout(() => boardEl.innerText = 'Oh no, 3 mins is up! You didnt complete the game in time :(', 1000*3*60);
 };
 
 initGame();
+
+// //create reset Button
+//   const resetButton = document.createElement('button');
+//   resetButton.innerText = 'Reset Game';
+//   document.body.appendChild(resetButton);
+//   resetButton.addEventListener("click", resetGame);
