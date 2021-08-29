@@ -108,8 +108,52 @@ let firstCardElement;
 let deck;
 let canClick = true;
 let numPairs = 0;
+let input;
+let playerName;
+let counter;
+let ref;
+
+const boardContainer = document.createElement('div');
+
+const inputContainer = document.createElement('div');
+inputContainer.classList.add('wrapper');
+
+const inputField = document.createElement('input');
+inputField.classList.add('input');
+input = inputField.innerText;
+console.log(input);
+
+const submitButton = document.createElement('button');
+submitButton.innerText = 'Submit';
+submitButton.classList.add('button');
+
+const resetButton = document.createElement('button');
+resetButton.innerText = 'Reset Game';
+resetButton.classList.add('resetButton', 'wrapper');
 
 const timer = document.createElement('div');
+
+const countdown = () => {
+  const delayInMs = 1000;
+  counter = 181;
+
+  // countdowntimer
+  ref = setInterval(() => {
+    counter -= 1;
+    timer.innerHTML = `Timer: ${counter}`;
+    timer.classList.add('countdown');
+
+    if (counter <= 10) {
+      timer.style.backgroundColor = 'red';
+    }
+
+    if (counter <= 0 && canClick) {
+      clearInterval(ref);
+      timer.remove();
+      if (counter <= 0 && numPairs < 8) { output('TIME\'S UP. YOU LOSE!');
+        gameInfo.classList.add('outcome');
+        gameInfo.style.backgroundColor = 'red'; } } }, delayInMs);
+};
 
 // =============== GAMEPLAY LOGIC ==================
 const squareClick = (cardElement, column, row) => {
@@ -147,7 +191,7 @@ const squareClick = (cardElement, column, row) => {
         canClick = false;
         numPairs += 1;
 
-        setTimeout(() => {
+        setTimeout((ref) => {
           if (numPairs === 8 && counter < 181) {
             clearInterval(ref);
             timer.remove();
@@ -185,7 +229,6 @@ const squareClick = (cardElement, column, row) => {
   }
 };
 
-// =============== GAME INITIALIZATION ===================
 // create all the board elements that will go on the screen
 // return the built board
 const buildBoardElements = () => {
@@ -229,12 +272,42 @@ const buildBoardElements = () => {
   return boardElement;
 };
 
+// const gameReset = () => {
+//   boardContainer.remove();
+//   clearInterval(ref);
+//   timer.remove();
+//   inputContainer.remove();
+//   initGame();
+// };
+
+const submitClick = () => {
+  input = inputField.value;
+  playerName = input;
+  console.log(input);
+  inputContainer.remove();
+  countdown();
+  gameInfo.innerHTML = `Hello ${playerName}!<br>You have 3 minutes to find all matching pairs of cards in the board below!<br>Click on any of the cards below to begin.`;
+  const boardEl = buildBoardElements(board);
+  boardContainer.appendChild(boardEl);
+  // document.body.appendChild(resetButton);
+  // resetButton.addEventListener('click', gameReset);
+};
+
+// =============== GAME INITIALIZATION ===================
+
 const initGame = () => {
   document.body.appendChild(timer);
 
-  gameInfo.innerHTML = 'You have 3 minutes to find all matching pairs of cards in the board below!<br>Click on any of the cards below to begin.';
+  gameInfo.innerHTML = 'Enter player name to begin game';
   gameInfo.classList.add('info');
   document.body.appendChild(gameInfo);
+
+  gameInfo.appendChild(inputContainer);
+  inputContainer.appendChild(inputField);
+  inputContainer.appendChild(submitButton);
+  submitButton.addEventListener('click', submitClick);
+
+  document.body.appendChild(boardContainer);
 
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
@@ -251,33 +324,6 @@ const initGame = () => {
       board[i].push(deck.pop());
     }
   }
-
-  const boardEl = buildBoardElements(board);
-
-  document.body.appendChild(boardEl);
 };
 
-buildBoardElements();
 initGame();
-
-// const countdown = () => {
-const delayInMs = 1000;
-let counter = 81;
-
-const ref = setInterval(() => {
-  counter -= 1;
-  timer.innerHTML = `Timer: ${counter}`;
-  timer.classList.add('countdown');
-
-  if (counter <= 10) {
-    timer.style.backgroundColor = 'red';
-  }
-
-  if (counter <= 0 && canClick) {
-    clearInterval(ref);
-    timer.remove();
-    if (counter <= 0 && numPairs < 8) { output('TIME\'S UP. YOU LOSE!');
-      gameInfo.classList.add('outcome');
-      gameInfo.style.backgroundColor = 'red'; } } }, delayInMs);
-
-// };
