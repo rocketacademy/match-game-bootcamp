@@ -147,6 +147,9 @@ const squareClick = (cardElement, column, row) => {
     ) {
       console.log('match');
       messageDisplay('You found a match!');
+      setTimeout(() => {
+        messageDisplay('');
+      }, 3000);
 
       // turn this card over
       cardElement.appendChild(createCard(clickedCard));
