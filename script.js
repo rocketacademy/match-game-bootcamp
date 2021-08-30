@@ -4,15 +4,19 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
-let canClick = true;
+let canClick = false;
 const gameMsg = document.createElement('div');
+const timer = document.createElement('div');
+const nameDiv = document.createElement('div');
+const buttonsDiv = document.createElement('div');
+const boardElement = document.createElement('div');
 let timeLeft = 180000;
+let user = '';
+let pairsToMatch = (boardSize ** 2) / 2;
+let gameReset = false;
+let gamesWon = 0;
 
 const squareClick = (cardElement, column, row) => {
-  console.log(cardElement);
-  console.log('FIRST CARD DOM ELEMENT', firstCard);
-  console.log('BOARD CLICKED CARD', board[column][row]);
-
   const clickedCard = board[column][row];
 
   // the user already clicked on this square
@@ -21,23 +25,25 @@ const squareClick = (cardElement, column, row) => {
   }
 
   if (firstCard === null) {
-    console.log('first turn');
     gameMsg.innerText = 'Choose your second card!';
     firstCard = clickedCard;
     cardElement.innerText = `${firstCard.suit}${firstCard.name}`;
     firstCardElement = cardElement;
   } else {
-    console.log('second turn');
     cardElement.innerText = `${clickedCard.suit}${clickedCard.name}`;
     canClick = false;
     if (
       clickedCard.name === firstCard.name
         && clickedCard.suit === firstCard.suit
     ) {
-      console.log('match');
       gameMsg.innerText = "It's a match! Choose another card!";
+      canClick = true;
+      pairsToMatch -= 1;
+      if (pairsToMatch === 0) {
+        gameMsg.innerText = 'Yay you won this round!';
+        gamesWon += 1;
+      }
     } else {
-      console.log('NOT a match');
       gameMsg.innerText = 'Meh. No match.';
       setTimeout(() => {
         canClick = true;
@@ -113,7 +119,6 @@ const shuffleCards = (cardDeck) => {
 
 // eslint-disable-next-line
 const buildBoardElements = (board) => {
-  const boardElement = document.createElement('div');
   boardElement.classList.add('board');
 
   for (let i = 0; i < board.length; i += 1) {
@@ -145,15 +150,12 @@ const msToMin = (timeMs) => {
   return `${minutes}:${padSeconds}`;
 };
 
-const initGame = () => {
-  gameMsg.classList.add('message');
-  gameMsg.innerText = 'Welcome to Match Game! Click any card to begin.';
-  document.body.appendChild(gameMsg);
-
-  const timer = document.createElement('div');
+const startTimer = () => {
+  gameMsg.innerText = 'Game started! Please choose a card.';
   timer.classList.add('message');
   timer.innerText = `Time left: ${msToMin(timeLeft)}`;
-  document.body.appendChild(timer);
+
+  canClick = true;
 
   const countTime = setInterval(() => { timer.innerText = `Time left: ${msToMin(timeLeft)}`;
 
@@ -163,8 +165,58 @@ const initGame = () => {
       canClick = false;
     }
 
+    if (gameReset === true) {
+      gameReset = false;
+      clearInterval(countTime);
+      canClick = false;
+    }
+
     timeLeft -= 1000;
   }, 1000);
+};
+
+const resetGame = () => {
+  gameMsg.innerText = `Game reset! ${user}, please click start to begin again.`;
+  gameReset = true;
+
+  boardElement.innerHTML = '';
+  buildBoardElements(board);
+
+  timeLeft = 180000;
+};
+
+const inputName = () => {
+  user = document.querySelector('#userName').value;
+  gameMsg.innerText = `Hello ${user}! Please click start to begin.`;
+  nameDiv.innerHTML = '';
+
+  const startButton = document.createElement('button');
+  const resetButton = document.createElement('button');
+  startButton.innerText = 'Start';
+  resetButton.innerText = 'Reset';
+  startButton.addEventListener('click', startTimer);
+  resetButton.addEventListener('click', resetGame);
+  buttonsDiv.appendChild(startButton);
+  buttonsDiv.appendChild(resetButton);
+};
+
+const initGame = () => {
+  gameMsg.classList.add('message');
+  gameMsg.innerHTML = 'Welcome to Match Game! <br> Please enter your name: ';
+  document.body.appendChild(gameMsg);
+
+  const nameInput = document.createElement('input');
+  nameInput.setAttribute('id', 'userName');
+  const nameButton = document.createElement('button');
+  nameButton.innerText = 'Submit';
+  nameButton.addEventListener('click', inputName);
+  nameDiv.appendChild(nameInput);
+  nameDiv.appendChild(nameButton);
+  document.body.appendChild(nameDiv);
+
+  document.body.appendChild(buttonsDiv);
+
+  document.body.appendChild(timer);
 
   const doubleDeck = makeDeck();
   const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
@@ -179,6 +231,11 @@ const initGame = () => {
 
   const boardEl = buildBoardElements(board);
   document.body.appendChild(boardEl);
+
+  const scoreDiv = document.createElement('div');
+  scoreDiv.classList.add('message');
+  scoreDiv.innerText = `Score: ${gamesWon}`;
+  document.body.appendChild(scoreDiv);
 };
 
 initGame();
