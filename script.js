@@ -181,7 +181,7 @@ const createCard = (cardInfo) => {
 
   const name = document.createElement('div');
   name.classList.add(cardInfo.displayName, cardInfo.colour);
-  name.innerText = '';
+  name.innerText = '3';
 
   const card = document.createElement('div');
   card.classList.add('card');
