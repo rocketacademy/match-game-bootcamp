@@ -60,6 +60,7 @@ const makeDeck = (cardAmount) => {
         name: cardName,
         suit: currentSuit,
         rank: rankCounter,
+        color: 'red',
       };
 
       console.log(`rank: ${rankCounter}`);
@@ -101,8 +102,9 @@ const squareClick = (cardElement, column, row) => {
   if (firstCard === null && canClick) {
     console.log('first turn');
     firstCard = clickedCard;
+    console.log(firstCard);
     // turn this card over
-    cardElement.innerText = firstCard.name;
+    cardElement.innerText = `${firstCard.name}\n${firstCard.suit}`;
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
@@ -121,7 +123,8 @@ const squareClick = (cardElement, column, row) => {
       console.log(scoreIndex < 8);
       console.log(scoreIndex === 1);
       if (scoreIndex < 8) {
-        cardElement.innerText = clickedCard.name;
+        cardElement.innerText = `${clickedCard.name}\n${firstCard.suit}`;
+        cardElement.classList.add(clickedCard.colour);
         console.log('test');
         showMatch = shortMessage();
         displayMsgCounter = true;
@@ -132,7 +135,8 @@ const squareClick = (cardElement, column, row) => {
       }
       if (scoreIndex === 8) {
         console.log('test2');
-        cardElement.innerText = clickedCard.name;
+        cardElement.innerText = `${clickedCard.name}\n${firstCard.suit}`;
+        cardElement.classList.add(clickedCard.colour);
         displayMsgCounter = false;
         showMatch = shortMessage(displayMsgCounter);
         displayMsgCounter = true;
@@ -146,7 +150,8 @@ const squareClick = (cardElement, column, row) => {
     } else {
       canClick = false;
       console.log('NOT a match');
-      cardElement.innerText = clickedCard.name;
+      cardElement.innerText = `${clickedCard.name}\n${firstCard.suit}`;
+      cardElement.classList.add(clickedCard.colour);
       setTimeout(() => {
         cardElement.innerText = '';
         canClick = true;
