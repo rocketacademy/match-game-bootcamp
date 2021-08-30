@@ -158,7 +158,7 @@ winsList.classList.add('info', 'wrapper');
 
 const countdown = () => {
   const delayInMs = 1000;
-  counter = 180;
+  counter = 10;
 
   timer.innerHTML = `Timer: ${counter}`;
   timer.classList.add('countdown');
@@ -170,13 +170,14 @@ const countdown = () => {
     timer.classList.add('countdown');
 
     if (counter <= 10) {
-      timer.style.backgroundColor = 'red';
+      // timer.style.backgroundColor = 'red';
     }
 
     if (counter <= 0 && canClick) {
       clearInterval(ref);
       timer.remove();
       if (counter <= 0 && numPairs < 8) { output('TIME\'S UP. YOU LOSE!');
+        board.splice(0, board.length);
         gameInfo.classList.add('outcome');
         gameInfo.style.backgroundColor = 'red'; } } }, delayInMs);
 };
