@@ -1,6 +1,6 @@
 // boardSize has to be an even number
 const boardSize = 4;
-const board = [];
+let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
@@ -10,11 +10,30 @@ const timer = document.createElement('div');
 const nameDiv = document.createElement('div');
 const buttonsDiv = document.createElement('div');
 const boardElement = document.createElement('div');
+const scoreDiv = document.createElement('div');
 let timeLeft = 180000;
 let user = '';
 let pairsToMatch = (boardSize ** 2) / 2;
 let gameReset = false;
 let gamesWon = 0;
+
+const getRandomIndex = (max) => Math.floor(Math.random() * max);
+
+const shuffleBoard = () => {
+  board = [];
+  // eslint-disable-next-line
+  const doubleDeck = makeDeck();
+  const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  // eslint-disable-next-line
+  deck = shuffleCards(deckSubset);
+
+  for (let i = 0; i < boardSize; i += 1) {
+    board.push([]);
+    for (let j = 0; j < boardSize; j += 1) {
+      board[i].push(deck.pop());
+    }
+  }
+};
 
 const squareClick = (cardElement, column, row) => {
   const clickedCard = board[column][row];
@@ -40,8 +59,17 @@ const squareClick = (cardElement, column, row) => {
       canClick = true;
       pairsToMatch -= 1;
       if (pairsToMatch === 0) {
-        gameMsg.innerText = 'Yay you won this round!';
+        gameReset = true;
         gamesWon += 1;
+        scoreDiv.innerText = '';
+        scoreDiv.innerText = `Score: ${gamesWon}`;
+        canClick = false;
+        gameMsg.innerText = 'Yay you won this round!';
+        // eslint-disable-next-line
+        const winMsg = setTimeout(() => {
+          // eslint-disable-next-line
+          resetGame();
+        }, 5000);
       }
     } else {
       gameMsg.innerText = 'Meh. No match.';
@@ -50,7 +78,7 @@ const squareClick = (cardElement, column, row) => {
         firstCardElement.innerText = '';
         cardElement.innerText = '';
         gameMsg.innerText = 'Choose another card!';
-      }, 3000);
+      }, 1000);
     }
     firstCard = null;
   }
@@ -97,8 +125,6 @@ const makeDeck = () => {
 
   return newDeck;
 };
-
-const getRandomIndex = (max) => Math.floor(Math.random() * max);
 
 const shuffleCards = (cardDeck) => {
 // Loop over the card deck array once
@@ -176,10 +202,11 @@ const startTimer = () => {
 };
 
 const resetGame = () => {
-  gameMsg.innerText = `Game reset! ${user}, please click start to begin again.`;
+  gameMsg.innerText = `New game! ${user}, please click start to begin again.`;
   gameReset = true;
 
   boardElement.innerHTML = '';
+  shuffleBoard();
   buildBoardElements(board);
 
   timeLeft = 180000;
@@ -218,21 +245,11 @@ const initGame = () => {
 
   document.body.appendChild(timer);
 
-  const doubleDeck = makeDeck();
-  const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
-  deck = shuffleCards(deckSubset);
-
-  for (let i = 0; i < boardSize; i += 1) {
-    board.push([]);
-    for (let j = 0; j < boardSize; j += 1) {
-      board[i].push(deck.pop());
-    }
-  }
+  shuffleBoard();
 
   const boardEl = buildBoardElements(board);
   document.body.appendChild(boardEl);
 
-  const scoreDiv = document.createElement('div');
   scoreDiv.classList.add('message');
   scoreDiv.innerText = `Score: ${gamesWon}`;
   document.body.appendChild(scoreDiv);
