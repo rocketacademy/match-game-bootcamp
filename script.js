@@ -11,6 +11,7 @@ let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let canClick = true;
 const shuffleCards = (cards) => {
   // Loop over the card deck array once
   for (let currentIndex = 0; currentIndex < cards.length; currentIndex += 1) {
@@ -97,7 +98,7 @@ const squareClick = (cardElement, column, row) => {
   }
 
   // first turn
-  if (firstCard === null) {
+  if (firstCard === null && canClick) {
     console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
@@ -119,7 +120,7 @@ const squareClick = (cardElement, column, row) => {
       updatingScore();
       console.log(scoreIndex < 8);
       console.log(scoreIndex === 1);
-      if (scoreIndex < 2) {
+      if (scoreIndex < 8) {
         cardElement.innerText = clickedCard.name;
         console.log('test');
         showMatch = shortMessage();
@@ -137,16 +138,18 @@ const squareClick = (cardElement, column, row) => {
         displayMsgCounter = true;
         showMatch = setTimeout(() => {
           shortMessage(displayMsgCounter);
-        }, 5000);
+        }, 50000);
         console.log('1 point');
         playerScore += 1;
         scoreIndex = 0;
       }
     } else {
+      canClick = false;
       console.log('NOT a match');
       cardElement.innerText = clickedCard.name;
       setTimeout(() => {
         cardElement.innerText = '';
+        canClick = true;
       }, 3000);
 
       // turn this card back over
@@ -230,6 +233,7 @@ const initGame = () => {
   const boardEl = buildBoardElements(board);
 
   resetbuttom.innerText = 'reset';
+
   resetbuttom.addEventListener('click', resetGame);
 
   updatingScore = () => {
