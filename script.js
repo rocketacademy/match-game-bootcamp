@@ -112,6 +112,7 @@ let input;
 let playerName;
 let counter;
 let ref;
+let playerWins = 0;
 const boardElement = document.createElement('div');
 
 const boardContainer = document.createElement('div');
@@ -151,12 +152,16 @@ leaderDiv.innerText = 'Leaderboard';
 const playerList = document.createElement('span');
 playerList.innerText = 'Player';
 
-const winsList = document.createElement('span');
-winsList.innerText = 'Wins';
+const winsList = document.createElement('div');
+winsList.innerHTML = `Wins: ${playerWins}`;
+winsList.classList.add('info', 'wrapper');
 
 const countdown = () => {
   const delayInMs = 1000;
-  counter = 181;
+  counter = 180;
+
+  timer.innerHTML = `Timer: ${counter}`;
+  timer.classList.add('countdown');
 
   // countdowntimer
   ref = setInterval(() => {
@@ -216,6 +221,8 @@ const squareClick = (cardElement, column, row) => {
           if (numPairs === 8 && counter < 181) {
             clearInterval(ref);
             timer.remove();
+            playerWins += 1;
+            winsList.innerHTML = `Wins: ${playerWins}`;
             output('Congratulations, you win!');
             gameInfo.classList.add('outcome');
           } else {
@@ -298,17 +305,23 @@ const gameReset = () => {
     timer.remove();
     inputField.value = '';
     boardElement.innerHTML = '';
+    numPairs = 0;
     board.splice(0, board.length);
     reset.remove();
+    winsList.remove();
     // inputContainer.remove();
     initGame();
     inputContainer.remove();
+    gameInfo.classList.remove('outcome');
+    gameInfo.style.backgroundColor = 'white';
     countdown();
     gameInfo.innerHTML = `Hello ${playerName}!<br>You have 3 minutes to find all matching pairs of cards in the board below!<br>Click on any of the cards below to begin.`;
     const boardEl = buildBoardElements(board);
     timerCon.appendChild(timer);
     resetContainer.appendChild(reset);
     boardContainer.appendChild(boardEl);
+    winsList.innerHTML = `Wins: ${playerWins}`;
+    document.body.appendChild(winsList);
     reset.addEventListener('click', gameReset); }
 };
 
@@ -323,7 +336,7 @@ const submitClick = () => {
   timerCon.appendChild(timer);
   resetContainer.appendChild(reset);
   boardContainer.appendChild(boardEl);
-
+  document.body.appendChild(winsList);
   reset.addEventListener('click', gameReset);
 };
 
@@ -363,3 +376,6 @@ const initGame = () => {
 };
 
 initGame();
+
+// pending
+// clean the outcome msg as the second round, the green and red doesnt work.
