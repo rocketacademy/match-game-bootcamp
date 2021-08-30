@@ -30,13 +30,14 @@ const squareClick = (cardElement, column, row) => {
       console.log('first players turn');
       firstCard = clickedCard;
       // turn this card over
-      cardElement.innerText = firstCard.name;
+      cardElement.innerText = `${firstCard.name}${firstCard.suitSymbol}`
       // hold onto this for later when it may not match
       firstCardElement = cardElement;
     } 
     // or else second players turn
     else {
       console.log('second players turn');
+      //IF IT IS A MATCH
       if (
         clickedCard.name === firstCard.name &&
         clickedCard.suit === firstCard.suit
@@ -44,8 +45,15 @@ const squareClick = (cardElement, column, row) => {
         console.log('match');
     
         // turn this card over
-        cardElement.innerText = clickedCard.name;
+        
+        cardElement.innerText = `${clickedCard.name}${clickedCard.suitSymbol}`
+      //IF IT IS NOT A MATCH
       } else {
+        cardElement.innerText = `${clickedCard.name}${clickedCard.suitSymbol}`
+        setTimeout(() => {cardElement.innerText= "" 
+       firstCardElement.innerText = '';}
+       ,3000)
+        
         console.log('NOT a match');
 
         // turn this card back over
@@ -54,8 +62,7 @@ const squareClick = (cardElement, column, row) => {
 
       // reset the first card
       firstCard = null;
-    }
-};
+    }}
 //Game Initialisation
 
 // create all the board elements that will go on the screen
@@ -131,13 +138,13 @@ const makeDeck = (cardAmount) => {
 
       // 1, 11, 12 ,13
       if (cardName === '1') {
-        cardName = 'ace';
+        cardName = 'A';
       } else if (cardName === '11') {
-        cardName = 'jack';
+        cardName = 'J';
       } else if (cardName === '12') {
-        cardName = 'queen';
+        cardName = 'Q';
       } else if (cardName === '13') {
-        cardName = 'king';
+        cardName = 'K';
       }
 
       // make a single card object variable
