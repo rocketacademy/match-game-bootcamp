@@ -144,6 +144,16 @@ const reset = document.createElement('button');
 reset.innerText = 'Reset Game';
 reset.classList.add('resetButton');
 
+const leaderDiv = document.createElement('div');
+leaderDiv.classList.add('wrapper');
+leaderDiv.innerText = 'Leaderboard';
+
+const playerList = document.createElement('span');
+playerList.innerText = 'Player';
+
+const winsList = document.createElement('span');
+winsList.innerText = 'Wins';
+
 const countdown = () => {
   const delayInMs = 1000;
   counter = 181;
@@ -291,7 +301,15 @@ const gameReset = () => {
     board.splice(0, board.length);
     reset.remove();
     // inputContainer.remove();
-    initGame(); }
+    initGame();
+    inputContainer.remove();
+    countdown();
+    gameInfo.innerHTML = `Hello ${playerName}!<br>You have 3 minutes to find all matching pairs of cards in the board below!<br>Click on any of the cards below to begin.`;
+    const boardEl = buildBoardElements(board);
+    timerCon.appendChild(timer);
+    resetContainer.appendChild(reset);
+    boardContainer.appendChild(boardEl);
+    reset.addEventListener('click', gameReset); }
 };
 
 const submitClick = () => {
@@ -324,6 +342,8 @@ const initGame = () => {
   document.body.appendChild(boardContainer);
   document.body.appendChild(timerCon);
   document.body.appendChild(resetContainer);
+  // document.body.appendChild(leaderDiv);
+  // leaderDiv.appendChild(playerList);
 
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
