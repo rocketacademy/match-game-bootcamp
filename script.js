@@ -1,4 +1,4 @@
-// completed => Match Game setTimeout / Match Game Match
+// completed => Match Game setTimeout / Match Game Match /Full Match Game /Match Game Timer
 
 // boardSize has to be an even number
 const boardSize = 4;
@@ -8,25 +8,21 @@ let firstCardElement;
 let deck;
 let state;
 let timer;
-let firstClick = true;
-let milliseconds = 1;
+const firstClick = true;
+const milliseconds = 1;
 const delayInMilliseconds = 1;
+let submitBtn;
+let inputBox;
+let count = 0;
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function squareClick(cardElement, column, row) {
   if (firstClick) {
-    const ref = setInterval(() => {
-      timer.innerText = milliseconds;
-
-      if (milliseconds <= 0) {
-        clearInterval(ref);
-      }
-
-      milliseconds += 1;
-    }, delayInMilliseconds);
-    firstClick = false;
+    const threeMins = 60 * 3;
+    display = timer;
+    timerCountDown(threeMins, display);
   }
   console.log(cardElement);
 
@@ -62,6 +58,8 @@ async function squareClick(cardElement, column, row) {
       console.log('match');
       state.innerText = 'match';
       cardElement.innerText = clickedCard.name;
+      count++;
+      countElement.innerHTML = `current score = ${count}`;
       await sleep(1000);
       state.innerText = '';
       // turn this card over
@@ -214,8 +212,35 @@ const shuffleCards = (cards) => {
   // Return the shuffled deck
   return cards;
 };
-
+let userName;
+let resetBtn;
+let countElement;
 const initGame = () => {
+  // create reset button
+  const resetButtonDiv = document.createElement('div');
+  resetBtn = document.createElement('button');
+  resetBtn.innerHTML = 'reset';
+  document.body.appendChild(resetButtonDiv).appendChild(resetBtn);
+  resetBtn.addEventListener('click', reset);
+  // create count element
+  countElement = document.createElement('h3');
+  countElement.innerHTML = `current score =  ${count}`;
+  document.body.appendChild(resetButtonDiv).appendChild(countElement);
+  // create name
+  const userNameDiv = document.createElement('div');
+  userName = document.createElement('h3');
+  document.body.appendChild(userNameDiv).appendChild(userName);
+  // create input box
+  const inputBoxDiv = document.createElement('div');
+  inputBox = document.createElement('input');
+  submitBtn = document.createElement('button');
+  const name = document.createElement('span');
+  name.innerHTML = 'Input Name :';
+  submitBtn.innerHTML = 'submit';
+  document.body.appendChild(inputBoxDiv).appendChild(name);
+  document.body.appendChild(inputBoxDiv).appendChild(inputBox);
+  document.body.appendChild(inputBoxDiv).appendChild(submitBtn);
+  submitBtn.addEventListener('click', onclick);
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   const doubleDeck = makeDeck();
@@ -234,13 +259,46 @@ const initGame = () => {
   const boardEl = buildBoardElements(board);
 
   document.body.appendChild(boardEl);
-
-  state = document.createElement('div');
-  state.className = 'currentState';
-  document.body.appendChild(state);
+  // set timer element
   timer = document.createElement('div');
   timer.className = 'timer';
   document.body.appendChild(timer);
+  // set state element
+  state = document.createElement('div');
+  state.className = 'currentState';
+  document.body.appendChild(state);
+};
+
+const timerCountDown = (duration, display) => {
+  let timer = duration; let minutes; let
+    seconds;
+  setInterval(() => {
+    minutes = parseInt(timer / 60, 10);
+    seconds = parseInt(timer % 60, 10);
+
+    minutes = minutes < 10 ? `0${minutes}` : minutes;
+    seconds = seconds < 10 ? `0${seconds}` : seconds;
+    display.textContent = `${minutes}:${seconds}`;
+
+    if (--timer < 0) {
+      timer = duration;
+    }
+  }, 1000);
+};
+
+const onclick = () => {
+  const getName = inputBox.value;
+  console.log(getName);
+  if (getName === '') {
+    window.alert('please input name');
+  } else {
+    userName.innerHTML = `welcome ${getName}`;
+  }
+};
+
+const reset = () => {
+  console.log('reset');
+  window.location.reload();
 };
 
 initGame();
