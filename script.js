@@ -6,6 +6,7 @@ let firstCardElement;
 let deck;
 let canClick = true;
 const gameMsg = document.createElement('div');
+let timeLeft = 180000;
 
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
@@ -136,10 +137,34 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
+const msToMin = (timeMs) => {
+  const timeSec = timeMs / 1000;
+  const minutes = Math.floor(timeSec / 60);
+  const seconds = timeSec % 60;
+  const padSeconds = String(seconds).padEnd(2, 0);
+  return `${minutes}:${padSeconds}`;
+};
+
 const initGame = () => {
   gameMsg.classList.add('message');
   gameMsg.innerText = 'Welcome to Match Game! Click any card to begin.';
   document.body.appendChild(gameMsg);
+
+  const timer = document.createElement('div');
+  timer.classList.add('message');
+  timer.innerText = `Time left: ${msToMin(timeLeft)}`;
+  document.body.appendChild(timer);
+
+  const countTime = setInterval(() => { timer.innerText = `Time left: ${msToMin(timeLeft)}`;
+
+    if (timeLeft <= 0) {
+      clearInterval(countTime);
+      timer.innerText = 'Times up!';
+      canClick = false;
+    }
+
+    timeLeft -= 1000;
+  }, 1000);
 
   const doubleDeck = makeDeck();
   const deckSubset = doubleDeck.slice(0, boardSize * boardSize);

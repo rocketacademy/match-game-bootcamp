@@ -2,14 +2,14 @@ body {
   background-color: pink;
 }
 
-.board {
+/* .board {
   padding: 10px;
   margin: 10px;
   background-color: grey;
   height: 500px;
   width: 500px;
   border-radius: 10px;
-}
+} */
 
 .square {
   padding: 10px;
