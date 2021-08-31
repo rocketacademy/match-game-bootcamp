@@ -1,7 +1,7 @@
 // ###### set global variables ######
 // #################################
 
-const boardSize = 2;
+const boardSize = 4;
 let board = [];
 let firstCard = null;
 let firstCardElement;
@@ -152,17 +152,6 @@ const resetGame = () => {
   initGame();
   numberOfMatches = 0;
 };
-
-// function to set the Timer
-const ref = setInterval(() => {
-  const minutes = Number(Math.floor(gameTime / 60));
-  const seconds = Number(gameTime % 60);
-  timer.innerHTML = `⏱ You have ${minutes}:${seconds} mins to complete this game ⏱`;
-  if (gameTime <= 0) {
-    clearInterval(ref);
-  }
-  gameTime -= 1;
-}, 1000);
 
 // function for interaction when squars are clicked
 const squareClick = (cardElement, column, row) => {
@@ -320,8 +309,11 @@ const initGame = () => {
   // set game time
   gameTime = 180;
 
+  // call timeout function
+  timeOut();
+
   // generate timer message that counts down
-  timer.innerHTML = `⏱ You have ${minutes}:${seconds} mins to complete this game ⏱`;
+  timer.innerHTML = `⏱ You have ${minutes} mins ${seconds} secs to complete this game ⏱`;
   document.body.appendChild(timer);
 
   const boardEl = buildBoardElements(board);
@@ -336,3 +328,18 @@ const initGame = () => {
 };
 
 userNameGame();
+
+// function to set the Timer
+const timeOut = () => {
+  const ref = setInterval(() => {
+    const minutes = Number(Math.floor(gameTime / 60));
+    const seconds = Number(gameTime % 60);
+    timer.innerHTML = `⏱ You have ${minutes} mins ${seconds} secs to complete this game ⏱`;
+    if (gameTime <= 0) {
+      clearInterval(ref);
+      resetGame();
+      output('⏰ TIME HAS RUN OUT! Please try again!');
+    }
+    gameTime -= 1;
+  }, 1000);
+};
