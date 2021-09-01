@@ -1,3 +1,131 @@
 body {
-  background-color: pink;
+  background-color: white;
+}
+
+.square {
+  padding: 50px 10px 50px 10px;
+  margin: 10px;
+  background-color: lightgray;
+  display: inline-block;
+  vertical-align: top;
+  height: 115px;
+  width: 140px;
+  border-style: groove;
+  border-color: lightgray;
+}
+
+.squareFace {
+  padding: 60px, 10px, 40px, 10px;
+  margin: 10px;
+  background-color: floralwhite;
+  display: inline-block;
+  vertical-align: top;
+  height: 115px;
+  width: 140px;
+  border-style: groove;
+  border-color: floralwhite;
+  font-size: 40px;
+  text-align: center;
+}
+
+.board {
+  text-align: center;
+}
+
+.red {
+  color: red;
+}
+
+.black {
+  color: black;
+}
+
+.header {
+  margin: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border-style: dotted;
+  border-color: gray;
+
+  text-align: center;
+}
+
+.info {
+  margin: 10px;
+  padding: 20px 0px 57px 0px;
+  text-align: center;
+  display: inline-block;
+  font-size: 25px;
+  height: 60px;
+  width: -webkit-fill-available;
+
+  vertical-align: middle;
+}
+
+.countdown {
+  margin: auto;
+  margin-top: 30px;
+  padding: 10px;
+  background-color: black;
+  color: white;
+  font-size: 20px;
+  height: fit-content;
+  border-radius: 8px;
+  width: 110px;
+  display: block;
+  text-align: center;
+}
+
+.outcome {
+  font-weight: bold;
+  background-color: chartreuse;
+  color: black;
+  font-size: 30px;
+  padding: 31px 0px 3px 0px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.input {
+  height: 40px;
+  border-radius: 8px;
+  border-style: double;
+  width: 280px;
+  font-size: 20px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.button {
+  font-family: Roboto;
+  margin: 10px;
+  padding: 10px;
+  width: 110px;
+  border-radius: 8px;
+  background-color: lightgray;
+  border-style: outset;
+  border-color: lightgray;
+  border-width: 4px;
+  font-size: 20px;
+  vertical-align: middle;
+}
+
+.wrapper {
+  text-align: center;
+  padding-bottom: 30px;
+}
+
+.resetButton {
+  font-family: Roboto;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: antiquewhite;
+  border-style: outset;
+  border-color: lightgray;
+  border-width: 4px;
+  font-size: 20px;
+  vertical-align: middle;
+  align-items: center;
+  /* display: flex; */
 }
