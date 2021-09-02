@@ -1,3 +1,29 @@
 body {
   background-color: pink;
 }
+
+/* .board {
+  padding: 10px;
+  margin: 10px;
+  background-color: grey;
+  height: 500px;
+  width: 500px;
+  border-radius: 10px;
+} */
+
+.square {
+  padding: 10px;
+  margin: 10px;
+  background-color: white;
+  display: inline-block;
+  height: 40px;
+  width: 40px;
+  vertical-align: middle;
+  text-align: center;
+  border-radius: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.message {
+  font-family: Arial, Helvetica, sans-serif;
+}
