@@ -4,66 +4,80 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
-//Set the interval between clicks
+// Set the interval between clicks
 let canClick = true;
-//Create a div element for game instructions
+// Create a div element for game instructions
 const gameInfo = document.createElement('div');
 
-//game play logic
-//player 1 turn, if both cards match, player points =+ 1
-//else, player 2 turn,player points =+ 1
+// game play logic
+// player 1 turn, if both cards match, player points =+ 1
+// else, player 2 turn,player points =+ 1
 
 const squareClick = (cardElement, column, row) => {
-    console.log(cardElement);
-//first card is console logged, to track what was the first card.
-    console.log('FIRST CARD DOM ELEMENT', firstCard);
-    console.log('BOARD CLICKED CARD', board[column][row]);
-    //to store clicked card.
-    const clickedCard = board[column][row]; 
-    // the user already clicked on this square, to avoid 2 entries on same square
-    if( cardElement.innerText !== '' ){
-        return;
-    }
-    // first players turn
-    //If state = null, it is player 1's turn.
-    if (firstCard === null) {
-      console.log('first players turn');
-      firstCard = clickedCard;
+  console.log(cardElement);
+  if (canClick === false) {
+    return;
+  }
+  if (canClick === true) {
+    canClick = false;
+    setTimeout(() => {
+      canClick = true;
+    }, 2000);
+  }
+
+  // first card is console logged, to track what was the first card.
+  console.log('FIRST CARD DOM ELEMENT', firstCard);
+  console.log('BOARD CLICKED CARD', board[column][row]);
+  // to store clicked card.
+  const clickedCard = board[column][row];
+  // the user already clicked on this square, to avoid 2 entries on same square
+
+  if (cardElement.innerText !== '') {
+    return;
+  }
+  // Choose 2nd card
+  // If havent click first card, you want to click first card
+  if (firstCard === null) {
+    console.log('choose 2nd cards');
+    // store first card as clicked card in line 45
+    firstCard = clickedCard;
+    // turn this card over
+    cardElement.innerText = `${firstCard.name}${firstCard.suitSymbol}`;
+    // hold onto this for later when it may not match
+    firstCardElement = cardElement; }
+
+  // or else second players turn
+  else {
+    console.log('second players turn');
+    // IF IT IS A MATCH
+    if (
+      clickedCard.name === firstCard.name
+        && clickedCard.suit === firstCard.suit
+    ) {
+      console.log('match');
       // turn this card over
-      cardElement.innerText = `${firstCard.name}${firstCard.suitSymbol}`
-      // hold onto this for later when it may not match
-      firstCardElement = cardElement;
-    } 
-    // or else second players turn
-    else {
-      console.log('second players turn');
-      //IF IT IS A MATCH
-      if (
-        clickedCard.name === firstCard.name &&
-        clickedCard.suit === firstCard.suit
-      ) {
-        console.log('match');
-    
-        // turn this card over
-        
-        cardElement.innerText = `${clickedCard.name}${clickedCard.suitSymbol}`
-      //IF IT IS NOT A MATCH
-      } else {
-        cardElement.innerText = `${clickedCard.name}${clickedCard.suitSymbol}`
-        setTimeout(() => {cardElement.innerText= "" 
-       firstCardElement.innerText = '';}
-       ,3000)
-        
-        console.log('NOT a match');
+      cardElement.innerText = `${clickedCard.name}${clickedCard.suitSymbol}`;
+      firstCardElement = null;
+      firstCard = null;
 
-        // turn this card back over
+      // IF IT IS NOT A MATCH (Check if point is scored)
+    } else {
+      cardElement.innerText = `${clickedCard.name}${clickedCard.suitSymbol}`;
+      setTimeout(() => {
         firstCardElement.innerText = '';
-      }
+        firstCardElement.className = 'square';
+        cardElement.innerText = '';
+        cardElement.className = 'square';
+      }, 1000);
 
+      console.log('NOT a match');
+
+      // turn both cards back over after 3 seconds
+      // removing innerText and changing the css class back to square, returns it to it's original state
       // reset the first card
       firstCard = null;
-    }}
-//Game Initialisation
+    } } };
+// Game Initialisation
 
 // create all the board elements that will go on the screen
 // return the built board
@@ -112,8 +126,7 @@ const makeDeck = (cardAmount) => {
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
     // make a variable of the current suit
 
-    
-// Store the current suit in a variable
+    // Store the current suit in a variable
     const currentSuit = suits[suitIndex];
     let currentSymbol;
     let currentColour = 'red';
@@ -148,7 +161,7 @@ const makeDeck = (cardAmount) => {
       }
 
       // make a single card object variable
-        const card = {
+      const card = {
         name: cardName,
         suit: currentSuit,
         rank: rankCounter,
@@ -160,7 +173,7 @@ const makeDeck = (cardAmount) => {
       newDeck.push(card);
     }
   }
-  return newDeck
+  return newDeck;
 };
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
 const getRandomIndex = (max) => Math.floor(Math.random() * max);
@@ -199,19 +212,18 @@ const createCard = (cardInfo) => {
   return card;
 };
 
-
 // Create a helper function for output to abstract complexity
 // of DOM manipulation away from game logic
 
 const initGame = () => {
-//Gameinfo div
+// Gameinfo div
   gameInfo.innerText = 'Welcome to MATCH GAME! In this game the user turns cards over one at a time to find matching pairs of cards. Click the respective buttons to draw cards, ';
   document.body.appendChild(gameInfo);
 
   // create this special deck by getting the doubled cards and
   // making a smaller array that is (boardSize squared) number of cards
-  let doubleDeck = makeDeck();
-  let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  const doubleDeck = makeDeck();
+  const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
   deck = shuffleCards(deckSubset);
 
   // deal the cards out to the board data structure
@@ -225,9 +237,9 @@ const initGame = () => {
   document.body.appendChild(boardEl);
 };
 
-initGame()
+initGame();
 
-//git add (script.js)
-//git commit -m (comment of what changes you added)
-//add the new changes to github, git push origin master
-//$ git push
+// git add (script.js)
+// git commit -m (comment of what changes you added)
+// add the new changes to github, git push origin master
+// $ git push
