@@ -1,3 +1,37 @@
-body {
-  background-color: pink;
+@import url("https://fonts.googleapis.com/css?family=Lobster");
+
+/* .square {
+  padding: 10px;
+  margin: 10px;
+  background-color: white;
+  display: inline-block;
+  height: 25px;
+  width: 25px;
+  vertical-align: top;
+} */
+
+.board {
+  font-family: Lobster, monospace;
+  font-size: 40px;
 }
+
+.square {
+  margin: 25px;
+  padding: 25px;
+  /* background-image: url("/Users/grahamlim/Documents/bootcamp/week-02/day-003/pre-class/match-game-bootcamp/doge_card.gif"); */
+  background-color: pink;
+  /* width: 100px; */
+  length: 25px;
+  text-align: center;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+#header {
+  font-family: Lobster, monospace;
+  font-size: 5em;
+}
+
+/* body {
+  background-color: beige;
+} */
