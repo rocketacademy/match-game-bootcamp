@@ -1,3 +1,66 @@
 body {
-  background-color: pink;
+  background-color: rgb(192, 215, 255);
+}
+.square {
+  padding: 10px;
+  margin: 10px;
+  background-color: white;
+  display: inline-block;
+  height: 30px;
+  width: 25px;
+  vertical-align: top;
+}
+.suit {
+  margin: 5px;
+  font-size: 20px;
+}
+
+.name {
+  margin: 5px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.red {
+  color: rgb(208, 9, 9);
+}
+
+div {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+button {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+input {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+#gameInfo {
+  font-family: Arial, Helvetica, sans-serif;
+}
+#gameInfo2 {
+  font-family: Arial, Helvetica, sans-serif;
+}
+#timer {
+  font-family: Arial, Helvetica, sans-serif;
+}
+#reset {
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 2px 4px 2px 4px;
+  font-size: 15px;
+}
+#submit {
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 2px 4px 2px 4px;
+  font-size: 15px;
+}
+#userInput {
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 2px 4px 2px 4px;
+  font-size: 15px;
 }
