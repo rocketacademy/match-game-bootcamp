@@ -8,7 +8,7 @@ let firstCardElement;
 let deck;
 let state;
 let timer;
-const firstClick = true;
+let firstClick = true;
 const milliseconds = 1;
 const delayInMilliseconds = 1;
 let submitBtn;
@@ -21,8 +21,10 @@ function sleep(ms) {
 async function squareClick(cardElement, column, row) {
   if (firstClick) {
     const threeMins = 60 * 3;
+    // const threeMins = 1 * 3;
     display = timer;
     timerCountDown(threeMins, display);
+    firstClick = false;
   }
   console.log(cardElement);
 
@@ -272,7 +274,7 @@ const initGame = () => {
 const timerCountDown = (duration, display) => {
   let timer = duration; let minutes; let
     seconds;
-  setInterval(() => {
+  const ref = setInterval(() => {
     minutes = parseInt(timer / 60, 10);
     seconds = parseInt(timer % 60, 10);
 
@@ -282,7 +284,19 @@ const timerCountDown = (duration, display) => {
 
     if (--timer < 0) {
       timer = duration;
+      clearInterval(ref);
+
+      if (window.confirm('time up play again ?')) {
+        window.location.reload();
+      } else {
+        document.body.innerHTML = 'error refesh page';
+      }
     }
+
+    // if (timer === 0) {
+    //   const square = document.querySelectorAll('square');
+    //   clearInterval(ref);
+    // }
   }, 1000);
 };
 
