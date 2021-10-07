@@ -19,7 +19,7 @@ let secondCard = null;
 let canClick = true;
 let delayInMilliSeconds = 3000;
 let timeCheck = 1;
-let timer = 180000;
+let timer = 90;
 let playerName =  '';
 let winCounter = 0 ; 
 let matches =  0;
@@ -30,6 +30,7 @@ messageEl.className = 'message'
 const statsBoard = document.createElement('div');
 const statsEl = document.createElement('p');
 const resetButton = document.createElement('button');
+const timerEl = document.createElement('p');
 resetButton.innerText = 'Reset'
 
 
@@ -74,10 +75,15 @@ const squareClick = (cardElement, column, row) => {
         
         messageEl.innerText = 'MATCH!'
         document.body.appendChild(messageEl);
+        canClick=false;
         matches += 1;
-        setTimeout(()=>{
+        if (matches <8) {
+          setTimeout(()=>{
           messageEl.remove()
+          canClick=true;
         },delayInMilliSeconds);
+        };
+        
     
         // turn this card over
         cardElement.innerText = clickedCard.name;
@@ -95,17 +101,11 @@ const squareClick = (cardElement, column, row) => {
           // turn this card back over
         firstCardElement.innerText = '';
         cardElement.innerText = '';
-        
-
-        
-        
-
-
+        canClick=true;
         }
+
         setTimeout(delayedFlip,delayInMilliSeconds);
-        setTimeout(()=>{
-          canClick=true;
-        }, delayInMilliSeconds) ;  
+
     
         
       }
@@ -171,6 +171,7 @@ const resetGame =()=>{
   }
   board = [];
   matches = 0;
+  timer =  90;
   initGame();
 }
 
@@ -179,8 +180,11 @@ const initGame = () => {
   statsEl.innerText = `${playerName}'s Match Game! Current wins:${winCounter}`
   statsBoard.appendChild(statsEl);
   statsBoard.appendChild(resetButton);
+  timerEl.innerText = `Time left: ${timer} seconds`
+  statsBoard.appendChild(timerEl);
   document.body.appendChild(statsBoard);
   resetButton.addEventListener('click',resetGame);
+  timerFunc();
   
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
@@ -264,7 +268,29 @@ const shuffleCards = (cards) => {
   return cards;
 };
 
+const timerFunc = () => {
+  
+  //canClick= true;
+  const ref = setInterval(() => {
+  
+  timer -= 1;
+  timerEl.innerText = `Time left: ${timer} seconds`
+  statsBoard.appendChild(timerEl);
 
+  if (matches == 8){
+    clearInterval(ref);
+  }
+
+  if (timer ==0) {
+    clearInterval(ref);
+    canClick = false;
+    messageEl.innerText = 'Time is up! Please reset to try again'
+    document.body.appendChild(messageEl);
+    
+  }
+}, 1000);
+
+}
 
 const enterName = ()=>{
   const inputField = document.createElement('input');
