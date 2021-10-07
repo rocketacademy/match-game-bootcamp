@@ -1,11 +1,11 @@
-let boardSize;
 let board = [];
 let firstCard = null;
 let firstCardElement = null;
 let deck = [];
 let canClick = true;
-let totalPairs = null;
+let totalPairs = 0;
 let matchedPairs = 0;
+let time;
 
 const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
 const symbols = ['♥', '♦', '♣', '♠'];
@@ -14,6 +14,7 @@ const startButton = document.getElementById('start-game');
 const resetButton = document.getElementById('reset');
 const boardSizeInput = document.querySelectorAll('input[name="board-size"]');
 const timeInput = document.querySelectorAll('input[name="time"]');
+const timer = document.createElement('div');
 const boardElement = document.createElement('div');
 const output = document.createElement('p');
 
@@ -41,7 +42,7 @@ const resetGame = () => {
   firstCardElement = null;
   deck = [];
   canClick = true;
-  totalPairs = null;
+  totalPairs = 0;
   matchedPairs = 0;
 
   boardSizeInput.forEach((radio) => { radio.disabled = false; });
@@ -77,7 +78,10 @@ const squareClick = (cardElement, column, row) => {
       if (match) {
         matchedPairs += 1;
         let message = 'Match!';
-        if (matchedPairs === totalPairs) message += '<br>You win!!!';
+        if (matchedPairs === totalPairs) {
+          message += '<br>You win!!!';
+          clearInterval(time);
+        }
         print(message);
       } else {
         print('No match!');
@@ -191,6 +195,10 @@ const makeDeck = () => {
 };
 
 const initGame = () => {
+  timer.id = 'timer';
+  timer.innerText = '0:00';
+  document.body.appendChild(timer);
+
   boardElement.classList.add('board');
   document.body.appendChild(boardElement);
 
@@ -199,7 +207,11 @@ const initGame = () => {
 
   startButton.addEventListener('click', () => {
     boardElement.innerHTML = '';
-    boardSize = Number(document.querySelector('input[name="board-size"]:checked').value);
+    const boardSize = Number(document.querySelector('input[name="board-size"]:checked').value);
+    const minutes = Number(document.querySelector('input[name="time"]:checked').value);
+    // minutes = 0.1;
+    let seconds = minutes * 60;
+    timer.innerText = `${minutes}:00`;
     totalPairs = (boardSize * boardSize) / 2;
     makeDeck();
     // deal the cards out to the board data structure
@@ -215,11 +227,31 @@ const initGame = () => {
     timeInput.forEach((radio) => { radio.disabled = true; });
     startButton.disabled = true;
     resetButton.disabled = false;
+
+    time = setInterval(() => {
+      seconds -= 1;
+      const secondsLeft = seconds % 60;
+      const minutesLeft = Math.floor(seconds / 60);
+
+      if (secondsLeft >= 10) {
+        timer.innerText = `${minutesLeft}:${secondsLeft}`;
+      } else {
+        timer.innerText = `${minutesLeft}:0${secondsLeft}`;
+      }
+
+      if (seconds <= 0) {
+        clearInterval(time);
+        print("Time's up! You lose.");
+        setTimeout(resetGame, 1000);
+      }
+    }, 1000);
   });
 
   resetButton.addEventListener('click', () => {
+    clearInterval(time);
     resetGame();
     boardElement.innerHTML = '';
+    timer.innerText = '0:00';
   });
 };
 
