@@ -10,6 +10,7 @@ let time;
 const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
 const symbols = ['♥', '♦', '♣', '♠'];
 
+const gameContainer = document.getElementById('container');
 const startButton = document.getElementById('start-game');
 const resetButton = document.getElementById('reset');
 const boardSizeInput = document.querySelectorAll('input[name="board-size"]');
@@ -34,6 +35,7 @@ const createCardUI = (card, cardElement) => {
 
   cardElement.appendChild(name);
   cardElement.appendChild(suit);
+  cardElement.classList.add('face-up');
 };
 
 const resetGame = () => {
@@ -78,20 +80,31 @@ const squareClick = (cardElement, column, row) => {
       if (match) {
         matchedPairs += 1;
         let message = 'Match!';
+        cardElement.classList.add('match');
+        firstCardElement.classList.add('match');
         if (matchedPairs === totalPairs) {
           message += '<br>You win!!!';
           clearInterval(time);
         }
         print(message);
       } else {
+        cardElement.classList.add('no-match');
+        firstCardElement.classList.add('no-match');
         print('No match!');
       }
 
       setTimeout(() => {
+        cardElement.classList.remove('match');
+        firstCardElement.classList.remove('match');
+        cardElement.classList.remove('no-match');
+        firstCardElement.classList.remove('no-match');
+
         if (matchedPairs === totalPairs) { resetGame(); }
         else if (!match) {
           cardElement.innerHTML = '';
           firstCardElement.innerHTML = '';
+          cardElement.classList.remove('face-up');
+          firstCardElement.classList.remove('face-up');
         }
         // reset the first card
         firstCard = null;
@@ -120,7 +133,7 @@ const buildBoardElements = () => {
       const square = document.createElement('div');
 
       // set a class for CSS purposes
-      square.classList.add('card');
+      square.classList.add('card', 'face-down');
 
       // set the click event
       square.addEventListener('click', (event) => {
@@ -197,18 +210,18 @@ const makeDeck = () => {
 const initGame = () => {
   timer.id = 'timer';
   timer.innerText = '0:00';
-  document.body.appendChild(timer);
+  gameContainer.appendChild(timer);
 
   boardElement.classList.add('board');
-  document.body.appendChild(boardElement);
+  gameContainer.appendChild(boardElement);
 
   output.id = 'output';
-  document.body.appendChild(output);
+  gameContainer.appendChild(output);
 
   startButton.addEventListener('click', () => {
     boardElement.innerHTML = '';
     const boardSize = Number(document.querySelector('input[name="board-size"]:checked').value);
-    const minutes = Number(document.querySelector('input[name="time"]:checked').value);
+    const minutes = 0.1;
     // minutes = 0.1;
     let seconds = minutes * 60;
     timer.innerText = `${minutes}:00`;
@@ -241,6 +254,7 @@ const initGame = () => {
 
       if (seconds <= 0) {
         clearInterval(time);
+        canClick = false;
         print("Time's up! You lose.");
         setTimeout(resetGame, 1000);
       }
