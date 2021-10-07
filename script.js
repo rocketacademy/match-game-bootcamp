@@ -17,6 +17,7 @@ let firstCardElement;
 let deck;
 let secondCard = null;
 let canClick = true;
+delayInMilliSeconds = 3000;
 
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
 const getRandomIndex = (max) => Math.floor(Math.random() * max);
@@ -55,6 +56,14 @@ const squareClick = (cardElement, column, row) => {
         clickedCard.suit === firstCard.suit
       ) {
         console.log('match');
+        // create a message to show match and remove after 3s
+        const messageEl = document.createElement('p');
+        messageEl.className = 'message'
+        messageEl.innerText = 'MATCH!'
+        document.body.appendChild(messageEl);
+        setTimeout(()=>{
+          messageEl.remove()
+        },delayInMilliSeconds);
     
         // turn this card over
         cardElement.innerText = clickedCard.name;
@@ -62,13 +71,21 @@ const squareClick = (cardElement, column, row) => {
         console.log('NOT a match');
         secondCard = clickedCard;
         cardElement.innerText = clickedCard.name;
-        delayInMilliSeconds = 3000;
+        
         canClick= false;
+        
+        
+
+
         const delayedFlip = () => {
           // turn this card back over
         firstCardElement.innerText = '';
         cardElement.innerText = '';
         
+
+        
+        
+
 
         }
         setTimeout(delayedFlip,delayInMilliSeconds);
