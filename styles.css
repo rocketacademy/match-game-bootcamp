@@ -16,8 +16,9 @@ body {
   padding: 10px;
   margin: 10px;
   background-color: greenyellow;
-  display: inline-block;
+  display: table;
   vertical-align: top;
+  position: ;
 }
 
 /* .row {

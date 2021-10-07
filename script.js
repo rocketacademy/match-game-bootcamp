@@ -20,6 +20,8 @@ const boardSize = 4;
 const board = [];
 let firstCard = null;
 let firstCardElement;
+let secondCard = null;
+let secondCardElement;
 let deck;
 
 const testDiv = document.createElement('div');
@@ -68,8 +70,18 @@ const squareClick = (cardElement, column, row) => {
     } else {
       console.log('NOT a match');
 
-      // turn this card back over
-      firstCardElement.innerText = '';
+      secondCard = clickedCard;
+
+      // turn this card over
+      cardElement.innerText = secondCard.name;
+
+      secondCardElement = cardElement;
+
+      // wait 3 seconds, then turn this card back over
+      setTimeout(() => {
+        firstCardElement.innerText = '';
+        secondCardElement.innerText = '';
+      }, 3000);
     }
 
     // reset the first card
