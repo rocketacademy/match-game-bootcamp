@@ -1,11 +1,18 @@
-const boardSize = 4;
-const board = [];
+let boardSize;
+let board = [];
 let firstCard = null;
-let firstCardElement;
-const deck = [];
+let firstCardElement = null;
+let deck = [];
+let canClick = true;
+
 const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
 const symbols = ['♥', '♦', '♣', '♠'];
-let canClick = true;
+
+const startButton = document.getElementById('start-game');
+const resetButton = document.getElementById('reset');
+const boardSizeInput = document.querySelectorAll('input[name="board-size"]');
+const timeInput = document.querySelectorAll('input[name="time"]');
+const boardElement = document.createElement('div');
 
 const createCardUI = (card, cardElement) => {
   const suit = document.createElement('div');
@@ -59,12 +66,6 @@ const squareClick = (cardElement, column, row) => {
 // create all the board elements that will go on the screen
 // return the built board
 const buildBoardElements = () => {
-  // create the element that everything will go inside of
-  const boardElement = document.createElement('div');
-
-  // give it a class for CSS purposes
-  boardElement.classList.add('board');
-
   // use the board data structure we passed in to create the correct size board
   for (let i = 0; i < board.length; i += 1) {
     // make a var for just this row of cards
@@ -94,8 +95,6 @@ const buildBoardElements = () => {
     }
     boardElement.appendChild(rowElement);
   }
-
-  return boardElement;
 };
 
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
@@ -157,22 +156,45 @@ function makeDeck() {
   }
 }
 
+const resetGame = () => {
+  board = [];
+  firstCard = null;
+  firstCardElement = null;
+  deck = [];
+  canClick = true;
+
+  boardSizeInput.forEach((radio) => { radio.disabled = false; });
+  timeInput.forEach((radio) => { radio.disabled = false; });
+  startButton.disabled = false;
+  resetButton.disabled = true;
+  boardElement.innerHTML = '';
+};
+
 const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
-  makeDeck();
 
-  // deal the cards out to the board data structure
-  for (let i = 0; i < boardSize; i += 1) {
-    board.push([]);
-    for (let j = 0; j < boardSize; j += 1) {
-      board[i].push(deck.pop());
+  startButton.addEventListener('click', () => {
+    boardSize = Number(document.querySelector('input[name="board-size"]:checked').value);
+    makeDeck();
+    // deal the cards out to the board data structure
+    for (let i = 0; i < boardSize; i += 1) {
+      board.push([]);
+      for (let j = 0; j < boardSize; j += 1) {
+        board[i].push(deck.pop());
+      }
     }
-  }
+    boardElement.classList.add('board');
+    document.body.appendChild(boardElement);
+    buildBoardElements(board);
 
-  const boardEl = buildBoardElements(board);
+    boardSizeInput.forEach((radio) => { radio.disabled = true; });
+    timeInput.forEach((radio) => { radio.disabled = true; });
+    startButton.disabled = true;
+    resetButton.disabled = false;
+  });
 
-  document.body.appendChild(boardEl);
+  resetButton.addEventListener('click', resetGame);
 };
 
 initGame();

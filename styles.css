@@ -44,3 +44,11 @@ body {
 .black {
   color: black;
 }
+
+.input-label {
+  display: inline;
+}
+
+/* .board {
+  display: none;
+} */

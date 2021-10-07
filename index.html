@@ -7,6 +7,40 @@
 
   <body>
     <h1 id="header">SWE101! 🚀</h1>
+    <div id="input">
+      <div id="board-size-input">
+        <p class="input-label">Board size:</p>
+        <label for="two">
+          <input id="two" type="radio" name="board-size" value="2" checked />2
+        </label>
+        <label for="four">
+          <input id="four" type="radio" name="board-size" value="4" />4
+        </label>
+        <label for="six">
+          <input id="six" type="radio" name="board-size" value="6" />6
+        </label>
+        <label for="eight">
+          <input id="eight" type="radio" name="board-size" value="8" />8
+        </label>
+        <label for="ten">
+          <input id="ten" type="radio" name="board-size" value="10" />10
+        </label>
+      </div>
+      <div id="time-input">
+        <p class="input-label">Time:</p>
+        <label for="one-min">
+          <input id="one-min" type="radio" name="time" value="1" checked />1 min
+        </label>
+        <label for="three-min">
+          <input id="three-min" type="radio" name="time" value="3" />3 min
+        </label>
+        <label for="five-min">
+          <input id="five-min" type="radio" name="time" value="5" />5 min
+        </label>
+      </div>
+      <button id="start-game">Start Game</button>
+      <button id="reset" disabled>Reset</button>
+    </div>
     <!-- Import program logic -->
     <script src="script.js"></script>
   </body>
