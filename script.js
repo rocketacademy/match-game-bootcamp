@@ -4,8 +4,9 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let shuffledDeck;
-let secondCard;
 let secondCardElement;
+let userName = '';
+let seconds = 0;
 
 // Gameplay Logic
 const squareClick = (cardElement, row, column) => {
@@ -13,7 +14,7 @@ const squareClick = (cardElement, row, column) => {
   // the user already clicked on this square
   if (cardElement.innerHTML !== '') {
     // Inform player to select a diff card
-    output('You have already selected this card. <br> Please select another one!');
+    output(`<name> ${userName}! </name><br> You have already selected this card. <br> Please select another one!`);
     return;
   }
   // first turn
@@ -22,7 +23,7 @@ const squareClick = (cardElement, row, column) => {
     // turn this card over
     cardElement.innerHTML = `${firstCard.displayName}  ${firstCard.suitSymbol} `;
     // Inform player of selected card
-    output(`You selected a ${firstCard.name} of ${firstCard.suitSymbol} <br> Try to find the same number!`);
+    output(`<name> ${userName}! </name><br> You selected a ${firstCard.name} of ${firstCard.suitSymbol} <br> Try to find the same number!`);
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
     // second turn
@@ -33,20 +34,19 @@ const squareClick = (cardElement, row, column) => {
     ) {
       // turn this card over
       cardElement.innerHTML = `${clickedCard.displayName} ${clickedCard.suitSymbol} `;
-      output('WOOOOO! <br> You found a match!');
+      output(`<name> ${userName}! </name><br> WOOOOO! <br> You found a match!`);
       // Show match message for 3 sec
       matchInfo.innerHTML = 'MATCH!!!!!!!!!';
       document.body.appendChild(matchInfo);
       // Timeout to empty out element content
       setTimeout(() => {
         matchInfo.innerHTML = '';
-      }, 1000);
+      }, 3000);
     } else {
       // turn this card back over
       firstCardElement.innerHTML = '';
-      output('Darn! It wasn\'t a match... <br> Try again!');
+      output(`<name> ${userName}! </name><br> Darn! It wasn\'t a match... <br> Try again!`);
       // Show wrong card for 3 sec
-      secondCard = clickedCard;
       secondCardElement = cardElement;
       secondCardElement.innerHTML = `${clickedCard.displayName} ${clickedCard.suitSymbol} `;
       setTimeout(() => {
@@ -94,6 +94,7 @@ const buildBoardElements = (board) => {
 
   return boardElement;
 };
+
 // Create double decks
 const makeDeck = () => {
   const newDeck = [];
@@ -177,8 +178,6 @@ const gameInfo = document.createElement('div');
 // Add class to make visual changes in CSS
 gameInfo.classList.add('gameInfo');
 
-gameInfo.innerHTML = 'Player! <br> Try to pick two of the same card in a row. <br> Pick all the cards correctly to win!';
-
 // Create element for 'MATCH!' pop up message
 const matchInfo = document.createElement('div');
 // Add class to make visual changes in CSS
@@ -193,7 +192,7 @@ const output = (message) => {
 const gameTimer = document.createElement('div');
 // Add class to make visual changes in CSS
 gameTimer.classList.add('gameTimer');
-let seconds = 180;
+seconds = 180;
 // setInterval to stop timer after 180 secs
 const countdown = setInterval(() => {
   gameTimer.innerHTML = `Try to complete the board in 3 min!: <timer> ${seconds} </timer>`;
@@ -203,6 +202,25 @@ const countdown = setInterval(() => {
   }
   seconds -= 1;
 }, 1000);
+
+// Create input button to take user's name
+const playerName = document.createElement('input');
+playerName.placeholder = 'Please enter your name';
+// Create submit button
+const submit = document.createElement('button');
+submit.innerHTML = 'Submit';
+
+// Create reset button
+const reset = document.createElement('button');
+reset.innerText = 'Reset';
+
+// Start timer and game after name is input
+const startGame = () => {
+  userName = playerName.value;
+  playerName.value = '';
+  playerName.placeholder = 'Enjoy the game!';
+  gameInfo.innerHTML = `<name> Hello ${userName}! 😊</name><br> Try to pick two of the same cards in a row. <br> Pick all the cards correctly to win!`;
+};
 
 const initGame = () => {
   // create this special deck by getting the doubled cards and
@@ -218,13 +236,43 @@ const initGame = () => {
       board[i].push(shuffledDeck.pop());
     }
   }
-
+  // Append all elements to body
   const boardEl = buildBoardElements(board);
-
-  document.body.appendChild(gameTimer);
+  document.body.appendChild(playerName);
+  document.body.appendChild(submit);
+  document.body.appendChild(reset);
   document.body.appendChild(boardEl);
+  document.body.appendChild(gameTimer);
   document.body.appendChild(brk);
   document.body.appendChild(gameInfo);
+
+  // // Callback function to reset game
+  const resetGame = () => {
+    board.length = 0;
+    shuffledDeck.length = 0;
+    const doubleDeck = makeDeck();
+    const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+    shuffledDeck = shuffleCards(deckSubset);
+
+    // deal the cards out to the board data structure
+    for (let i = 0; i < boardSize; i += 1) {
+      board.push([]);
+      for (let j = 0; j < boardSize; j += 1) {
+        board[i].push(shuffledDeck.pop());
+        // square.innerHTML = '';
+      }
+    }
+    // boardElement.document.body.removeChild(boardElement);
+    // gameTimer.remove();
+    // brk.remove();
+    // gameInfo.remove();
+    // playerName.remove();
+    // matchInfo.remove();
+    gameInfo.innerHTML = `<name> ${userName}! 😊</name><br> The game has been reset! <br> Enjoy the next round!`;
+    seconds = 180;
+  };
+  submit.addEventListener('click', () => startGame());
+  reset.addEventListener('click', () => resetGame());
 };
 
 initGame();

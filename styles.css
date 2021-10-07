@@ -32,3 +32,7 @@ timer {
   font-family: "Source Sans Pro", sans-serif;
   background-color: black;
 }
+
+name {
+  font-size: 40px;
+}
