@@ -4,6 +4,8 @@ let firstCard = null;
 let firstCardElement = null;
 let deck = [];
 let canClick = true;
+let totalPairs = null;
+let matchedPairs = 0;
 
 const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
 const symbols = ['♥', '♦', '♣', '♠'];
@@ -13,6 +15,12 @@ const resetButton = document.getElementById('reset');
 const boardSizeInput = document.querySelectorAll('input[name="board-size"]');
 const timeInput = document.querySelectorAll('input[name="time"]');
 const boardElement = document.createElement('div');
+const output = document.createElement('p');
+
+// Helper function to output message
+const print = (message) => {
+  output.innerHTML = message;
+};
 
 const createCardUI = (card, cardElement) => {
   const suit = document.createElement('div');
@@ -25,6 +33,22 @@ const createCardUI = (card, cardElement) => {
 
   cardElement.appendChild(name);
   cardElement.appendChild(suit);
+};
+
+const resetGame = () => {
+  board = [];
+  firstCard = null;
+  firstCardElement = null;
+  deck = [];
+  canClick = true;
+  totalPairs = null;
+  matchedPairs = 0;
+
+  boardSizeInput.forEach((radio) => { radio.disabled = false; });
+  timeInput.forEach((radio) => { radio.disabled = false; });
+  startButton.disabled = false;
+  resetButton.disabled = true;
+  print('');
 };
 
 const squareClick = (cardElement, column, row) => {
@@ -48,16 +72,27 @@ const squareClick = (cardElement, column, row) => {
       // second turn
     } else {
       canClick = false;
+      const match = clickedCard.name === firstCard.name && clickedCard.suit === firstCard.suit;
       createCardUI(clickedCard, cardElement);
+      if (match) {
+        matchedPairs += 1;
+        let message = 'Match!';
+        if (matchedPairs === totalPairs) message += '<br>You win!!!';
+        print(message);
+      } else {
+        print('No match!');
+      }
 
       setTimeout(() => {
-        if (clickedCard.name !== firstCard.name || clickedCard.suit !== firstCard.suit) {
+        if (matchedPairs === totalPairs) { resetGame(); }
+        else if (!match) {
           cardElement.innerHTML = '';
           firstCardElement.innerHTML = '';
         }
         // reset the first card
         firstCard = null;
         canClick = true;
+        print('');
       }, 1000);
     }
   }
@@ -139,7 +174,7 @@ const generateCard = (cardRank, suit) => {
 };
 
 // generate a shuffled standard deck of cards
-function makeDeck() {
+const makeDeck = () => {
   const tempDeck = [];
   for (let i = 1; i <= 13; i += 1) {
     for (let j = 0; j < 4; j += 1) {
@@ -148,34 +183,24 @@ function makeDeck() {
     }
   }
 
-  const numUniqueCards = (boardSize * boardSize) / 2;
-  for (let k = 0; k < numUniqueCards; k += 1) {
+  for (let k = 0; k < totalPairs; k += 1) {
     const randCard = tempDeck.pop();
     deck.splice(getRandomIndex(deck.length + 1), 0, randCard);
     deck.splice(getRandomIndex(deck.length + 1), 0, randCard);
   }
-}
-
-const resetGame = () => {
-  board = [];
-  firstCard = null;
-  firstCardElement = null;
-  deck = [];
-  canClick = true;
-
-  boardSizeInput.forEach((radio) => { radio.disabled = false; });
-  timeInput.forEach((radio) => { radio.disabled = false; });
-  startButton.disabled = false;
-  resetButton.disabled = true;
-  boardElement.innerHTML = '';
 };
 
 const initGame = () => {
-  // create this special deck by getting the doubled cards and
-  // making a smaller array that is ( boardSize squared ) number of cards
+  boardElement.classList.add('board');
+  document.body.appendChild(boardElement);
+
+  output.id = 'output';
+  document.body.appendChild(output);
 
   startButton.addEventListener('click', () => {
+    boardElement.innerHTML = '';
     boardSize = Number(document.querySelector('input[name="board-size"]:checked').value);
+    totalPairs = (boardSize * boardSize) / 2;
     makeDeck();
     // deal the cards out to the board data structure
     for (let i = 0; i < boardSize; i += 1) {
@@ -184,8 +209,6 @@ const initGame = () => {
         board[i].push(deck.pop());
       }
     }
-    boardElement.classList.add('board');
-    document.body.appendChild(boardElement);
     buildBoardElements(board);
 
     boardSizeInput.forEach((radio) => { radio.disabled = true; });
@@ -194,7 +217,10 @@ const initGame = () => {
     resetButton.disabled = false;
   });
 
-  resetButton.addEventListener('click', resetGame);
+  resetButton.addEventListener('click', () => {
+    resetGame();
+    boardElement.innerHTML = '';
+  });
 };
 
 initGame();
