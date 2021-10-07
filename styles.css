@@ -20,3 +20,15 @@ body {
   font-size: 20px;
   font-family: "Lucida Console", "Courier New", monospace;
 }
+
+.gameTimer {
+  font-size: 18px;
+  font-family: "Lucida Console", "Courier New", monospace;
+}
+
+timer {
+  font-size: 30px;
+  color: green;
+  font-family: "Source Sans Pro", sans-serif;
+  background-color: black;
+}

@@ -40,7 +40,7 @@ const squareClick = (cardElement, row, column) => {
       // Timeout to empty out element content
       setTimeout(() => {
         matchInfo.innerHTML = '';
-      }, 3000);
+      }, 1000);
     } else {
       // turn this card back over
       firstCardElement.innerHTML = '';
@@ -174,18 +174,35 @@ const brk = document.createElement('br');
 
 // Create element for game info
 const gameInfo = document.createElement('div');
+// Add class to make visual changes in CSS
 gameInfo.classList.add('gameInfo');
 
 gameInfo.innerHTML = 'Player! <br> Try to pick two of the same card in a row. <br> Pick all the cards correctly to win!';
 
 // Create element for 'MATCH!' pop up message
 const matchInfo = document.createElement('div');
+// Add class to make visual changes in CSS
 matchInfo.classList.add('matchInfo');
 
 // Create function to help change output message
 const output = (message) => {
   gameInfo.innerHTML = message;
 };
+
+// Create element for game timer
+const gameTimer = document.createElement('div');
+// Add class to make visual changes in CSS
+gameTimer.classList.add('gameTimer');
+let seconds = 180;
+// setInterval to stop timer after 180 secs
+const countdown = setInterval(() => {
+  gameTimer.innerHTML = `Try to complete the board in 3 min!: <timer> ${seconds} </timer>`;
+
+  if (seconds === 0) {
+    clearInterval(countdown);
+  }
+  seconds -= 1;
+}, 1000);
 
 const initGame = () => {
   // create this special deck by getting the doubled cards and
@@ -204,6 +221,7 @@ const initGame = () => {
 
   const boardEl = buildBoardElements(board);
 
+  document.body.appendChild(gameTimer);
   document.body.appendChild(boardEl);
   document.body.appendChild(brk);
   document.body.appendChild(gameInfo);
