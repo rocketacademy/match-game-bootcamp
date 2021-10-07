@@ -5,11 +5,14 @@
 const boardSize = 4; // boardSize has to be an even number
 const board = [];
 let firstCard = null;
-let firstCardElement;
+let firstCardElement; //used to hold first clicked square. no need global variable cos only used in squareClick?
 let deck;
-let textArea;
-let matchCounter = 0;
-let canClick = true;
+let textArea; //p element to display msgs
+let timerDisplay; //h1 element to display countdown
+let matchCounter = 0; //keep track of # of matches made, once this counter reaches 8, game over msg displays
+let canClick = true; //toggle to prevent user from clicking on squares when both mismatched cards are shown
+let timeAvail; //time to countdown
+let countdown; //countdown timer function
 
 /// //////////////////////////////
 // Helper functions
@@ -137,12 +140,11 @@ const squareClick = (cardElement, column, row) => {
     firstCard = null;
   }
   if (matchCounter === 8) {
-    output(
-      "<strong>Congratulations! You've completed the game! Refresh the page to play again! </strong>"
-    );
     setTimeout(() => {
-      output("");
-    }, 5000);
+      output(
+        "<strong>Congratulations! You've completed the game! Click reset to play again! </strong>"
+      );
+    }, 1000);
   }
 };
 
@@ -181,6 +183,9 @@ const buildBoardElements = (board) => {
         // we will want to pass in the card element so
         // that we can change how it looks on screen, i.e.,
         // "turn the card over"
+        if (timeAvail <= 0) {
+          canClick = false;
+        }
         canClick === true ? squareClick(event.currentTarget, i, j) : "'"; //will only call squareClick if canClick!
       });
 
@@ -193,7 +198,7 @@ const buildBoardElements = (board) => {
 };
 
 // IIFE so game will be initialised without having to call the function
-(() => {
+const gameInit = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   // doubleDeck created such tt 2 similar cards are always side-by-side, so cut off a portion of doubleDeck to use first before shuffling it
@@ -210,6 +215,23 @@ const buildBoardElements = (board) => {
   }
 
   matchCounter = 0;
+
+  timerDisplay = document.createElement("h1");
+  document.body.append(timerDisplay);
+  timeAvail = 100;
+  let countdown = setInterval(function () {
+    timeAvail--;
+    timerDisplay.innerHTML = `Time left: ${timeAvail}s`;
+    if (timeAvail <= 0) {
+      output("<strong>Time's up! Click reset to try again.</strong>");
+      clearInterval(countdown);
+    }
+    if (matchCounter === 8) {
+      clearInterval(countdown);
+      timerDisplay.innerHTML = "Time left: 00000000";
+    }
+  }, 1000);
+
   const boardEl = buildBoardElements(board);
 
   document.body.appendChild(boardEl);
@@ -220,4 +242,6 @@ const buildBoardElements = (board) => {
   output(
     "<ol> <strong> <li>Click on any one of the boxes above to reveal a card.</li><li>Select any other empty box to find a match!</li> </strong></ol> "
   );
-})();
+};
+
+gameInit();
