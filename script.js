@@ -1,5 +1,3 @@
-// Please implement exercise logic here
-// boardSize has to be an even number
 const boardSize = 4;
 const board = [];
 let firstCard = null;
@@ -7,43 +5,54 @@ let firstCardElement;
 const deck = [];
 const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
 const symbols = ['♥', '♦', '♣', '♠'];
+let canClick = true;
+
+const createCardUI = (card, cardElement) => {
+  const suit = document.createElement('div');
+  suit.classList.add('suit', card.colour);
+  suit.innerText = card.suitSymbol;
+
+  const name = document.createElement('div');
+  name.classList.add('name', card.colour);
+  name.innerText = card.displayName;
+
+  cardElement.appendChild(name);
+  cardElement.appendChild(suit);
+};
 
 const squareClick = (cardElement, column, row) => {
-  console.log(cardElement);
+  if (canClick) {
+    const clickedCard = board[column][row];
 
-  console.log('FIRST CARD DOM ELEMENT', firstCard);
-
-  console.log('BOARD CLICKED CARD', board[column][row]);
-
-  const clickedCard = board[column][row];
-
-  // the user already clicked on this square
-  if (cardElement.innerText !== '') {
-    return;
-  }
-
-  // first turn
-  if (firstCard === null) {
-    firstCard = clickedCard;
-    // turn this card over
-    cardElement.innerText = firstCard.name;
-
-    // hold onto this for later when it may not match
-    firstCardElement = cardElement;
-
-    // second turn
-  } else {
-    cardElement.innerText = clickedCard.name;
-
-    if (clickedCard.name !== firstCard.name || clickedCard.suit !== firstCard.suit) {
-      setTimeout(() => {
-        cardElement.innerText = '';
-        firstCardElement.innerText = '';
-      }, 1000);
+    // the user already clicked on this square
+    if (cardElement.innerHTML !== '') {
+      return;
     }
 
-    // reset the first card
-    firstCard = null;
+    // first turn
+    if (firstCard === null) {
+      firstCard = clickedCard;
+      // turn this card over
+      createCardUI(firstCard, cardElement);
+
+      // hold onto this for later when it may not match
+      firstCardElement = cardElement;
+
+      // second turn
+    } else {
+      canClick = false;
+      createCardUI(clickedCard, cardElement);
+
+      setTimeout(() => {
+        if (clickedCard.name !== firstCard.name || clickedCard.suit !== firstCard.suit) {
+          cardElement.innerHTML = '';
+          firstCardElement.innerHTML = '';
+        }
+        // reset the first card
+        firstCard = null;
+        canClick = true;
+      }, 1000);
+    }
   }
 };
 
@@ -71,10 +80,9 @@ const buildBoardElements = () => {
       const square = document.createElement('div');
 
       // set a class for CSS purposes
-      square.classList.add('square');
+      square.classList.add('card');
 
       // set the click event
-      // eslint-disable-next-line
       square.addEventListener('click', (event) => {
         // we will want to pass in the card element so
         // that we can change how it looks on screen, i.e.,
