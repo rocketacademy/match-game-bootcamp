@@ -1,51 +1,58 @@
-/////////////////////////////////
-//Global variables
-/////////////////////////////////
+/// //////////////////////////////
+// Global variables
+/// //////////////////////////////
 
 const boardSize = 4; // boardSize has to be an even number
 const board = [];
-let firstCard = null,
-  firstCardElement,
-  deck;
+let firstCard = null;
+let firstCardElement;
+let deck;
+let textArea;
+let matchCounter = 0;
+let canClick = true;
 
-/////////////////////////////////
-//Helper functions
-/////////////////////////////////
-const makeDeck = (cardAmount) => {
-  // create the empty deck at the beginning
+/// //////////////////////////////
+// Helper functions
+/// //////////////////////////////
+const makeDeck = () => {
   const newDeck = [];
   const suits = ["hearts", "diamonds", "clubs", "spades"];
+  const suitSymbols = ["♥️", "♦", "♣", "♠"];
+  const suitColors = ["red", "red", "black", "black"];
 
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
-    // make a variable of the current suit
     const currentSuit = suits[suitIndex];
-    console.log(`current suit: ${currentSuit}`);
+    const suitSymbol = suitSymbols[suitIndex];
+    const suitColor = suitColors[suitIndex];
 
-    // loop to create all cards in this suit
-    // rank 1-13
     for (let rankCounter = 1; rankCounter <= 13; rankCounter += 1) {
-      // Convert rankCounter to string
+      // By default, the card name is the same as rankCounter
       let cardName = `${rankCounter}`;
-
-      // 1, 11, 12 ,13
+      let shortName = `${rankCounter}`;
+      // If rank is 1, 11, 12, or 13, set cardName to the ace or face card's name
       if (cardName === "1") {
         cardName = "ace";
+        shortName = "A";
       } else if (cardName === "11") {
         cardName = "jack";
+        shortName = "J";
       } else if (cardName === "12") {
         cardName = "queen";
+        shortName = "Q";
       } else if (cardName === "13") {
         cardName = "king";
+        shortName = "K";
       }
 
-      // make a single card object variable
+      // Create a new card with the current name, suit, and rank
       const card = {
-        name: cardName,
+        suitPic: suitSymbol,
         suit: currentSuit,
+        name: cardName,
+        displayName: shortName,
+        colour: suitColor,
         rank: rankCounter,
       };
-
-      console.log(`rank: ${rankCounter}`);
 
       // add the card to the deck
       newDeck.push(card); // add double the cards to the deck
@@ -70,16 +77,18 @@ const shuffleCards = (cards) => {
   }
   return cards;
 };
-/////////////////////////////////
-//Game play logic
-/////////////////////////////////
+
+// Create a helper function for output to abstract complexity
+// of DOM manipulation away from game logic
+const output = (message) => {
+  textArea.innerHTML = message;
+};
+
+/// //////////////////////////////
+// Game play logic
+/// //////////////////////////////
 const squareClick = (cardElement, column, row) => {
-  console.log(cardElement);
-
-  console.log("FIRST CARD DOM ELEMENT", firstCard);
-
-  console.log("BOARD CLICKED CARD", board[column][row]);
-
+  //cardElement refers to the clicked square HTML element
   const clickedCard = board[column][row];
 
   // the user already clicked on this square
@@ -89,40 +98,57 @@ const squareClick = (cardElement, column, row) => {
 
   // first turn
   if (firstCard === null) {
-    console.log("first turn");
     firstCard = clickedCard;
-    // turn this card over
-    cardElement.innerText = firstCard.name;
+    cardElement.innerText = `${firstCard.displayName} of ${firstCard.suitPic}`;
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
 
     // second turn
   } else {
-    console.log("second turn");
     if (
       clickedCard.name === firstCard.name &&
       clickedCard.suit === firstCard.suit
     ) {
+      cardElement.innerText = `${firstCard.displayName} of ${firstCard.suitPic}`;
       console.log("match");
+      output("<strong>Good job, you found a match! Keeping going!</strong>");
+      setTimeout(() => {
+        output("");
+      }, 1000);
 
-      // turn this card over
-      cardElement.innerText = clickedCard.name;
+      matchCounter += 1;
     } else {
       console.log("NOT a match");
+      output("<strong>No match...keep trying!</strong>");
+      canClick = false; // disallow clicking when cards are being displayed
+      //still mismatched card and 1 second later, turn the card over
+      cardElement.innerText = `${clickedCard.displayName} of ${clickedCard.suitPic}`;
 
-      // turn this card back over
-      firstCardElement.innerText = "";
+      setTimeout(() => {
+        cardElement.innerText = "";
+        firstCardElement.innerText = "";
+        canClick = true; // allow clicking after cards disapppear
+        output("");
+      }, 1000);
     }
 
     // reset the first card
     firstCard = null;
   }
+  if (matchCounter === 8) {
+    output(
+      "<strong>Congratulations! You've completed the game! Refresh the page to play again! </strong>"
+    );
+    setTimeout(() => {
+      output("");
+    }, 5000);
+  }
 };
 
-/////////////////////////////////
-//Game initialisation logic
-/////////////////////////////////
+/// //////////////////////////////
+// Game initialisation logic
+/// //////////////////////////////
 // create all the board elements that will go on the screen
 // return the built board
 const buildBoardElements = (board) => {
@@ -155,7 +181,7 @@ const buildBoardElements = (board) => {
         // we will want to pass in the card element so
         // that we can change how it looks on screen, i.e.,
         // "turn the card over"
-        squareClick(event.currentTarget, i, j);
+        canClick === true ? squareClick(event.currentTarget, i, j) : "'"; //will only call squareClick if canClick!
       });
 
       rowElement.appendChild(square);
@@ -166,11 +192,13 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
+// IIFE so game will be initialised without having to call the function
 (() => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
-  let doubleDeck = makeDeck();
-  let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  // doubleDeck created such tt 2 similar cards are always side-by-side, so cut off a portion of doubleDeck to use first before shuffling it
+  const doubleDeck = makeDeck();
+  const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
   deck = shuffleCards(deckSubset);
 
   // deal the cards out to the board data structure
@@ -181,7 +209,15 @@ const buildBoardElements = (board) => {
     }
   }
 
+  matchCounter = 0;
   const boardEl = buildBoardElements(board);
 
   document.body.appendChild(boardEl);
+
+  textArea = document.createElement("p");
+  textArea.classList.add("msg");
+  document.body.append(textArea);
+  output(
+    "<ol> <strong> <li>Click on any one of the boxes above to reveal a card.</li><li>Select any other empty box to find a match!</li> </strong></ol> "
+  );
 })();
