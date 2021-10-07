@@ -19,7 +19,7 @@ let canClick = true;
 const makeDeck = (cardAmount) => {
   // create the empty deck at the beginning
   const newDeck = [];
-  const suits = ["♥️", "♦️", "♣️", "♠️"];
+  const suits = ['♥️', '♦️', '♣️', '♠️'];
 
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
     // make a variable of the current suit
@@ -33,14 +33,14 @@ const makeDeck = (cardAmount) => {
       let cardName = `${rankCounter}`;
 
       // 1, 11, 12 ,13
-      if (cardName === "1") {
-        cardName = "A";
-      } else if (cardName === "11") {
-        cardName = "J";
-      } else if (cardName === "12") {
-        cardName = "Q";
-      } else if (cardName === "13") {
-        cardName = "K";
+      if (cardName === '1') {
+        cardName = 'A';
+      } else if (cardName === '11') {
+        cardName = 'J';
+      } else if (cardName === '12') {
+        cardName = 'Q';
+      } else if (cardName === '13') {
+        cardName = 'K';
       }
 
       // make a single card object variable
@@ -84,21 +84,21 @@ const shuffleCards = (cardDeck) => {
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
 
-  console.log("FIRST CARD DOM ELEMENT", firstCard);
+  console.log('FIRST CARD DOM ELEMENT', firstCard);
 
-  console.log("BOARD CLICKED CARD", board[column][row]);
+  console.log('BOARD CLICKED CARD', board[column][row]);
 
   const clickedCard = board[column][row];
 
   // the user already clicked on this square
-  if (cardElement.innerText !== "") {
+  if (cardElement.innerText !== '') {
     return;
   }
 
   // first turn
   if (firstCard === null && canClick === true) {
     canClick = false;
-    console.log("first turn");
+    console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
     cardElement.innerHTML = `${firstCard.name}<br>${firstCard.suit}`;
@@ -106,20 +106,20 @@ const squareClick = (cardElement, column, row) => {
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
     // Print game state to select 2nd card
-    gameInfo.innerText = "Please click on a 2nd card. Click to begin!";
+    gameInfo.innerText = 'Please click on a 2nd card. Click to begin!';
     // second turn
 
-    let delayClick = () => {
+    const delayClick = () => {
       canClick = true;
     };
     setTimeout(delayClick, 3500);
   } else {
-    console.log("second turn");
+    console.log('second turn');
     if (
-      clickedCard.name === firstCard.name &&
-      clickedCard.suit === firstCard.suit
+      clickedCard.name === firstCard.name
+      && clickedCard.suit === firstCard.suit
     ) {
-      console.log("match");
+      console.log('match');
 
       // turn this card over
       cardElement.innerHTML = `${clickedCard.name}<br>${clickedCard.suit}`;
@@ -128,21 +128,21 @@ const squareClick = (cardElement, column, row) => {
       gameInfo.innerText = "It's a match! Please select a new card";
 
       // Set delay to make message dissapear
-      let dissapearMessage = () => {
-        gameInfo.innerText = "";
+      const dissapearMessage = () => {
+        gameInfo.innerText = '';
       };
 
       setTimeout(dissapearMessage, 3000);
     } else {
-      console.log("NOT a match");
+      console.log('NOT a match');
       // Print game state that it matches
       gameInfo.innerText = "It's not a match. Please select a new card.";
       cardElement.innerHTML = `${clickedCard.name}<br>${clickedCard.suit}`;
 
       // Delay card flip for 3 seconds before hiding it
-      let delayCardTurn = () => {
-        firstCardElement.innerHTML = "";
-        cardElement.innerHTML = "";
+      const delayCardTurn = () => {
+        firstCardElement.innerHTML = '';
+        cardElement.innerHTML = '';
       };
 
       setTimeout(delayCardTurn, 3000);
@@ -161,10 +161,10 @@ const squareClick = (cardElement, column, row) => {
 // return the built board
 const buildBoardElements = (board) => {
   // create the element that everything will go inside of
-  const boardElement = document.createElement("div");
+  const boardElement = document.createElement('div');
 
   // give it a class for CSS purposes
-  boardElement.classList.add("board");
+  boardElement.classList.add('board');
 
   // use the board data structure we passed in to create the correct size board
   for (let i = 0; i < board.length; i += 1) {
@@ -172,16 +172,16 @@ const buildBoardElements = (board) => {
     const row = board[i];
 
     // make an element for this row of cards
-    const rowElement = document.createElement("div");
-    rowElement.classList.add("row");
+    const rowElement = document.createElement('div');
+    rowElement.classList.add('row');
 
     // make all the squares for this row
     for (let j = 0; j < row.length; j += 1) {
       // create the square element
-      const square = document.createElement("div");
+      const square = document.createElement('div');
 
       // set a class for CSS purposes
-      square.classList.add("square");
+      square.classList.add('square');
 
       // set the click event
       // eslint-disable-next-line
@@ -218,9 +218,9 @@ const initGame = () => {
   const boardEl = buildBoardElements(board);
   document.body.appendChild(boardEl);
 
-  gameInfo = document.createElement("div");
-  gameInfo.classList.add("textContainer");
-  gameInfo.innerText = "Its player 1 turn. Click to begin!";
+  gameInfo = document.createElement('div');
+  gameInfo.classList.add('textContainer');
+  gameInfo.innerText = 'Its player 1 turn. Click to begin!';
   document.body.appendChild(gameInfo);
 };
 
