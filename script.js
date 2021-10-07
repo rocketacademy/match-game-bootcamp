@@ -87,6 +87,10 @@ const shuffleCards = (cards) => {
 const boardSize = 4;
 const board = [];
 
+// build message container
+const messageContainer = document.createElement('div');
+document.body.appendChild(messageContainer);
+
 // gameplay logic
 // set canClick variable to prevent clicking
 // during delay for card to turn back
@@ -121,7 +125,8 @@ const squareClick = (cardElement, column, row) => {
       if (
         clickedCard.name === firstCard.name
       ) {
-        console.log('match');
+        messageContainer.innerText = 'it\'s a match 🥳';
+        setTimeout(() => { messageContainer.innerText = ''; }, 2000);
 
         // turn this card over
         cardElement.innerText = clickedCard.name;
