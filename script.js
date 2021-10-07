@@ -88,7 +88,7 @@ const boardSize = 4;
 const board = [];
 
 // build message container
-const messageContainer = document.createElement('div');
+const messageContainer = document.createElement('span');
 document.body.appendChild(messageContainer);
 
 // gameplay logic
@@ -132,10 +132,10 @@ const squareClick = (cardElement, column, row) => {
         cardElement.innerText = clickedCard.name;
       } else {
         canClick = false;
-        console.log('NOT a match');
+        messageContainer.innerText = 'not a match 👻';
         // if cards don't match, then turn back over in 3 seconds
         cardElement.innerText = clickedCard.name;
-        setTimeout(() => { cardElement.innerText = ''; firstCardElement.innerText = ''; canClick = true; }, 3000);
+        setTimeout(() => { cardElement.innerText = ''; firstCardElement.innerText = ''; canClick = true; messageContainer.innerText = ''; }, 2000);
 
       // turn this card back over
       }
@@ -207,4 +207,5 @@ const initGame = () => {
 };
 
 initGame();
+
 // buildBoardElements(board);
