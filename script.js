@@ -7,15 +7,6 @@ let shuffledDeck;
 let secondCard;
 let secondCardElement;
 
-// Create element for game info
-const gameInfo = document.createElement('div');
-gameInfo.innerHTML = 'Player! <br> Try to pick two of the same card in a row. <br> Pick all the cards correctly to win!';
-
-// Create function to help change output message
-const output = (message) => {
-  gameInfo.innerHTML = message;
-};
-
 // Gameplay Logic
 const squareClick = (cardElement, row, column) => {
   const clickedCard = board[row][column];
@@ -43,6 +34,13 @@ const squareClick = (cardElement, row, column) => {
       // turn this card over
       cardElement.innerHTML = `${clickedCard.displayName} ${clickedCard.suitSymbol} `;
       output('WOOOOO! <br> You found a match!');
+      // Show match message for 3 sec
+      matchInfo.innerHTML = 'MATCH!!!!!!!!!';
+      document.body.appendChild(matchInfo);
+      // Timeout to empty out element content
+      setTimeout(() => {
+        matchInfo.innerHTML = '';
+      }, 3000);
     } else {
       // turn this card back over
       firstCardElement.innerHTML = '';
@@ -173,6 +171,21 @@ const shuffleCards = (deckSubset) => {
 
 // Create line break between game board and game info
 const brk = document.createElement('br');
+
+// Create element for game info
+const gameInfo = document.createElement('div');
+gameInfo.classList.add('gameInfo');
+
+gameInfo.innerHTML = 'Player! <br> Try to pick two of the same card in a row. <br> Pick all the cards correctly to win!';
+
+// Create element for 'MATCH!' pop up message
+const matchInfo = document.createElement('div');
+matchInfo.classList.add('matchInfo');
+
+// Create function to help change output message
+const output = (message) => {
+  gameInfo.innerHTML = message;
+};
 
 const initGame = () => {
   // create this special deck by getting the doubled cards and
