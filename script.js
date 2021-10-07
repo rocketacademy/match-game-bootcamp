@@ -11,13 +11,27 @@ const lowerRightPosition = grid[1][1]; // 'Z'
 
 // boardSize has to be an even number
 const boardSize = 4;
-const board = [];
+let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
 let secondCard = null;
 let canClick = true;
-delayInMilliSeconds = 3000;
+let delayInMilliSeconds = 3000;
+let timeCheck = 1;
+let timer = 180000;
+let playerName =  '';
+let winCounter = 0 ; 
+let matches =  0;
+const messageEl = document.createElement('p');
+messageEl.className = 'message'
+
+//create header scoreboard
+const statsBoard = document.createElement('div');
+const statsEl = document.createElement('p');
+const resetButton = document.createElement('button');
+resetButton.innerText = 'Reset'
+
 
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
 const getRandomIndex = (max) => Math.floor(Math.random() * max);
@@ -32,7 +46,7 @@ const squareClick = (cardElement, column, row) => {
     
     const clickedCard = board[column][row]; 
 
-    // the user already clicked on this square
+    // the user already clicked on this square or cannot click
     if( cardElement.innerText !== '' || canClick==false ){
         return;
     }
@@ -57,10 +71,10 @@ const squareClick = (cardElement, column, row) => {
       ) {
         console.log('match');
         // create a message to show match and remove after 3s
-        const messageEl = document.createElement('p');
-        messageEl.className = 'message'
+        
         messageEl.innerText = 'MATCH!'
         document.body.appendChild(messageEl);
+        matches += 1;
         setTimeout(()=>{
           messageEl.remove()
         },delayInMilliSeconds);
@@ -98,6 +112,12 @@ const squareClick = (cardElement, column, row) => {
 
       // reset the first card
       firstCard = null;
+    }
+
+    if (matches == 8){
+      messageEl.innerText = "All matches found! Win"
+      winCounter +=1 ;
+      statsEl.innerText = `${playerName}'s Match Game! Current wins:${winCounter}`
     }
 };
 
@@ -144,7 +164,24 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
+const resetGame =()=>{
+  let numEle = document.body.childNodes.length;
+  for (let i = numEle-1; i>1;  i-=1){
+    document.body.childNodes[i].remove();
+  }
+  board = [];
+  matches = 0;
+  initGame();
+}
+
 const initGame = () => {
+  // insert scoreboard elements
+  statsEl.innerText = `${playerName}'s Match Game! Current wins:${winCounter}`
+  statsBoard.appendChild(statsEl);
+  statsBoard.appendChild(resetButton);
+  document.body.appendChild(statsBoard);
+  resetButton.addEventListener('click',resetGame);
+  
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
@@ -227,4 +264,31 @@ const shuffleCards = (cards) => {
   return cards;
 };
 
-initGame();
+
+
+const enterName = ()=>{
+  const inputField = document.createElement('input');
+  const submitButton = document.createElement('button');
+  const submitName = () => {
+    playerName = inputField.value;
+    messageEl.remove();
+    inputField.remove();
+    submitButton.remove();
+    initGame();
+  }
+  if (playerName==''){
+    messageEl.innerText = 'Please enter your name to start'
+    document.body.appendChild(messageEl);
+    submitButton.innerText = 'Submit';
+    document.body.appendChild(inputField);
+    document.body.appendChild(submitButton);
+    submitButton.addEventListener('click',submitName);
+
+  }else{
+    initGame();
+  }
+
+  
+}
+
+enterName();
