@@ -24,7 +24,6 @@ const squareClick = (cardElement, column, row) => {
 
   // first turn
   if (firstCard === null) {
-    console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
     cardElement.innerText = firstCard.name;
@@ -34,20 +33,13 @@ const squareClick = (cardElement, column, row) => {
 
     // second turn
   } else {
-    console.log('second turn');
-    if (
-      clickedCard.name === firstCard.name
-        && clickedCard.suit === firstCard.suit
-    ) {
-      console.log('match');
+    cardElement.innerText = clickedCard.name;
 
-      // turn this card over
-      cardElement.innerText = clickedCard.name;
-    } else {
-      console.log('NOT a match');
-
-      // turn this card back over
-      firstCardElement.innerText = '';
+    if (clickedCard.name !== firstCard.name || clickedCard.suit !== firstCard.suit) {
+      setTimeout(() => {
+        cardElement.innerText = '';
+        firstCardElement.innerText = '';
+      }, 1000);
     }
 
     // reset the first card
