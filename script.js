@@ -24,6 +24,9 @@ let secondCard = null;
 let secondCardElement;
 let deck;
 
+// create a click state - to prevent user from clicking before cards disappear
+const canClick = true;
+
 const testDiv = document.createElement('div');
 testDiv.classList.add('board');
 testDiv.innerText = 'HELLO WELCOME TO MATCH GAME';
@@ -64,6 +67,13 @@ const squareClick = (cardElement, column, row) => {
         && clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
+      // create match message, disappear after 3 seconds
+      const matchMessage = document.createElement('div');
+      matchMessage.innerText = "IT'S A MATCH!";
+      document.body.appendChild(matchMessage);
+      setTimeout(() => {
+        matchMessage.innerText = '';
+      }, 3000);
 
       // turn this card over
       cardElement.innerText = clickedCard.name;
@@ -81,7 +91,7 @@ const squareClick = (cardElement, column, row) => {
       setTimeout(() => {
         firstCardElement.innerText = '';
         secondCardElement.innerText = '';
-      }, 3000);
+      }, 2000);
     }
 
     // reset the first card
