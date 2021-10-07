@@ -89,9 +89,9 @@ body {
 }
 
 .match {
-  border: solid 3px limegreen;
+  border: solid 2px limegreen;
 }
 
 .no-match {
-  border: solid 3px red;
+  border: solid 2px red;
 }
