@@ -28,6 +28,7 @@ messageEl.className = 'message'
 
 //create header scoreboard
 const statsBoard = document.createElement('div');
+statsBoard.className = 'headBoard'
 const statsEl = document.createElement('p');
 const resetButton = document.createElement('button');
 const timerEl = document.createElement('p');
@@ -54,11 +55,11 @@ const squareClick = (cardElement, column, row) => {
 
     // first turn
     if (firstCard === null) {
-      console.log('first turn');
+      console.log(clickedCard);
       firstCard = clickedCard;
       // turn this card over
-      cardElement.innerText = firstCard.name;
-  
+      //cardElement.innerText = firstCard.name + firstCard.suit;
+      cardElement.innerHTML = `${firstCard.name}<br>${firstCard.suit}`
       // hold onto this for later when it may not match
       firstCardElement = cardElement;
 
@@ -86,11 +87,11 @@ const squareClick = (cardElement, column, row) => {
         
     
         // turn this card over
-        cardElement.innerText = clickedCard.name;
+        cardElement.innerHTML = `${clickedCard.name}<br>${clickedCard.suit}`
       } else {
         console.log('NOT a match');
         secondCard = clickedCard;
-        cardElement.innerText = clickedCard.name;
+        cardElement.innerHTML = `${clickedCard.name}<br>${clickedCard.suit}`
         
         canClick= false;
         
@@ -117,7 +118,7 @@ const squareClick = (cardElement, column, row) => {
     if (matches == 8){
       messageEl.innerText = "All matches found! Win"
       winCounter +=1 ;
-      statsEl.innerText = `${playerName}'s Match Game! Current wins:${winCounter}`
+      statsEl.innerHTML = `${playerName}'s Match Game!<br>Current wins:${winCounter}`
     }
 };
 
@@ -177,7 +178,7 @@ const resetGame =()=>{
 
 const initGame = () => {
   // insert scoreboard elements
-  statsEl.innerText = `${playerName}'s Match Game! Current wins:${winCounter}`
+  statsEl.innerHTML = `${playerName}'s Match Game!<br>Current wins:${winCounter}`
   statsBoard.appendChild(statsEl);
   statsBoard.appendChild(resetButton);
   timerEl.innerText = `Time left: ${timer} seconds`
@@ -199,16 +200,19 @@ const initGame = () => {
       board[i].push(deck.pop());
     }
   }
-
+  const lineBreak = document.createElement('br');
+  document.body.appendChild(lineBreak);
   const boardEl = buildBoardElements(board);
 
   document.body.appendChild(boardEl);
+  const lineBreak2 = document.createElement('br');
+  document.body.appendChild(lineBreak2);
 };
 
 const makeDeck = (cardAmount) => {
   // create the empty deck at the beginning
   const newDeck = [];
-  const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
+  const suits = ["♥️", "♦️", "♣️", "♠️"];
 
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
     // make a variable of the current suit
@@ -305,6 +309,8 @@ const enterName = ()=>{
   if (playerName==''){
     messageEl.innerText = 'Please enter your name to start'
     document.body.appendChild(messageEl);
+    const lineBreak = document.createElement('br');
+    document.body.appendChild(lineBreak);
     submitButton.innerText = 'Submit';
     document.body.appendChild(inputField);
     document.body.appendChild(submitButton);
