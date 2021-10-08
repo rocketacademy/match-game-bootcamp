@@ -51,7 +51,7 @@ const squareClick = (cardElement, row, column) => {
       secondCardElement.innerHTML = `${clickedCard.displayName} ${clickedCard.suitSymbol} `;
       setTimeout(() => {
         secondCardElement.innerHTML = '';
-      }, 3000);
+      }, 1000);
     }
 
     // reset the first card
@@ -248,26 +248,29 @@ const initGame = () => {
 
   // // Callback function to reset game
   const resetGame = () => {
+    // Clear out array with cards
     board.length = 0;
+    // Clear out shuffled deck
     shuffledDeck.length = 0;
+    // Create new shuffled deck
     const doubleDeck = makeDeck();
     const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
     shuffledDeck = shuffleCards(deckSubset);
 
-    // deal the cards out to the board data structure
+    // Deal cards to array again
     for (let i = 0; i < boardSize; i += 1) {
       board.push([]);
       for (let j = 0; j < boardSize; j += 1) {
         board[i].push(shuffledDeck.pop());
-        // square.innerHTML = '';
       }
     }
-    // boardElement.document.body.removeChild(boardElement);
-    // gameTimer.remove();
-    // brk.remove();
-    // gameInfo.remove();
-    // playerName.remove();
-    // matchInfo.remove();
+    // Create element ?array which selects all squares
+    const allSquares = document.querySelectorAll('.square');
+    // Clear out all square elements so that board appears empty
+    for (let k = 0; k < allSquares.length; k += 1) {
+      allSquares[k].innerHTML = '';
+    }
+
     gameInfo.innerHTML = `<name> ${userName}! 😊</name><br> The game has been reset! <br> Enjoy the next round!`;
     seconds = 180;
   };
