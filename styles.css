@@ -1,3 +1,38 @@
 body {
   background-color: pink;
 }
+.square {
+  padding: 10px;
+  margin: 10px;
+  background-color: white;
+  display: inline-block;
+  height: 40px;
+  width: 40px;
+  vertical-align: top;
+}
+
+.matchInfo {
+  font-size: 50px;
+  font-family: "Lucida Console", "Courier New", monospace;
+}
+
+.gameInfo {
+  font-size: 20px;
+  font-family: "Lucida Console", "Courier New", monospace;
+}
+
+.gameTimer {
+  font-size: 18px;
+  font-family: "Lucida Console", "Courier New", monospace;
+}
+
+timer {
+  font-size: 30px;
+  color: green;
+  font-family: "Source Sans Pro", sans-serif;
+  background-color: black;
+}
+
+name {
+  font-size: 40px;
+}
