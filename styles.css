@@ -1,3 +1,54 @@
 body {
   background-color: pink;
 }
+.square {
+  padding: 10px;
+  margin: 10px;
+  background-color: white;
+  display: inline-block;
+  height: 30px;
+  width: 15px;
+  vertical-align: middle;
+  text-align: center;
+  border-width: 3px;
+  border-style: solid;
+  border-color: black;
+  border-radius: 20%;
+  color: red;
+}
+
+.headBoard {
+  background-color: rgb(108, 231, 194);
+  display: inline-block;
+  height: 150px;
+  width: 250px;
+  vertical-align: middle;
+  text-align: center;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  border-radius: 3%;
+  color: rgb(15, 13, 13);
+}
+
+.board {
+  background-color: rgb(236, 240, 213);
+  display: inline-block;
+  height: 300px;
+  width: 250px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  border-radius: 3%;
+  color: rgb(15, 13, 13);
+}
+
+.message {
+  background-color: rgb(255, 255, 255);
+  display: inline-block;
+  width: 250px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  text-align: center;
+}
