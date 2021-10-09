@@ -2,17 +2,23 @@
 // Global variables
 /// //////////////////////////////
 
-const boardSize = 4; // boardSize has to be an even number
-const board = [];
+let boardSize = 0; // boardSize has to be an even number
+let numMatches = 0;
+let board = [];
 let firstCard = null;
 let firstCardElement; //used to hold first clicked square. no need global variable cos only used in squareClick?
-let deck;
 let textArea; //p element to display msgs
-let timerDisplay; //h1 element to display countdown
 let matchCounter = 0; //keep track of # of matches made, once this counter reaches 8, game over msg displays
+let winCounter = 0; //keep track of # of wins
 let canClick = true; //toggle to prevent user from clicking on squares when both mismatched cards are shown
-let timeAvail; //time to countdown
-let countdown; //countdown timer function
+let timeAvail; //actual variable used for countdown
+let timeSelected; //selected time to countdown
+let playerName = "";
+const gamePlayArea = document.createElement("div");
+document.body.append(gamePlayArea);
+gamePlayArea.classList.add("gamePlayArea");
+const container = document.createElement("div");
+gamePlayArea.append(container);
 
 /// //////////////////////////////
 // Helper functions
@@ -59,7 +65,7 @@ const makeDeck = () => {
 
       // add the card to the deck
       newDeck.push(card); // add double the cards to the deck
-      newDeck.push(card);
+      // newDeck.push(card);
     }
   }
 
@@ -81,6 +87,25 @@ const shuffleCards = (cards) => {
   return cards;
 };
 
+//creating a card for display with information stored in card object
+const createCard = (cardInfo) => {
+  const suit = document.createElement("div");
+  suit.classList.add("suit", cardInfo.colour);
+  suit.innerText = cardInfo.suitPic;
+
+  const name = document.createElement("div");
+  name.classList.add("name", cardInfo.colour);
+  name.innerText = cardInfo.displayName;
+
+  const card = document.createElement("div");
+  card.classList.add("card");
+
+  card.appendChild(name);
+  card.appendChild(suit);
+
+  return card;
+};
+
 // Create a helper function for output to abstract complexity
 // of DOM manipulation away from game logic
 const output = (message) => {
@@ -95,14 +120,15 @@ const squareClick = (cardElement, column, row) => {
   const clickedCard = board[column][row];
 
   // the user already clicked on this square
-  if (cardElement.innerText !== "") {
+  if (cardElement.innerHTML !== "") {
     return;
   }
 
   // first turn
   if (firstCard === null) {
     firstCard = clickedCard;
-    cardElement.innerText = `${firstCard.displayName} of ${firstCard.suitPic}`;
+    cardElement.append(createCard(firstCard));
+    cardElement.classList.add("squareFront");
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
@@ -113,24 +139,32 @@ const squareClick = (cardElement, column, row) => {
       clickedCard.name === firstCard.name &&
       clickedCard.suit === firstCard.suit
     ) {
-      cardElement.innerText = `${firstCard.displayName} of ${firstCard.suitPic}`;
       console.log("match");
-      output("<strong>Good job, you found a match! Keeping going!</strong>");
-      setTimeout(() => {
-        output("");
-      }, 1000);
+      cardElement.append(createCard(clickedCard));
+      cardElement.classList.add("squareFront");
 
       matchCounter += 1;
+
+      if (matchCounter < numMatches) {
+        output("<strong>Good job, you found a match! Keeping going!</strong>");
+        setTimeout(() => {
+          output("");
+        }, 1000);
+      }
     } else {
       console.log("NOT a match");
       output("<strong>No match...keep trying!</strong>");
       canClick = false; // disallow clicking when cards are being displayed
       //still mismatched card and 1 second later, turn the card over
-      cardElement.innerText = `${clickedCard.displayName} of ${clickedCard.suitPic}`;
+      cardElement.append(createCard(clickedCard));
+      cardElement.classList.add("squareFront");
+      // cardElement.innerText = `${clickedCard.displayName} of ${clickedCard.suitPic}`;
 
       setTimeout(() => {
-        cardElement.innerText = "";
-        firstCardElement.innerText = "";
+        cardElement.innerHTML = "";
+        firstCardElement.innerHTML = "";
+        cardElement.classList.remove("squareFront");
+        firstCardElement.classList.remove("squareFront");
         canClick = true; // allow clicking after cards disapppear
         output("");
       }, 1000);
@@ -139,12 +173,12 @@ const squareClick = (cardElement, column, row) => {
     // reset the first card
     firstCard = null;
   }
-  if (matchCounter === 8) {
-    setTimeout(() => {
-      output(
-        "<strong>Congratulations! You've completed the game! Click reset to play again! </strong>"
-      );
-    }, 1000);
+  if (matchCounter === numMatches) {
+    winCounter += 1;
+    output(
+      "<strong>Congratulations! You've completed the game! Click reset to play again! </strong>"
+    );
+    container.children[0].innerHTML = `<span><strong>Welcome ${playerName}! Wins: ${winCounter}</strong>  </span> `;
   }
 };
 
@@ -175,7 +209,7 @@ const buildBoardElements = (board) => {
       const square = document.createElement("div");
 
       // set a class for CSS purposes
-      square.classList.add("square");
+      square.classList.add("squareBack");
 
       // set the click event
       // eslint-disable-next-line
@@ -186,7 +220,7 @@ const buildBoardElements = (board) => {
         if (timeAvail <= 0) {
           canClick = false;
         }
-        canClick === true ? squareClick(event.currentTarget, i, j) : "'"; //will only call squareClick if canClick!
+        canClick === true ? squareClick(event.currentTarget, i, j) : ""; //will only call squareClick if canClick!
       });
 
       rowElement.appendChild(square);
@@ -197,51 +231,120 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
-// IIFE so game will be initialised without having to call the function
+// laying out elements for game set up
+(() => {
+  const inputLabel = document.createElement("label");
+  container.append(inputLabel);
+  inputLabel.innerHTML = "<strong>Please enter your name: </strong>";
+  const nameInput = document.createElement("input");
+  container.append(nameInput);
+  nameInput.placeholder = "John Doe";
+
+  const sizeSelectLabel = document.createElement("label");
+  container.append(sizeSelectLabel);
+  sizeSelectLabel.innerHTML = "<strong>  Select board size: </strong>";
+  const boardSizeSelect = document.createElement("select");
+  container.append(boardSizeSelect);
+  for (let i = 0; i < 4; i += 1) {
+    const sizeOptions = [2, 4, 6, 8];
+    const option = document.createElement("option");
+    option.value = sizeOptions[i];
+    option.text = sizeOptions[i];
+    boardSizeSelect.append(option);
+  }
+
+  const timeSelectLabel = document.createElement("label");
+  container.append(timeSelectLabel);
+  timeSelectLabel.innerHTML = "<strong>  Select time limit : </strong>";
+  const timeSelect = document.createElement("select");
+  container.append(timeSelect);
+  for (let i = 0; i < 4; i += 1) {
+    const timeOptions = [20, 60, 90, 120];
+    const option = document.createElement("option");
+    option.value = timeOptions[i];
+    option.text = `${timeOptions[i]} seconds`;
+    timeSelect.append(option);
+  }
+
+  const playBtn = document.createElement("button");
+  container.append(playBtn);
+  playBtn.innerHTML = "Play Game!";
+
+  // interactive part of game set up
+
+  playBtn.addEventListener("click", () => {
+    timeSelected = timeSelect.value;
+    boardSize = boardSizeSelect.value;
+    playerName = nameInput.value;
+    gameInit();
+  });
+})();
+
+//initialise game
 const gameInit = () => {
-  // create this special deck by getting the doubled cards and
-  // making a smaller array that is ( boardSize squared ) number of cards
-  // doubleDeck created such tt 2 similar cards are always side-by-side, so cut off a portion of doubleDeck to use first before shuffling it
-  const doubleDeck = makeDeck();
-  const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
-  deck = shuffleCards(deckSubset);
+  container.innerHTML = `<span><strong>Welcome ${playerName}! Wins: ${winCounter}</strong>  </span>`;
+  const resetBtn = document.createElement("button");
+  resetBtn.innerHTML = "Reset Game";
+  container.append(resetBtn);
+  resetBtn.addEventListener("click", () => {
+    gamePlayArea.innerHTML = "";
+    gameReInit();
+  });
+
+  const baseDeck = shuffleCards(makeDeck());
+  numMatches = (boardSize * boardSize) / 2;
+  const interimDeck = baseDeck.slice(0, numMatches);
+  const playDeck = shuffleCards(interimDeck.concat(interimDeck));
 
   // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
     board.push([]);
     for (let j = 0; j < boardSize; j += 1) {
-      board[i].push(deck.pop());
+      board[i].push(playDeck.pop());
     }
   }
 
-  matchCounter = 0;
+  const timerDisplayBox = document.createElement("div");
+  gamePlayArea.append(timerDisplayBox);
+  timerDisplayBox.classList.add("timerDisplayBox");
 
-  timerDisplay = document.createElement("h1");
-  document.body.append(timerDisplay);
-  timeAvail = 100;
-  let countdown = setInterval(function () {
-    timeAvail--;
-    timerDisplay.innerHTML = `Time left: ${timeAvail}s`;
+  const timerDisplay = document.createElement("span");
+  timerDisplayBox.append(timerDisplay);
+  timerDisplay.innerHTML = `<strong>Time left: ---</strong>`;
+
+  timeAvail = timeSelected;
+
+  const countdown = setInterval(() => {
+    console.log(`Time avail inside setInterval: ${timeAvail}`);
+    timeAvail -= 1;
+    timerDisplay.innerHTML = `<strong>Time left: ${timeAvail}s</strong>`;
     if (timeAvail <= 0) {
       output("<strong>Time's up! Click reset to try again.</strong>");
       clearInterval(countdown);
     }
-    if (matchCounter === 8) {
+    if (matchCounter === numMatches) {
       clearInterval(countdown);
-      timerDisplay.innerHTML = "Time left: 00000000";
+      timerDisplay.innerHTML = "<strong>Time left: ---</strong>";
     }
   }, 1000);
 
   const boardEl = buildBoardElements(board);
 
-  document.body.appendChild(boardEl);
+  gamePlayArea.appendChild(boardEl);
 
   textArea = document.createElement("p");
   textArea.classList.add("msg");
-  document.body.append(textArea);
+  gamePlayArea.append(textArea);
   output(
     "<ol> <strong> <li>Click on any one of the boxes above to reveal a card.</li><li>Select any other empty box to find a match!</li> </strong></ol> "
   );
 };
 
-gameInit();
+const gameReInit = () => {
+  board = [];
+  firstCard = null;
+  matchCounter = 0;
+  canClick = true;
+  gamePlayArea.append(container);
+  gameInit();
+};

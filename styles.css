@@ -1,13 +1,58 @@
 body {
+  display: flex;
   background-color: pink;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
-.square {
+.gamePlayArea {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  background-color: pink;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.squareBack {
   padding: 10px;
   margin: 10px;
-  background-color: white;
+  background: repeating-linear-gradient(
+    45deg,
+    #3f87a6,
+    #ebf8e1 15%,
+    #f69d3c 20%
+  );
   display: inline-block;
-  height: 50px;
-  width: 50px;
+  height: 45px;
+  width: 30px;
   vertical-align: middle;
   text-align: center;
+  border-radius: 10%;
+}
+.squareFront {
+  background: white;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.red {
+  color: rgba(255, 0, 0, 0.589);
+}
+.timerDisplayBox {
+  display: flex;
+  padding: 12px;
+  margin: 5px;
+  background: #e6dfdfbe;
+  height: 20px;
+  width: 180px;
+  align-items: center;
+  justify-content: center;
+  border: solid black;
+  border-radius: 25px;
+}
+h2 {
+  margin: 0em;
 }
