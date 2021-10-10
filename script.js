@@ -1,13 +1,36 @@
 // GLOBAL VARIABLES
-const boardSize = 4;
+const boardSize = 6;
 const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
 const gameInterface = document.createElement('div');
 gameInterface.classList.add('gameUi');
+let playerWin;
+const delayInMilliseconds = 1000;
+const gameTimer = document.createElement('div');
+gameTimer.classList.add('timer');
+let timeCounter = 180;
+let timerStarted = 0;
 
 // GAMEPLAY LOGIC
+const startCountdownTimer = () => {
+  console.log('timer started!');
+  timerStarted = 1;
+  const ref = setInterval(() => {
+    timeCounter -= 1;
+    console.log(timeCounter);
+    console.log(delayInMilliseconds);
+    gameTimer.innerText = `GAME TIME LIMIT
+  ${timeCounter}`;
+    if (timeCounter === 0) {
+      clearInterval(ref);
+      playerWin = 0;
+      gameInterface.innerText = 'Time is up, you lost! Try again?';
+    }
+  }, delayInMilliseconds);
+};
+
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
 
@@ -16,6 +39,12 @@ const squareClick = (cardElement, column, row) => {
   console.log('BOARD CLICKED CARD', board[column][row]);
 
   const clickedCard = board[column][row];
+
+  // first click start timer.
+  if (timerStarted === 0) {
+    timerStarted = 1;
+    startCountdownTimer();
+  }
 
   // user clicked same square - tell user to pick another
   if (cardElement.innerText !== '') {
@@ -206,7 +235,11 @@ const shuffleCards = (cards) => {
 const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
+  document.body.appendChild(gameTimer);
   document.body.appendChild(gameInterface);
+  gameTimer.innerText = `GAME TIME LIMIT
+  ${timeCounter}`;
+
   gameInterface.innerText = `Hello, welcome to Match Game.
   The rules are simple, find all the pairs to win!
   

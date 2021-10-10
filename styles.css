@@ -41,3 +41,11 @@ body {
 .black {
   color: black;
 }
+
+.timer {
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: chocolate;
+  font-family: monospace;
+  font-size: 20px;
+}
