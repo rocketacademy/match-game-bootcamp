@@ -4,6 +4,8 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+const gameInterface = document.createElement('div');
+gameInterface.classList.add('gameUi');
 
 // GAMEPLAY LOGIC
 const squareClick = (cardElement, column, row) => {
@@ -25,11 +27,13 @@ const squareClick = (cardElement, column, row) => {
     console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
-    cardElement.innerText = firstCard.name;
+    cardElement.innerText = `${firstCard.displayName}
+    ${firstCard.symbol}`;
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
 
+    gameInterface.innerText = `You picked ${firstCard.name} of ${firstCard.suit}. Let's hope you pick its pair, click on another blank card!`;
     // second turn
   } else {
     console.log('second turn');
@@ -40,12 +44,17 @@ const squareClick = (cardElement, column, row) => {
       console.log('match');
 
       // turn this card over
-      cardElement.innerText = clickedCard.name;
+      cardElement.innerText = `${clickedCard.displayName} 
+      ${clickedCard.symbol}`;
+
+      gameInterface.innerText = 'They matched, well done!! On to the next pair!';
     } else {
       console.log('NOT a match');
 
       // turn this card back over
       firstCardElement.innerText = '';
+
+      gameInterface.innerText = 'It did not match, try again!';
     }
 
     // reset the first card
@@ -80,6 +89,11 @@ const buildBoardElements = (board) => {
       // set a class for CSS purposes
       square.classList.add('square');
 
+      // color
+      if (square.suit === 'diamonds' || square.suit === 'hearts') {
+        square.classList.add('red');
+      }
+
       // set the click event
       // eslint-disable-next-line
       square.addEventListener('click', (event) => {
@@ -97,23 +111,30 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
-const makeDeck = () => {
-  // create the empty deck at the beginning
+const createDeck = () => {
+  // newDeck array to contain cards
   const newDeck = [];
-  const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
+
+  // outer loop. four suits; suit symbols; suit colors
+  const suits = ['diamonds', 'clubs', 'hearts', 'spades'];
+  const suitSymbols = ['♦️', '♣️', '♥️', '♠️'];
 
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
-    // make a variable of the current suit
     const currentSuit = suits[suitIndex];
-    console.log(`current suit: ${currentSuit}`);
+    const currentSymbol = suitSymbols[suitIndex];
 
-    // loop to create all cards in this suit
-    // rank 1-13
+    let suitColor = '';
+    if (currentSuit === 'diamonds' || currentSuit === 'hearts') {
+      suitColor = 'red';
+    } else if (currentSuit === 'clubs' || currentSuit === 'spades') {
+      suitColor = 'black';
+    }
+    // inner loop. 1 to 13 ranks;
     for (let rankCounter = 1; rankCounter <= 13; rankCounter += 1) {
-      // Convert rankCounter to string
+      // Define card names
       let cardName = `${rankCounter}`;
-
-      // 1, 11, 12 ,13
+      let shortName = `${rankCounter}`;
+      // Define exceptions for card name
       if (cardName === '1') {
         cardName = 'ace';
       } else if (cardName === '11') {
@@ -124,20 +145,33 @@ const makeDeck = () => {
         cardName = 'king';
       }
 
-      // make a single card object variable
+      // Define exceptions for display name
+      if (shortName === '1') {
+        shortName = 'A';
+      } else if (shortName === '11') {
+        shortName = 'J';
+      } else if (shortName === '12') {
+        shortName = 'Q';
+      } else if (shortName === '13') {
+        shortName = 'K';
+      }
+
+      // Create Card
       const card = {
         name: cardName,
         suit: currentSuit,
         rank: rankCounter,
+        symbol: currentSymbol,
+        color: suitColor,
+        displayName: shortName,
       };
 
-      console.log(`rank: ${rankCounter}`);
-
-      // add the card to the deck
-      newDeck.push(card); // add double the cards to the deck
+      // add card to deck through push function.
       newDeck.push(card);
+      newDeck.push(card); // for pairs
     }
   }
+
   return newDeck;
 };
 
@@ -164,7 +198,12 @@ const shuffleCards = (cards) => {
 const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
-  const doubleDeck = makeDeck();
+  document.body.appendChild(gameInterface);
+  gameInterface.innerText = `Hello, welcome to Match Game.
+  The rules are simple, find all the pairs to win!
+  
+  Click to begin playing :)`;
+  const doubleDeck = createDeck();
   console.log(doubleDeck);
   const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
   deck = shuffleCards(deckSubset);
