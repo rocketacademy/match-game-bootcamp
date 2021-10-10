@@ -51,8 +51,15 @@ const squareClick = (cardElement, column, row) => {
     } else {
       console.log('NOT a match');
 
-      // turn this card back over
-      firstCardElement.innerText = '';
+      // turn this card over
+      cardElement.innerText = `${clickedCard.displayName} 
+      ${clickedCard.symbol}`;
+
+      // turn this both cards back over AFTER DELAY
+      setTimeout(() => {
+        firstCardElement.innerText = '';
+        cardElement.innerText = '';
+      }, 3000);
 
       gameInterface.innerText = 'It did not match, try again!';
     }
