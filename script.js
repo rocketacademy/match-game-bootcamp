@@ -4,14 +4,23 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+
+// Game interface
 const gameInterface = document.createElement('div');
 gameInterface.classList.add('gameUi');
-let playerWin;
+
+// Timer
 const delayInMilliseconds = 1000;
 const gameTimer = document.createElement('div');
 gameTimer.classList.add('timer');
 let timeCounter = 180;
 let timerStarted = 0;
+
+// Username
+let username;
+
+// Win-Lose
+let playerWin;
 
 // GAMEPLAY LOGIC
 const startCountdownTimer = () => {
@@ -78,7 +87,7 @@ const squareClick = (cardElement, column, row) => {
       ${clickedCard.symbol}`;
       setTimeout(() => {
         gameInterface.innerText = '';
-      }, 3000);
+      }, (delayInMilliseconds * 3));
     } else {
       console.log('NOT a match');
       gameInterface.innerText = 'It did not match, try again!';
@@ -91,7 +100,7 @@ const squareClick = (cardElement, column, row) => {
         firstCardElement.innerText = '';
         cardElement.innerText = '';
         gameInterface.innerText = '';
-      }, 3000);
+      }, (delayInMilliseconds * 3));
     }
 
     // reset the first card
@@ -240,7 +249,7 @@ const initGame = () => {
   gameTimer.innerText = `GAME TIME LIMIT
   ${timeCounter}`;
 
-  gameInterface.innerText = `Hello, welcome to Match Game.
+  gameInterface.innerText = `Hello ${username}, welcome to Match Game.
   The rules are simple, find all the pairs to win!
   
   Click to begin playing :)`;
@@ -263,4 +272,31 @@ const initGame = () => {
   document.body.appendChild(boardEl);
 };
 
-initGame();
+const preGame = () => {
+  // Username
+  const userInputDisplay = document.createElement('div');
+  document.body.appendChild(userInputDisplay);
+
+  const pregameMessage = document.createElement('p');
+  userInputDisplay.appendChild(pregameMessage);
+  pregameMessage.innerText = '';
+
+  const usernameBox = document.createElement('input');
+  usernameBox.setAttribute('type', 'text');
+  usernameBox.setAttribute('placeholder', 'type your name here');
+  // set id to retrieve user's name
+  usernameBox.setAttribute('id', 'username');
+  userInputDisplay.appendChild(usernameBox);
+
+  const inputButton = document.createElement('button');
+  inputButton.innerText = 'submit name';
+  userInputDisplay.appendChild(inputButton);
+  inputButton.addEventListener('click', () => {
+    const userInput = document.querySelector('#username');
+    console.log(userInput);
+    username = userInput.value;
+    document.body.removeChild(userInputDisplay);
+    initGame();
+  });
+};
+preGame();
