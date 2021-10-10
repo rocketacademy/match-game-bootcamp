@@ -16,6 +16,9 @@ gameTimer.classList.add('timer');
 let timeCounter = 180;
 let timerStarted = 0;
 
+// Click Validation
+let canClick = true;
+
 // Username
 let username;
 
@@ -90,7 +93,9 @@ const squareClick = (cardElement, column, row) => {
       }, (delayInMilliseconds * 3));
     } else {
       console.log('NOT a match');
-      gameInterface.innerText = 'It did not match, try again!';
+      gameInterface.innerText = `It did not match, try again!
+      You have a 3 seconds penalty and must wait until the cards flip back.`;
+      canClick = false;
       // turn this card over
       cardElement.innerText = `${clickedCard.displayName} 
       ${clickedCard.symbol}`;
@@ -100,6 +105,7 @@ const squareClick = (cardElement, column, row) => {
         firstCardElement.innerText = '';
         cardElement.innerText = '';
         gameInterface.innerText = '';
+        canClick = true;
       }, (delayInMilliseconds * 3));
     }
 
@@ -146,7 +152,9 @@ const buildBoardElements = (board) => {
         // we will want to pass in the card element so
         // that we can change how it looks on screen, i.e.,
         // "turn the card over"
-        squareClick(event.currentTarget, i, j);
+        if (canClick === true) {
+          squareClick(event.currentTarget, i, j);
+        }
       });
 
       rowElement.appendChild(square);
