@@ -42,15 +42,17 @@ const squareClick = (cardElement, column, row) => {
         && clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
+      gameInterface.innerText = 'They matched, well done!! On to the next pair!';
 
       // turn this card over
       cardElement.innerText = `${clickedCard.displayName} 
       ${clickedCard.symbol}`;
-
-      gameInterface.innerText = 'They matched, well done!! On to the next pair!';
+      setTimeout(() => {
+        gameInterface.innerText = '';
+      }, 3000);
     } else {
       console.log('NOT a match');
-
+      gameInterface.innerText = 'It did not match, try again!';
       // turn this card over
       cardElement.innerText = `${clickedCard.displayName} 
       ${clickedCard.symbol}`;
@@ -59,9 +61,8 @@ const squareClick = (cardElement, column, row) => {
       setTimeout(() => {
         firstCardElement.innerText = '';
         cardElement.innerText = '';
+        gameInterface.innerText = '';
       }, 3000);
-
-      gameInterface.innerText = 'It did not match, try again!';
     }
 
     // reset the first card
