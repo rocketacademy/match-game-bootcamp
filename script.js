@@ -88,8 +88,22 @@ const boardSize = 4;
 const board = [];
 
 // build message container
-const messageContainer = document.createElement('span');
+const messageContainer = document.createElement('div');
 document.body.appendChild(messageContainer);
+
+const timerContainer = document.createElement('div');
+document.body.appendChild(timerContainer);
+let milliseconds = 10000;
+const timer = setInterval(
+
+  () => {
+    timerContainer.innerText = milliseconds;
+    if (milliseconds <= 0) {
+      clearInterval(timer);
+    }
+    milliseconds -= 1;
+  }, 1,
+);
 
 // gameplay logic
 // set canClick variable to prevent clicking
