@@ -1,3 +1,18 @@
 body {
   background-color: pink;
 }
+
+.square {
+  padding: 30px;
+  margin: 10px;
+  background-color: white;
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+  vertical-align: top;
+}
+
+.red {
+  /* CX: Change colour to color */
+  color: red;
+}
