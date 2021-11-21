@@ -17,6 +17,11 @@ body {
 h1 {
   color: #2f8d55;
 }
+.game-info {
+  margin: 10px;
+  font-size: 150%;
+}
+
 .square {
   position: relative;
   padding: 10px;

@@ -4,6 +4,7 @@
 // boardSize has to be an even number
 const boardSize = 4;
 const board = [];
+const gameInfo = document.createElement("div");
 let firstCard = null;
 let firstCardElement;
 let deck;
@@ -101,6 +102,11 @@ const cardBackDeco = () => {
   squareDeco.src = "assets/images/xmas.svg";
 };
 
+//for game info text
+const output = (message) => {
+  gameInfo.innerText = message;
+};
+
 /* ##############
 ## GAME PLAY LOGIC ##
 ############## */
@@ -120,6 +126,7 @@ const squareClick = (cardElement, column, row) => {
 
   // first turn
   if (firstCard === null) {
+    output("Find another card to match");
     console.log("first turn");
     firstCard = clickedCard;
     // turn this card over
@@ -135,22 +142,29 @@ const squareClick = (cardElement, column, row) => {
       clickedCard.name === firstCard.name &&
       clickedCard.suit === firstCard.suit
     ) {
-      console.log("match");
+      output("Matched!");
 
       // turn this card over
       cardElement.innerText = `${clickedCard.name} \n\ ${clickedCard.suitSymbol}`;
     } else {
-      console.log("NOT a match");
+      output("NOT a match");
 
-      // turn this card back over with card back deco
-      firstCardElement.innerText = "";
-      cardBackDeco();
-      firstCardElement.appendChild(squareDeco);
-
+      // turn this card over for 3 seconds
+      cardElement.innerText = `${clickedCard.name} \n\ ${clickedCard.suitSymbol}`;
+      setTimeout( () => {
+        // turn this card back over with card back deco
+        firstCardElement.innerText = "";
+        cardBackDeco();
+        firstCardElement.appendChild(squareDeco);
+        cardElement.innerText = "";
+        cardBackDeco();
+        cardElement.appendChild(squareDeco);
+        // reset the first card
+        firstCard = null;
+      }
+      ,1500);
     }
 
-    // reset the first card
-    firstCard = null;
   }
 };
 
@@ -204,6 +218,10 @@ const buildBoardElements = (board) => {
 };
 
 const initGame = () => {
+  // fill game info div with starting instructions
+  gameInfo.classList.add("game-info");
+  gameInfo.innerText = "Let's play";
+  document.body.appendChild(gameInfo);
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
