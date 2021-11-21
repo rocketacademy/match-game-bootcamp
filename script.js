@@ -11,6 +11,7 @@ let cardElement;
 let deck;
 let square;
 let squareDeco;
+let overlay;
 let buttonWrapper;
 let goStart;
 let goReset;
@@ -271,6 +272,12 @@ const buildBoardElements = (board) => {
 };
 
 const initGame = () => {
+  //create overlay
+  overlay = document.createElement("div");
+  overlay.classList.add("overlay-text","visible");
+  overlay.innerHTML = "Enter your name here";
+  document.body.appendChild(overlay);
+  
   // fill game info div with starting instructions
   gameInfo.classList.add("game-info");
   gameInfo.innerText = "Let's play";

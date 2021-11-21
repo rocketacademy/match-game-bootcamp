@@ -99,3 +99,28 @@ h1 {
   width: 140%;
   height: auto;
 }
+
+.overlay-text {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: none;
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  position: fixed;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.8); /* Black background with opacity */
+  font-family: Candy;
+  color: #2f8d55;
+  transition: background-color 500ms, font-size 500ms;
+  font-size: 200%;
+}
+
+.overlay-text.visible {
+  display: flex;
+  animation: overlay-grow 500ms forwards;
+}
