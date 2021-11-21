@@ -11,7 +11,9 @@ let cardElement;
 let deck;
 let square;
 let squareDeco;
+let buttonWrapper;
 let goStart;
+let goReset;
 let timeRemaining;
 let minute = 3;
 let sec = 0;
@@ -191,7 +193,7 @@ const squareClick = (cardElement, column, row) => {
 
       // turn this card over
       cardElement.innerText = `${clickedCard.name} \n\ ${clickedCard.suitSymbol}`;
-      
+
     } else {
       //show message for 1.5 seconds
       output("Not a match");
@@ -272,15 +274,29 @@ const initGame = () => {
   gameInfo.classList.add("game-info");
   gameInfo.innerText = "Let's play";
   document.body.appendChild(gameInfo);
+
+  //button wrapper
+  buttonWrapper = document.createElement("div");
+  buttonWrapper.classList.add("button-wrapper");
+  document.body.appendChild(buttonWrapper);
+
   //button to start timer
   goStart = document.createElement("button");
-  goStart.classList.add("start-button");
+  goStart.classList.add("button");
   goStart.innerText = "Start";
-  gameInfo.appendChild(goStart);
+  buttonWrapper.appendChild(goStart);
   goStart.addEventListener("click", () => {
+    gameInfo.innerText ="Match all cards";
     goStart.remove();
     countDown();
   });
+
+  goReset = document.createElement("button");
+  goReset.classList.add("button");
+  goReset.innerText= "Reset";
+  buttonWrapper.appendChild(goReset);
+  goReset.addEventListener("click",gameOver);
+
   // set initial timer
   timeRemaining = document.createElement("span");
   timeRemaining.classList.add("time-remaining");
