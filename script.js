@@ -11,7 +11,10 @@ let cardElement;
 let deck;
 let square;
 let squareDeco;
+let goStart;
 let timeRemaining;
+let minute = 3;
+let sec = 0;
 let lockBoard = false; // use flag to not let user click while waiting for timeout
 
 /* ##############
@@ -110,22 +113,29 @@ const output = (message) => {
   gameInfo.innerText = message;
 };
 
+//timer & reset function
 const countDown = () => {
-  let minute = 2;
-  let sec = 59;
-  setInterval(function() {
+    const handle = setInterval(function() {
     timeRemaining.innerHTML =
     minute + " : " + sec.toString().padStart(2,'0');
-    sec--;
-    if (sec==00) {
+    if (minute !==0 && sec === 0) {
       minute--;
-      sec = 59;
-      if (minute == 0) {
-        minute = 2;
-      }
+      sec = 60;
     }
+    sec--;
+    if (minute === 0 && sec<0) {
+      gameInfo.innerText = "Game over!";
+      console.log("game is over");
+      clearInterval(handle);
+      setTimeout(gameOver,3000);
+  }
   },1000);
 };
+
+// function for game reset
+const gameOver = () => {
+ location.reload();
+}
 
 /* ##############
 ## GAME PLAY LOGIC ##
@@ -170,12 +180,18 @@ const squareClick = (cardElement, column, row) => {
       cardElement.classList.add("matched");
       output("Matched!");
       setTimeout (() => {
-      output("Find cards to match");
+      //if user finish before time is out
+      if (document.getElementsByClassName("matched").length === boardSize*boardSize) {
+      output("You won!");
+      } else {
+        output("Find cards to match");
       lockBoard = false;
+      }
       },1500)
 
       // turn this card over
       cardElement.innerText = `${clickedCard.name} \n\ ${clickedCard.suitSymbol}`;
+      
     } else {
       //show message for 1.5 seconds
       output("Not a match");
@@ -256,12 +272,19 @@ const initGame = () => {
   gameInfo.classList.add("game-info");
   gameInfo.innerText = "Let's play";
   document.body.appendChild(gameInfo);
-
+  //button to start timer
+  goStart = document.createElement("button");
+  goStart.classList.add("start-button");
+  goStart.innerText = "Start";
+  gameInfo.appendChild(goStart);
+  goStart.addEventListener("click", () => {
+    goStart.remove();
+    countDown();
+  });
   // set initial timer
   timeRemaining = document.createElement("span");
   timeRemaining.classList.add("time-remaining");
-  timeRemaining.innerHTML = "3:00";
-  countDown();
+  timeRemaining.innerHTML = minute + " : " + sec.toString().padStart(2,'0');
   document.body.appendChild(timeRemaining);
 
   // create this special deck by getting the doubled cards and

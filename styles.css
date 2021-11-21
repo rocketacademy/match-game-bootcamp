@@ -46,6 +46,7 @@ h1 {
   vertical-align: top;
   font-size: 200%;
   font-family: "Candy";
+  color: #2f8d55;
   box-shadow: 0px 0px 8px 3px #30aac1;
   border-radius: 8px;
 }
@@ -65,6 +66,17 @@ h1 {
   75% {
     transform: rotate(3deg);
   }
+}
+
+.start-button {
+  font-family: "Candy";
+  border: none;
+  width: 50px;
+  height: 20px;
+  position: absolute;
+  margin-left: 20px;
+  box-shadow: 0px 0px 8px 3px #30aac1;
+  border-radius: 8px;
 }
 
 .card-deco {
