@@ -7,13 +7,17 @@ const board = [];
 const gameInfo = document.createElement("div");
 let firstCard = null;
 let firstCardElement;
+let cardElement;
 let deck;
 let square;
 let squareDeco;
+let countDown;
+let lockBoard = false; // use flag to not let user click while waiting for timeout
 
 /* ##############
 ## HELPER FUNCTION ##
 ############## */
+
 const makeDeck = () => {
   let newDeck = [];
 
@@ -111,6 +115,8 @@ const output = (message) => {
 ## GAME PLAY LOGIC ##
 ############## */
 const squareClick = (cardElement, column, row) => {
+  if(lockBoard) return; // check flag
+  
   console.log(cardElement);
 
   console.log("FIRST CARD DOM ELEMENT", firstCard);
@@ -137,15 +143,19 @@ const squareClick = (cardElement, column, row) => {
 
     // second turn
   } else {
+    lockBoard=true;
     console.log("second turn");
     if (
       clickedCard.name === firstCard.name &&
       clickedCard.suit === firstCard.suit
     ) {
       //show message for 1.5 seconds
+      firstCardElement.classList.add("matched");
+      cardElement.classList.add("matched");
       output("Matched!");
       setTimeout (() => {
       output("Find cards to match");
+      lockBoard = false;
       },1500)
 
       // turn this card over
@@ -155,6 +165,7 @@ const squareClick = (cardElement, column, row) => {
       output("Not a match");
       setTimeout (() => {
       output("Find cards to match");
+      lockBoard = false;
       },1500)
 
       // turn this card over for 1.5 seconds
@@ -167,12 +178,11 @@ const squareClick = (cardElement, column, row) => {
         cardElement.innerText = "";
         cardBackDeco();
         cardElement.appendChild(squareDeco);
-        // reset the first card
-        firstCard = null;
       }
       ,1500);
     }
-
+        // reset the first card
+        firstCard = null;
   }
 };
 
@@ -230,6 +240,13 @@ const initGame = () => {
   gameInfo.classList.add("game-info");
   gameInfo.innerText = "Let's play";
   document.body.appendChild(gameInfo);
+
+  // set initial timer
+  countDown = document.createElement("p");
+  countDown.classList.add("timer");
+  countDown.innerText = "3:00";
+  document.body.appendChild(countDown);
+
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();

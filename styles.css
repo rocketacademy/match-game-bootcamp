@@ -3,8 +3,15 @@
   src: url("assets/font/Christmas.otf") format("opentype");
 }
 
+@font-face {
+  font-family: "Candy";
+  src: url("assets/font/Candcu__.ttf") format("truetype");
+}
+
 html {
   min-height: 100vh;
+  cursor: url(https://cur.cursors-4u.net/holidays/hol-1/hol80.ani),
+    url(https://cur.cursors-4u.net/holidays/hol-1/hol80.png), auto !important;
 }
 
 body {
@@ -22,6 +29,11 @@ h1 {
   font-size: 150%;
 }
 
+.timer {
+  font-size: 150%;
+  color: #2f8d55;
+  font-family: "Candy";
+}
 .square {
   position: relative;
   padding: 10px;
@@ -32,16 +44,41 @@ h1 {
   width: 75px;
   vertical-align: top;
   font-size: 200%;
+  font-family: "Candy";
   box-shadow: 0px 0px 8px 3px #30aac1;
   border-radius: 8px;
 }
 
+.square.matched {
+  animation: dance 1s linear infinite 500ms;
+}
+
+@keyframes dance {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-3deg);
+  }
+  75% {
+    transform: rotate(3deg);
+  }
+}
+
 .card-deco {
   position: absolute;
-  height: 125%;
+  height: auto;
   width: 125%;
-  margin: -20px;
-  display: flex;
+  margin: 50px 0px -20px 40px;
+  display: block;
   justify-content: center;
   align-items: center;
+  transform: translate(-50%, -50%);
+  transition: width 100ms ease-in-out, height 100ms ease-in-out;
+}
+
+.square:hover .card-deco {
+  width: 140%;
+  height: auto;
 }
