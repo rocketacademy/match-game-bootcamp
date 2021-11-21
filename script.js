@@ -17,7 +17,7 @@ let goReset;
 let timeRemaining;
 let minute = 3;
 let sec = 0;
-let lockBoard = false; // use flag to not let user click while waiting for timeout
+let lockBoard = true; // use flag to not let user click while waiting for timeout and start game
 
 /* ##############
 ## HELPER FUNCTION ##
@@ -184,7 +184,8 @@ const squareClick = (cardElement, column, row) => {
       setTimeout (() => {
       //if user finish before time is out
       if (document.getElementsByClassName("matched").length === boardSize*boardSize) {
-      output("You won!");
+        output("You won!");
+        setTimeout(gameOver,5000);
       } else {
         output("Find cards to match");
       lockBoard = false;
@@ -286,6 +287,7 @@ const initGame = () => {
   goStart.innerText = "Start";
   buttonWrapper.appendChild(goStart);
   goStart.addEventListener("click", () => {
+    lockBoard = false;
     gameInfo.innerText ="Match all cards";
     goStart.remove();
     countDown();
