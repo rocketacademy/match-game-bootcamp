@@ -11,13 +11,12 @@ let cardElement;
 let deck;
 let square;
 let squareDeco;
-let countDown;
+let timeRemaining;
 let lockBoard = false; // use flag to not let user click while waiting for timeout
 
 /* ##############
 ## HELPER FUNCTION ##
 ############## */
-
 const makeDeck = () => {
   let newDeck = [];
 
@@ -109,6 +108,23 @@ const cardBackDeco = () => {
 //for game info text
 const output = (message) => {
   gameInfo.innerText = message;
+};
+
+const countDown = () => {
+  let minute = 2;
+  let sec = 59;
+  setInterval(function() {
+    timeRemaining.innerHTML =
+    minute + " : " + sec.toString().padStart(2,'0');
+    sec--;
+    if (sec==00) {
+      minute--;
+      sec = 59;
+      if (minute == 0) {
+        minute = 2;
+      }
+    }
+  },1000);
 };
 
 /* ##############
@@ -242,10 +258,11 @@ const initGame = () => {
   document.body.appendChild(gameInfo);
 
   // set initial timer
-  countDown = document.createElement("p");
-  countDown.classList.add("timer");
-  countDown.innerText = "3:00";
-  document.body.appendChild(countDown);
+  timeRemaining = document.createElement("span");
+  timeRemaining.classList.add("time-remaining");
+  timeRemaining.innerHTML = "3:00";
+  countDown();
+  document.body.appendChild(timeRemaining);
 
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards

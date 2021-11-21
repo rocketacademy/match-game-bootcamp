@@ -29,10 +29,11 @@ h1 {
   font-size: 150%;
 }
 
-.timer {
+.time-remaining {
   font-size: 150%;
   color: #2f8d55;
   font-family: "Candy";
+  margin-bottom: 40px;
 }
 .square {
   position: relative;
