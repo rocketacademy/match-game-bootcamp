@@ -142,14 +142,22 @@ const squareClick = (cardElement, column, row) => {
       clickedCard.name === firstCard.name &&
       clickedCard.suit === firstCard.suit
     ) {
+      //show message for 1.5 seconds
       output("Matched!");
+      setTimeout (() => {
+      output("Find cards to match");
+      },1500)
 
       // turn this card over
       cardElement.innerText = `${clickedCard.name} \n\ ${clickedCard.suitSymbol}`;
     } else {
-      output("NOT a match");
+      //show message for 1.5 seconds
+      output("Not a match");
+      setTimeout (() => {
+      output("Find cards to match");
+      },1500)
 
-      // turn this card over for 3 seconds
+      // turn this card over for 1.5 seconds
       cardElement.innerText = `${clickedCard.name} \n\ ${clickedCard.suitSymbol}`;
       setTimeout( () => {
         // turn this card back over with card back deco
