@@ -3,7 +3,9 @@
 ############## */
 // boardSize has to be an even number
 const boardSize = 4;
-const board = [];
+let board = [];
+let boardEl;
+let boardElement;
 const gameInfo = document.createElement("div");
 let firstCard = null;
 let firstCardElement;
@@ -13,13 +15,17 @@ let square;
 let squareDeco;
 let overlay;
 let userName;
+let gridContainer;
+let scoreElement;
 let buttonWrapper;
 let goStart;
 let goReset;
 let timeRemaining;
 let minute = 3;
 let sec = 0;
+let score = 0;
 let lockBoard = true; // use flag to not let user click while waiting for timeout and start game
+let handle = 0;
 
 /* ##############
 ## HELPER FUNCTION ##
@@ -117,28 +123,64 @@ const output = (message) => {
   gameInfo.innerText = message;
 };
 
+// for timer text
+const timeOutput = () => {
+  timeRemaining.innerHTML =
+  `Time \n
+  ${minute}:${sec.toString().padStart(2,'0')}`
+}
+
+const scoreOutput = () => {
+  scoreElement.innerText = `Score ${score}`;
+}
+
 //timer & reset function
 const countDown = () => {
-    const handle = setInterval(function() {
-    timeRemaining.innerHTML =
-    minute + " : " + sec.toString().padStart(2,'0');
+    handle = setInterval(function() {
+    timeOutput();
     if (minute !==0 && sec === 0) {
       minute--;
       sec = 60;
     }
     sec--;
+    //stop timer if all cards matched
+    if (document.getElementsByClassName("matched").length === boardSize*boardSize) {
+      clearInterval(handle);
+    }
+    //stop timer if time is out
     if (minute === 0 && sec<0) {
       gameInfo.innerText = "Game over!";
       console.log("game is over");
       clearInterval(handle);
-      setTimeout(gameOver,3000);
+      setTimeout(gameReset,3000);
   }
   },1000);
 };
 
-// function for game reset
-const gameOver = () => {
- location.reload();
+// function for game reset, score is kept
+const gameReset = () => {
+  //resetTimer
+  clearInterval(handle);
+  minute = 3;
+  sec = 0;
+  timeOutput();
+  //reset start
+  goStart.disabled = false;
+  goStart.innerText = "Start again";
+  lockBoard = true;
+  board = [];
+  deck = [];
+  firstCard = null;
+  //reset matched card
+  let elems = document.getElementsByClassName("matched");
+  while(elems.length > 0){
+    elems[0].classList.remove("matched");
+  }
+  //reset the board
+  boardEl = null;
+  boardElement.remove();
+  //init game again
+  initGame();
 }
 
 /* ##############
@@ -187,7 +229,9 @@ const squareClick = (cardElement, column, row) => {
       //if user finish before time is out
       if (document.getElementsByClassName("matched").length === boardSize*boardSize) {
         output("You won!");
-        setTimeout(gameOver,5000);
+        score +=1;
+        scoreOutput();
+        setTimeout(gameReset,5000);
       } else {
         output("Find cards to match");
       lockBoard = false;
@@ -230,7 +274,7 @@ const squareClick = (cardElement, column, row) => {
 // return the built board
 const buildBoardElements = (board) => {
   // create the element that everything will go inside of
-  const boardElement = document.createElement("div");
+  boardElement = document.createElement("div");
 
   // give it a class for CSS purposes
   boardElement.classList.add("board");
@@ -272,7 +316,7 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
-const initGame = () => {
+const buildOtherElements = () => {
   // fill game info div with starting instructions
   gameInfo.classList.add("game-info");
   gameInfo.innerText = `Let's play !`;
@@ -299,6 +343,23 @@ const initGame = () => {
   }
   );
 
+  //grid container for time and score
+  gridContainer = document.createElement("div");
+  gridContainer.classList.add("grid-container");
+  document.body.appendChild(gridContainer);
+  
+  // set initial timer
+  timeRemaining = document.createElement("span");
+  timeRemaining.classList.add("time-remaining");
+  timeOutput();
+  gridContainer.appendChild(timeRemaining);
+
+  // set initial score
+  scoreElement = document.createElement("span");
+  scoreElement.classList.add("score");
+  scoreOutput();
+  gridContainer.appendChild(scoreElement);
+
   //button wrapper
   buttonWrapper = document.createElement("div");
   buttonWrapper.classList.add("button-wrapper");
@@ -312,7 +373,7 @@ const initGame = () => {
   goStart.addEventListener("click", () => {
     lockBoard = false;
     gameInfo.innerText ="Match all cards";
-    goStart.remove();
+    goStart.disabled = true;
     countDown();
   });
 
@@ -320,14 +381,12 @@ const initGame = () => {
   goReset.classList.add("button");
   goReset.innerText= "Reset";
   buttonWrapper.appendChild(goReset);
-  goReset.addEventListener("click",gameOver);
+  goReset.addEventListener("click",gameReset);
+};
 
-  // set initial timer
-  timeRemaining = document.createElement("span");
-  timeRemaining.classList.add("time-remaining");
-  timeRemaining.innerHTML = minute + " : " + sec.toString().padStart(2,'0');
-  document.body.appendChild(timeRemaining);
+buildOtherElements();
 
+const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
@@ -342,7 +401,7 @@ const initGame = () => {
     }
   }
 
-  const boardEl = buildBoardElements(board);
+  boardEl = buildBoardElements(board);
 
   document.body.appendChild(boardEl);
 };
