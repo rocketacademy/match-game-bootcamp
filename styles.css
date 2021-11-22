@@ -124,3 +124,14 @@ h1 {
   display: flex;
   animation: overlay-grow 500ms forwards;
 }
+
+.input {
+  margin-top: 20px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: white;
+  font-family: Candy;
+  font-size: 150%;
+  text-align: center;
+}

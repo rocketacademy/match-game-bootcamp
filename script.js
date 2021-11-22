@@ -12,6 +12,7 @@ let deck;
 let square;
 let squareDeco;
 let overlay;
+let userName;
 let buttonWrapper;
 let goStart;
 let goReset;
@@ -272,16 +273,31 @@ const buildBoardElements = (board) => {
 };
 
 const initGame = () => {
+  // fill game info div with starting instructions
+  gameInfo.classList.add("game-info");
+  gameInfo.innerText = `Let's play !`;
+  document.body.appendChild(gameInfo);
+  
   //create overlay
   overlay = document.createElement("div");
   overlay.classList.add("overlay-text","visible");
-  overlay.innerHTML = "Enter your name here";
+  overlay.innerHTML = "Enter your name here and press Enter";
   document.body.appendChild(overlay);
   
-  // fill game info div with starting instructions
-  gameInfo.classList.add("game-info");
-  gameInfo.innerText = "Let's play";
-  document.body.appendChild(gameInfo);
+  //create userName field
+  userName = document.createElement("input");
+  userName.classList.add("input");
+  userName.autofocus = true;
+  overlay.appendChild(userName);
+  userName.addEventListener("keydown", (e) => {
+    if (e.key === 'Enter') {
+      userName = userName.value;
+      overlay.classList.remove("visible");
+      output(`Let's play, ${userName}!`);
+    }
+    else return null;
+  }
+  );
 
   //button wrapper
   buttonWrapper = document.createElement("div");
