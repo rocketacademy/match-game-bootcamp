@@ -388,9 +388,11 @@ buildOtherElements();
 
 const initGame = () => {
   // create this special deck by getting the doubled cards and
+  // slice is done randomly 
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
-  let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  let sliceStart = 2*Math.round(getRandomIndex(88)/2);
+  let deckSubset = doubleDeck.slice(sliceStart, sliceStart+ boardSize * boardSize);
   deck = shuffleCards(deckSubset); // array cannot be reassigned thats why the global variable is still empty
 
   // deal the cards out to the board data structure to get pairs of each cards
