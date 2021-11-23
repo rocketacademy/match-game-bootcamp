@@ -25,7 +25,7 @@ let minute = 3;
 let sec = 0;
 let score = 0;
 let lockBoard = true; // use flag to not let user click while waiting for timeout and start game
-let handle = 0;
+let handle;
 
 /* ##############
 ## HELPER FUNCTION ##
@@ -125,36 +125,31 @@ const output = (message) => {
 
 // for timer text
 const timeOutput = () => {
-  timeRemaining.innerHTML =
-  `Time \n
-  ${minute}:${sec.toString().padStart(2,'0')}`
-}
+  timeRemaining.innerHTML = `Time \n
+  ${minute}:${sec.toString().padStart(2, "0")}`;
+};
 
 const scoreOutput = () => {
   scoreElement.innerText = `Score ${score}`;
-}
+};
 
 //timer & reset function
 const countDown = () => {
-    handle = setInterval(function() {
+  handle = setInterval(function () {
     timeOutput();
-    if (minute !==0 && sec === 0) {
+    if (minute !== 0 && sec === 0) {
       minute--;
       sec = 60;
     }
     sec--;
-    //stop timer if all cards matched
-    if (document.getElementsByClassName("matched").length === boardSize*boardSize) {
-      clearInterval(handle);
-    }
     //stop timer if time is out
-    if (minute === 0 && sec<0) {
+    if (minute === 0 && sec < 0) {
       gameInfo.innerText = "Game over!";
       console.log("game is over");
       clearInterval(handle);
-      setTimeout(gameReset,3000);
-  }
-  },1000);
+      setTimeout(gameReset, 3000);
+    }
+  }, 1000);
 };
 
 // function for game reset, score is kept
@@ -169,26 +164,23 @@ const gameReset = () => {
   goStart.innerText = "Start again";
   lockBoard = true;
   board = [];
-  deck = [];
-  firstCard = null;
-  //reset matched card
+  /*reset matched card
   let elems = document.getElementsByClassName("matched");
-  while(elems.length > 0){
-    elems[0].classList.remove("matched");
-  }
-  //reset the board
-  boardEl = null;
+  while (elems.length > 0) {
+  elems[0].classList.remove("matched");
+  }*/
   boardElement.remove();
   //init game again
   initGame();
-}
+};
 
 /* ##############
 ## GAME PLAY LOGIC ##
 ############## */
+
 const squareClick = (cardElement, column, row) => {
-  if(lockBoard) return; // check flag
-  
+  if (lockBoard) return; // check flag
+
   console.log(cardElement);
 
   console.log("FIRST CARD DOM ELEMENT", firstCard);
@@ -212,46 +204,48 @@ const squareClick = (cardElement, column, row) => {
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
-
-    // second turn
-  } else {
-    lockBoard=true;
+  } // second turn
+  else {
+    lockBoard = true;
     console.log("second turn");
     if (
       clickedCard.name === firstCard.name &&
       clickedCard.suit === firstCard.suit
     ) {
-      //show message for 1.5 seconds
+      //show message for 1 second
       firstCardElement.classList.add("matched");
       cardElement.classList.add("matched");
       output("Matched!");
-      setTimeout (() => {
-      //if user finish before time is out
-      if (document.getElementsByClassName("matched").length === boardSize*boardSize) {
-        output("You won!");
-        score +=1;
-        scoreOutput();
-        setTimeout(gameReset,5000);
-      } else {
-        output("Find cards to match");
-      lockBoard = false;
-      }
-      },1500)
+      setTimeout(() => {
+        //if user finish before time is out
+        if (
+          document.getElementsByClassName("matched").length ===
+          boardSize * boardSize
+        ) {
+          output("You won!");
+          score += 1;
+          scoreOutput();
+          clearInterval(handle);
+          setTimeout(gameReset, 5000);
+        } else {
+          output("Find cards to match");
+          lockBoard = false;
+        }
+      }, 1000);
 
       // turn this card over
       cardElement.innerText = `${clickedCard.name} \n\ ${clickedCard.suitSymbol}`;
-
     } else {
-      //show message for 1.5 seconds
+      //show message for 1 seconds
       output("Not a match");
-      setTimeout (() => {
-      output("Find cards to match");
-      lockBoard = false;
-      },1500)
+      setTimeout(() => {
+        output("Find cards to match");
+        lockBoard = false;
+      }, 1000);
 
-      // turn this card over for 1.5 seconds
+      // turn this card over for 1 seconds
       cardElement.innerText = `${clickedCard.name} \n\ ${clickedCard.suitSymbol}`;
-      setTimeout( () => {
+      setTimeout(() => {
         // turn this card back over with card back deco
         firstCardElement.innerText = "";
         cardBackDeco();
@@ -259,11 +253,10 @@ const squareClick = (cardElement, column, row) => {
         cardElement.innerText = "";
         cardBackDeco();
         cardElement.appendChild(squareDeco);
-      }
-      ,1500);
+      }, 1000);
     }
-        // reset the first card
-        firstCard = null;
+    // reset the first card
+    firstCard = null;
   }
 };
 
@@ -321,33 +314,31 @@ const buildOtherElements = () => {
   gameInfo.classList.add("game-info");
   gameInfo.innerText = `Let's play !`;
   document.body.appendChild(gameInfo);
-  
+
   //create overlay
   overlay = document.createElement("div");
-  overlay.classList.add("overlay-text","visible");
+  overlay.classList.add("overlay-text", "visible");
   overlay.innerHTML = "Enter your name here and press Enter";
   document.body.appendChild(overlay);
-  
+
   //create userName field
   userName = document.createElement("input");
   userName.classList.add("input");
   userName.autofocus = true;
   overlay.appendChild(userName);
   userName.addEventListener("keydown", (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       userName = userName.value;
       overlay.classList.remove("visible");
       output(`Let's play, ${userName}!`);
-    }
-    else return null;
-  }
-  );
+    } else return null;
+  });
 
   //grid container for time and score
   gridContainer = document.createElement("div");
   gridContainer.classList.add("grid-container");
   document.body.appendChild(gridContainer);
-  
+
   // set initial timer
   timeRemaining = document.createElement("span");
   timeRemaining.classList.add("time-remaining");
@@ -372,27 +363,30 @@ const buildOtherElements = () => {
   buttonWrapper.appendChild(goStart);
   goStart.addEventListener("click", () => {
     lockBoard = false;
-    gameInfo.innerText ="Match all cards";
+    gameInfo.innerText = "Match all cards";
     goStart.disabled = true;
     countDown();
   });
 
   goReset = document.createElement("button");
   goReset.classList.add("button");
-  goReset.innerText= "Reset";
+  goReset.innerText = "Reset";
   buttonWrapper.appendChild(goReset);
-  goReset.addEventListener("click",gameReset);
+  goReset.addEventListener("click", gameReset);
 };
 
 buildOtherElements();
 
 const initGame = () => {
   // create this special deck by getting the doubled cards and
-  // slice is done randomly 
+  // slice is done randomly
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
-  let sliceStart = 2*Math.round(getRandomIndex(88)/2);
-  let deckSubset = doubleDeck.slice(sliceStart, sliceStart+ boardSize * boardSize);
+  let sliceStart = 2 * Math.round(getRandomIndex(88) / 2);
+  let deckSubset = doubleDeck.slice(
+    sliceStart,
+    sliceStart + boardSize * boardSize
+  );
   deck = shuffleCards(deckSubset); // array cannot be reassigned thats why the global variable is still empty
 
   // deal the cards out to the board data structure to get pairs of each cards
