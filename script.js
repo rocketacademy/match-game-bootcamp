@@ -2,17 +2,59 @@
 
 // boardSize has to be an even number
 const boardSize = 4;
-const board = [];
+let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let timer = 180000;
+let boardFull = "";
+let numberofWins = 0;
+let username = "";
+
+//Number of wins tracker
+const winTracker = document.createElement("div");
+winTracker.setAttribute("id", "win-tracker");
+document.body.appendChild(winTracker);
+
+//components of the page
+const description = document.createElement("div");
+document.body.appendChild(description);
+const results = document.createElement("div");
+results.setAttribute("id", "results");
+document.body.appendChild(results);
+
+//inputfield
+const inputDiv = document.createElement("div");
+inputDiv.setAttribute("id", "input-field");
+document.body.appendChild(inputDiv);
+
+const inputField = document.createElement("input");
+inputField.setAttribute("type", "text");
+inputDiv.appendChild(inputField);
+
+const inputButton = document.createElement("button");
+inputButton.innerHTML = "Submit";
+inputDiv.appendChild(inputButton);
+
+const resetResults = () => {
+  results.innerText = "";
+};
+
+const checkForBoardFull = () => {
+  let boardFull = true;
+  let squares = document.getElementsByClassName("square");
+  for (let i = 0; i < squares.length; i += 1) {
+    let contents = squares[i].innerHTML;
+    if (contents === "") {
+      boardFull = false;
+    }
+  }
+  return boardFull;
+};
 
 //Game play logic
 const squareClick = (cardElement, column, row) => {
-  console.log("FIRST CARD DOM ELEMENT", firstCard);
-  console.log("BOARD CLICKED CARD", board[column][row]);
   const clickedCard = board[column][row];
-
   // the user already clicked on this square
   if (cardElement.innerText !== "") {
     return;
@@ -20,29 +62,40 @@ const squareClick = (cardElement, column, row) => {
 
   // first turn
   if (firstCard === null) {
-    console.log("first turn");
+    results.innerText = "First Turn!";
     firstCard = clickedCard;
     // turn this card over
-    cardElement.innerText = firstCard.name;
-    // hold onto this for later when it may not match
+    cardElement.innerHTML = `<img src="${firstCard.pic}"/>`;
     firstCardElement = cardElement;
     // second turn
   } else {
-    console.log("second turn");
+    results.innerText = "Second Turn!";
+    cardElement.innerHTML = `<img src="${clickedCard.pic}"/>`;
     if (
       clickedCard.name === firstCard.name &&
       clickedCard.suit === firstCard.suit
     ) {
-      console.log("match");
-      // turn this card over
-      cardElement.innerText = clickedCard.name;
+      results.innerText = "Its a Match!";
+      setTimeout(resetResults, 500);
     } else {
-      console.log("NOT a match");
-      // turn this card back over
-      firstCardElement.innerText = "";
+      results.innerText = "Its NOT a Match!";
+      setTimeout(resetResults, 500);
+      setTimeout(function () {
+        // turn this card back over
+        firstCardElement.innerHTML = "";
+        cardElement.innerHTML = "";
+      }, 500);
     }
     // reset the first card
     firstCard = null;
+  }
+
+  let check = checkForBoardFull();
+  if (check === true) {
+    results.innerText = "Congrats! You completed";
+    numberofWins += 1;
+    winTracker.innerText = `${username} number of wins: ${numberofWins}`;
+    setTimeout(restartGame, 500);
   }
 };
 
@@ -92,6 +145,7 @@ const initGame = () => {
     }
   }
   const boardEl = buildBoardElements(board);
+  boardEl.setAttribute("id", "board");
   document.body.appendChild(boardEl);
 };
 
@@ -102,8 +156,6 @@ const makeDeck = (cardAmount) => {
 
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
     const currentSuit = suits[suitIndex];
-    console.log(`current suit: ${currentSuit}`);
-
     for (let rankCounter = 1; rankCounter <= 13; rankCounter += 1) {
       let cardName = `${rankCounter}`;
 
@@ -145,4 +197,39 @@ const shuffleCards = (cards) => {
   return cards;
 };
 
-initGame();
+// Give the user 3 minutes to complete the game. You can't display a countdown timer until we learn setInterval, so the user won't be able to see the time left.
+const restartGame = () => {
+  document.getElementById("board").remove();
+  board = [];
+  let doubleDeck = makeDeck();
+  let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  deck = shuffleCards(deckSubset);
+
+  // deal the cards out to the board data structure
+  for (let i = 0; i < boardSize; i += 1) {
+    board.push([]);
+    for (let j = 0; j < boardSize; j += 1) {
+      board[i].push(deck.pop());
+    }
+  }
+  const boardEl = buildBoardElements(board);
+  boardEl.setAttribute("id", "board");
+  document.body.appendChild(boardEl);
+  results.innerText = "Restarted Game";
+};
+
+inputButton.addEventListener("click", function () {
+  username = inputField.value;
+  winTracker.innerText = `${username} number of wins: ${numberofWins}`;
+  inputDiv.remove();
+  description.innerText =
+    "You are given 3 minutes to finish matching the cards before the game will be automatically restarted.";
+
+  //Reset button
+  const resetButton = document.createElement("button");
+  resetButton.innerText = "Reset";
+  document.body.appendChild(resetButton);
+  resetButton.addEventListener("click", restartGame);
+  initGame();
+  setTimeout(restartGame, timer);
+});
