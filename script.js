@@ -5,6 +5,22 @@ let firstCard = null;
 let firstCardElement;
 let deck;
 
+
+const revealCard = (cardElement, cardInfo) => {
+  const name = document.createElement('div');
+  name.classList.add('name', cardInfo.colour);
+  name.innerText = cardInfo.displayName;
+
+  const suit = document.createElement('div');
+  suit.classList.add('suit', cardInfo.colour);
+  suit.innerText = cardInfo.suitSymbol;
+
+  cardElement.appendChild(name);
+  cardElement.appendChild(suit);
+
+  return cardElement;
+};
+
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
 
@@ -23,8 +39,10 @@ const squareClick = (cardElement, column, row) => {
   if (firstCard === null) {
     console.log('first turn');
     firstCard = clickedCard;
+
     // turn this card over
-    cardElement.innerText = firstCard.name;
+    // cardElement.innerText = firstCard.name;
+    revealCard(cardElement, firstCard);
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
@@ -32,17 +50,28 @@ const squareClick = (cardElement, column, row) => {
   // second turn
   } else {
     console.log('second turn');
+
+    revealCard(cardElement, clickedCard);
+
     if (clickedCard.name === firstCard.name
       && clickedCard.suit === firstCard.suit) {
       console.log('match');
 
       // turn this card over
-      cardElement.innerText = clickedCard.name;
+      // cardElement.innerText = clickedCard.name;
     } else {
       console.log('NOT a match');
 
-      // turn this card back over
-      firstCardElement.innerText = '';
+      // turn this card over
+      // cardElement.innerText = clickedCard.name;
+
+      // turn this card back over, after 3 seconds
+      setTimeout(() => {
+        // firstCardElement.innerText = '';
+        firstCardElement.innerHTML = '';
+        // cardElement.innerText = '';
+        cardElement.innerHTML = '';
+      }, 3000);
     }
 
     // reset the first card
@@ -86,6 +115,34 @@ const buildBoardElements = (board) => {
   // give it a class for CSS purposes
   boardElement.classList.add('board');
 
+  // // add area for state of game information
+  // const stateOfGameElement = document.createElement('div');
+  // stateOfGameElement.classList.add('game-state');
+  // boardElement.appendChild(stateOfGameElement);
+
+  // // add area for buttons
+  // const buttonsElement = document.createElement('div');
+  // buttonsElement.classList.add('buttons');
+
+  // // add start game button
+  // const startButtonElement = document.createElement('button');
+  // startButtonElement.innerText = 'Start Game';
+  // startButtonElement.classList.add('button');
+  // buttonsElement.appendChild(startButtonElement);
+
+  // // add reset game button
+  // const resetButtonElement = document.createElement('button');
+  // resetButtonElement.innerText = 'Reset Game';
+  // resetButtonElement.classList.add('button');
+  // buttonsElement.appendChild(resetButtonElement);
+
+  // boardElement.appendChild(buttonsElement);
+
+  // // add area for scores
+  // const scoresElement = document.createElement('div');
+  // scoresElement.classList.add('scores');
+  // boardElement.appendChild(scoresElement);
+
   // use the board data structure we passed in to create the correct size board
   for (let i = 0; i < board.length; i += 1) {
     // make a var for just this row of cards
@@ -101,7 +158,7 @@ const buildBoardElements = (board) => {
       const square = document.createElement('div');
 
       // set a class for CSS purposes
-      square.classList.add('square');
+      square.classList.add('card');
 
       // set the click event
       // eslint-disable-next-line
@@ -120,48 +177,71 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
+/**
+ * Make a new card deck
+ * @returns An array of cards
+ */
 const makeDeck = (cardAmount) => {
-  // create the empty deck at the beginning
+  // Initialise an empty deck array
   const newDeck = [];
+  // Initialise an array of the 4 suits in our deck. We will loop over this array.
   const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
+  const suitsSymbol = ['♥️', '♦️', '♣️', '♠️'];
 
+  // Loop over the suits array
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
     // make a variable of the current suit
     const currentSuit = suits[suitIndex];
     console.log(`current suit: ${currentSuit}`);
 
-    // loop to create all cards in this suit
-    // rank 1-13
+    // Loop from 1 to 13 to create all cards for a given suit
+    // Notice rankCounter starts at 1 and not 0, and ends at 13 and not 12.
+    // This is an example of a loop without an array.
     for (let rankCounter = 1; rankCounter <= 13; rankCounter += 1) {
-      // Convert rankCounter to string
+      // By default, the card name is the same as rankCounter
       let cardName = `${rankCounter}`;
+      let cardDisplayName = `${rankCounter}`;
 
-      // 1, 11, 12 ,13
+      // If rank is 1, 11, 12, or 13, set cardName to the ace or face card's name
       if (cardName === '1') {
         cardName = 'ace';
+        cardDisplayName = 'A';
       } else if (cardName === '11') {
         cardName = 'jack';
+        cardDisplayName = 'J';
       } else if (cardName === '12') {
         cardName = 'queen';
+        cardDisplayName = 'Q';
       } else if (cardName === '13') {
         cardName = 'king';
+        cardDisplayName = 'K';
       }
 
-      // make a single card object variable
+      let cardColour = 'black';
+      if ((suits[suitIndex] === 'hearts') || (suits[suitIndex] === 'diamonds')) {
+        cardColour = 'red';
+      }
+
+      // Create a new card info with the suit symbol ('♦️'), suit ('diamond'),
+      // name ('queen'), display name ('Q'), colour ('red'), and rank (12).
       const card = {
-        name: cardName,
+        suitSymbol: suitsSymbol[suitIndex],
         suit: currentSuit,
+        name: cardName,
+        displayName: cardDisplayName,
+        colour: cardColour,
         rank: rankCounter,
       };
 
       console.log(`rank: ${rankCounter}`);
 
-      // add the card to the deck
+      // Add the new card to the deck
       newDeck.push(card); // add double the cards to the deck
       newDeck.push(card);
     }
   }
 
+  // Return the completed card deck
   return newDeck;
 };
 
