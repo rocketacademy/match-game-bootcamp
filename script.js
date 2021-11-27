@@ -7,8 +7,28 @@ let firstCard = null;
 let firstCardElement;
 let deck;
 let canClick = true;
+// eslint-disable-next-line prefer-const
+let playerName;
+let input;
+let numPairs = 0;
+
 const gameInfo = document.createElement('div');
+gameInfo.classList.add('messages');
+
 const boardElement = document.createElement('div');
+
+const inputContainer = document.createElement('div');
+
+const inputField = document.createElement('input');
+input = inputField.innerText;
+
+const submitButton = document.createElement('button');
+submitButton.innerText = 'Submit';
+submitButton.classList.add('button');
+
+// const timerContainer = document.createElement('div');
+
+// const timer = document.createElement('div');
 
 // <--------- HELPER FUNCTIONS --------->
 // Function for output to abstract complexity of DOM manipulation away from game logic
@@ -29,14 +49,14 @@ const makeDeck = () => {
     let currentColor = 'red';
 
     if (currentSuit === 'hearts') {
-      currentSymbol = '♥';
+      currentSymbol = '\u2665';
     } else if (currentSuit === 'diamonds') {
-      currentSymbol = '♦️';
+      currentSymbol = '\u2666';
     } else if (currentSuit === 'clubs') {
-      currentSymbol = '♣️';
+      currentSymbol = '\u2663';
       currentColor = 'black';
     } else if (currentSuit === 'spades') {
-      currentSymbol = '♠️';
+      currentSymbol = '\u2660';
       currentColor = 'black';
     }
 
@@ -132,9 +152,24 @@ const squareClick = (cardElement, column, row) => {
         clickedCard.displayName === firstCard.displayName
         && clickedCard.suit === firstCard.suit
       ) {
+        numPairs += 1;
         console.log('match');
-        output('You got a match!');
-        // turn this card over
+        output('You got a match! The cards will disappear in 3 seconds.');
+        canClick = false;
+        setTimeout(() => {
+          // make card "disappear"
+          firstCardElement.innerHTML = '';
+          cardElement.innerHTML = '';
+          firstCardElement.className = 'cardmatched';
+          cardElement.className = 'cardmatched';
+          // output respective message
+          if (numPairs === 8) {
+            output('Congratulations! You win!');
+          } else {
+            output('Now click another card!');
+            canClick = true;
+          }
+        }, 3000);
       } else {
         output('That\'s not a match! You got 3 seconds to remember the cards!');
         console.log('NOT a match');
@@ -143,8 +178,8 @@ const squareClick = (cardElement, column, row) => {
         // turn this card back over
           firstCardElement.innerHTML = '';
           cardElement.innerHTML = '';
-          firstCardElement.classList.remove('cardfront');
-          cardElement.classList.remove('cardfront');
+          firstCardElement.className = 'cardback';
+          cardElement.className = 'cardback';
           canClick = true;
         }, 3000);
       }
@@ -193,14 +228,32 @@ const buildBoardElements = () => {
   return boardElement;
 };
 
+// Function to get player name
+const getPlayerName = () => {
+  input = inputField.value;
+  playerName = input;
+
+  if (input === '') {
+    output('You gotta type in a name!');
+  } else if (input !== '') {
+    inputContainer.remove();
+    output(`Hi ${playerName}! Click a card and find its matching pair!`);
+    const boardEl = buildBoardElements(board);
+    document.body.appendChild(boardEl);
+  }
+};
+
 // GAME INITIALISATION
 
 const initGame = () => {
+  output('Welcome! Let\'s get your name before we begin :)');
+  document.body.appendChild(gameInfo);
+  inputContainer.appendChild(inputField);
+  inputContainer.appendChild(submitButton);
+  document.body.appendChild(inputContainer);
+  submitButton.addEventListener('click', getPlayerName);
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
-  output('Click cards to flip them over and match them in pairs!');
-  gameInfo.classList.add('messages');
-  document.body.appendChild(gameInfo);
 
   const doubleDeck = makeDeck();
   const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
@@ -213,10 +266,6 @@ const initGame = () => {
       board[i].push(deck.pop());
     }
   }
-
-  const boardEl = buildBoardElements(board);
-
-  document.body.appendChild(boardEl);
 };
 
 initGame();

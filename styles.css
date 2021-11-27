@@ -11,6 +11,9 @@ body {
   width: 28px;
   border-radius: 8px;
   vertical-align: top;
+  border-style: solid;
+  border-width: 2px;
+  border-color: black;
 }
 
 .cardfront {
@@ -26,18 +29,23 @@ body {
   font-weight: bold;
   font-family: sans-serif;
   font-size: 20px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: black;
 }
 
-.suit {
-  margin: 5px;
-  font-size: 20px;
-}
-
-.name {
-  margin: 5px;
-  font-size: 24px;
-  font-weight: bold;
-  font-family: sans-serif;
+.cardmatched {
+  padding: 10px;
+  margin: 10px;
+  background-color: pink;
+  display: inline-block;
+  height: 45px;
+  width: 28px;
+  border-radius: 8px;
+  vertical-align: top;
+  border-style: solid;
+  border-width: 2px;
+  border-color: pink;
 }
 
 .red {
@@ -49,8 +57,12 @@ body {
 }
 
 .messages {
+  padding-bottom: 10px;
   font-size: 20px;
   font-family: sans-serif;
   display: inline-block;
-  margin: 10px;
+}
+
+.button {
+  margin-left: 10px;
 }
