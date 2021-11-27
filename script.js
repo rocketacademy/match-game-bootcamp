@@ -4,7 +4,12 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let isMatching = false;
 
+const displayMessage = (message) => {
+  const gameState = document.getElementById('game-state');
+  gameState.innerText = message;
+};
 
 const revealCard = (cardElement, cardInfo) => {
   const name = document.createElement('div');
@@ -31,7 +36,7 @@ const squareClick = (cardElement, column, row) => {
   const clickedCard = board[column][row];
 
   // the user already clicked on this square
-  if (cardElement.innerText !== '') {
+  if ((cardElement.innerText !== '') || isMatching) {
     return;
   }
 
@@ -47,20 +52,29 @@ const squareClick = (cardElement, column, row) => {
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
 
+    displayMessage('Click on another card to find match.');
+
   // second turn
   } else {
     console.log('second turn');
+    isMatching = true;
 
     revealCard(cardElement, clickedCard);
 
     if (clickedCard.name === firstCard.name
       && clickedCard.suit === firstCard.suit) {
       console.log('match');
+      displayMessage('That is a match.');
+      isMatching = false;
 
+      setTimeout(() => {
+        displayMessage('Click any card to continue playing.');
+      }, 3000);
       // turn this card over
       // cardElement.innerText = clickedCard.name;
     } else {
       console.log('NOT a match');
+      displayMessage('That is not a match.');
 
       // turn this card over
       // cardElement.innerText = clickedCard.name;
@@ -71,6 +85,8 @@ const squareClick = (cardElement, column, row) => {
         firstCardElement.innerHTML = '';
         // cardElement.innerText = '';
         cardElement.innerHTML = '';
+        displayMessage('Click any card to continue playing.');
+        isMatching = false;
       }, 3000);
     }
 
@@ -115,10 +131,12 @@ const buildBoardElements = (board) => {
   // give it a class for CSS purposes
   boardElement.classList.add('board');
 
-  // // add area for state of game information
-  // const stateOfGameElement = document.createElement('div');
-  // stateOfGameElement.classList.add('game-state');
-  // boardElement.appendChild(stateOfGameElement);
+  // add area for state of game information
+  const stateOfGameElement = document.createElement('div');
+  stateOfGameElement.setAttribute('id', 'game-state');
+  stateOfGameElement.classList.add('game-state');
+  stateOfGameElement.innerText = 'Click on any card to play the game.';
+  boardElement.appendChild(stateOfGameElement);
 
   // // add area for buttons
   // const buttonsElement = document.createElement('div');
