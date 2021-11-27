@@ -15,16 +15,77 @@ const upperRightPosition = grid[0][1]; // 'B'
 const lowerLeftPosition = grid[1][0]; // 'Y'
 const lowerRightPosition = grid[1][1]; // 'Z'
 
-const squareClick = (cardElement, column, row) => {
+const makeDeck = (cardAmount) => {
+  // create the empty deck at the beginning
+  const newDeck = [];
+  const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
 
-    console.log(cardElement);
-    
-    console.log('FIRST CARD DOM ELEMENT', firstCard);
-    
-    console.log('BOARD CLICKED CARD', board[column][row]);
+  for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
+    // make a variable of the current suit
+    const currentSuit = suits[suitIndex];
+    /* console.log(`current suit: ${currentSuit}`); */
+
+    // loop to create all cards in this suit
+    // rank 1-13
+    for (let rankCounter = 1; rankCounter <= 13; rankCounter += 1) {
+      // Convert rankCounter to string
+      let cardName = `${rankCounter}`;
+
+      // 1, 11, 12 ,13
+      if (cardName === '1') {
+        cardName = 'ace';
+      } else if (cardName === '11') {
+        cardName = 'jack';
+      } else if (cardName === '12') {
+        cardName = 'queen';
+      } else if (cardName === '13') {
+        cardName = 'king';
+      }
+
+      // make a single card object variable
+      const card = {
+        name: cardName,
+        suit: currentSuit,
+        rank: rankCounter,
+      };
+/* 
+      console.log(`rank: ${rankCounter}`); */
+
+      // add the card to the deck
+      newDeck.push(card); // add double the cards to the deck
+      newDeck.push(card);
+    }
+  }
+
+  return newDeck;
+};
+
+const getRandomIndex = (max) => Math.floor(Math.random() * max);
+
+const shuffleCards = (cards) => {
+  // Loop over the card deck array once
+  for (let currentIndex = 0; currentIndex < cards.length; currentIndex += 1) {
+    // Select a random index in the deck
+    const randomIndex = getRandomIndex(cards.length);
+    // Select the card that corresponds to randomIndex
+    const randomCard = cards[randomIndex];
+    // Select the card that corresponds to currentIndex
+    const currentCard = cards[currentIndex];
+    // Swap positions of randomCard and currentCard in the deck
+    cards[currentIndex] = randomCard;
+    cards[randomIndex] = currentCard;
+  }
+  // Return the shuffled deck
+  return cards;
+};
+
+const squareClick = (cardElement, column, row) => {
+/* console.log(cardElement);
+  onsole.log('FIRST CARD DOM ELEMENT', firstCard);
+  console.log('BOARD CLICKED CARD', board[column][row]); */
     
     const clickedCard = board[column][row]; 
-
+    
     // the user already clicked on this square
     if( cardElement.innerText !== '' ){
         return;
@@ -35,11 +96,9 @@ const squareClick = (cardElement, column, row) => {
       console.log('first turn');
       firstCard = clickedCard;
       // turn this card over
-      cardElement.innerText = firstCard.name;
-  
+      cardElement.innerText = firstCard.name;  
       // hold onto this for later when it may not match
       firstCardElement = cardElement;
-
     // second turn
     } else {
     
@@ -53,13 +112,18 @@ const squareClick = (cardElement, column, row) => {
         // turn this card over
         cardElement.innerText = clickedCard.name;
       } else {
+        cardElement.innerText = clickedCard.name;
+        setTimeout(() => {
+          cardElement.innerText = '';
+          // turn this card back over
+          firstCardElement.innerText = '';
+          /* // turn this card over
+          cardElement.innerText = ''; */
+         
+        }, 3000);
         console.log('NOT a match');
-    
-        // turn this card back over
-        firstCardElement.innerText = '';
       }
-
-      // reset the first card
+       // reset the first card
       firstCard = null;
     }
 };
@@ -107,69 +171,6 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
-const makeDeck = (cardAmount) => {
-  // create the empty deck at the beginning
-  const newDeck = [];
-  const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
-
-  for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
-    // make a variable of the current suit
-    const currentSuit = suits[suitIndex];
-    console.log(`current suit: ${currentSuit}`);
-
-    // loop to create all cards in this suit
-    // rank 1-13
-    for (let rankCounter = 1; rankCounter <= 13; rankCounter += 1) {
-      // Convert rankCounter to string
-      let cardName = `${rankCounter}`;
-
-      // 1, 11, 12 ,13
-      if (cardName === '1') {
-        cardName = 'ace';
-      } else if (cardName === '11') {
-        cardName = 'jack';
-      } else if (cardName === '12') {
-        cardName = 'queen';
-      } else if (cardName === '13') {
-        cardName = 'king';
-      }
-
-      // make a single card object variable
-      const card = {
-        name: cardName,
-        suit: currentSuit,
-        rank: rankCounter,
-      };
-
-      console.log(`rank: ${rankCounter}`);
-
-      // add the card to the deck
-      newDeck.push(card); // add double the cards to the deck
-      newDeck.push(card);
-    }
-  }
-
-  return newDeck;
-};
-
-const getRandomIndex = (max) => Math.floor(Math.random() * max);
-
-const shuffleCards = (cards) => {
-  // Loop over the card deck array once
-  for (let currentIndex = 0; currentIndex < cards.length; currentIndex += 1) {
-    // Select a random index in the deck
-    const randomIndex = getRandomIndex(cards.length);
-    // Select the card that corresponds to randomIndex
-    const randomCard = cards[randomIndex];
-    // Select the card that corresponds to currentIndex
-    const currentCard = cards[currentIndex];
-    // Swap positions of randomCard and currentCard in the deck
-    cards[currentIndex] = randomCard;
-    cards[randomIndex] = currentCard;
-  }
-  // Return the shuffled deck
-  return cards;
-};
 
 const initGame = () => {
   // create this special deck by getting the doubled cards and
@@ -187,8 +188,8 @@ const initGame = () => {
   }
 
   const boardEl = buildBoardElements(board);
-
   document.body.appendChild(boardEl);
+  
 };
 
 initGame()
