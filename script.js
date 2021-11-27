@@ -15,9 +15,11 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+// delay or sleep function
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Gameplay Logic
-const squareClick = (cardElement, column, row) => {
+const squareClick = async (cardElement, column, row) => {
   console.log(cardElement);
 
   console.log('FIRST CARD DOM ELEMENT', firstCard);
@@ -55,8 +57,21 @@ const squareClick = (cardElement, column, row) => {
     } else {
       console.log('NOT a match');
 
-      // turn this card back over
-      firstCardElement.innerText = '';
+      // turn this card over
+      cardElement.innerText = clickedCard.name;
+   
+      // delay time to turn over the 2 exposed wrong cards
+      setTimeout(() => {
+        // turn this card back over
+        firstCardElement.innerText = '';
+        cardElement.innerText = '';
+      }, 2000);
+
+      // await sleep(1000);
+
+      // // turn this card back over
+      // firstCardElement.innerText = '';
+      // cardElement.innerText = '';
     }
 
     // reset the first card
