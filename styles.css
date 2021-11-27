@@ -1,3 +1,56 @@
 body {
   background-color: pink;
 }
+
+.cardback {
+  padding: 10px;
+  margin: 10px;
+  background-color: grey;
+  display: inline-block;
+  height: 45px;
+  width: 28px;
+  border-radius: 8px;
+  vertical-align: top;
+}
+
+.cardfront {
+  margin: 10px;
+  padding: 10px;
+  background-color: white;
+  display: inline-block;
+  height: 45px;
+  width: 28px;
+  border-radius: 8px;
+  vertical-align: top;
+  text-align: center;
+  font-weight: bold;
+  font-family: sans-serif;
+  font-size: 20px;
+}
+
+.suit {
+  margin: 5px;
+  font-size: 20px;
+}
+
+.name {
+  margin: 5px;
+  font-size: 24px;
+  font-weight: bold;
+  font-family: sans-serif;
+}
+
+.red {
+  color: red;
+}
+
+.black {
+  color: black;
+}
+
+.messages {
+  font-size: 20px;
+  font-family: sans-serif;
+  display: inline-block;
+  margin: 10px;
+}
