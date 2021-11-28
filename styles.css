@@ -35,9 +35,14 @@ body {
   text-align: center;
 }
 .outputBox {
-  font-size: 36px;
+  font-size: 30px;
   color: red;
   font-weight: bold;
+  background-color: rgb(202, 202, 202);
+  margin: 10px;
+  padding: 10px;
+  height: 65px;
+  width: 50%;
 }
 .timeBox {
   font-size: 30px;

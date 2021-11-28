@@ -5,6 +5,7 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let matchedPair = 0;
 let milliseconds = 180000;
 
 // create a div element to display a message
@@ -77,7 +78,7 @@ const squareClick = (cardElement, column, row) => {
         && clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
-
+      matchedPair += 1;
       // turn this card over
       cardElement.classList.add('cardStyle');
 
@@ -111,6 +112,13 @@ const squareClick = (cardElement, column, row) => {
     }
     // reset the first card back to null
     firstCard = null;
+  }
+  if (matchedPair >= ((boardSize * boardSize) / 2)) {
+    output('Congrats, You matched everything! Hurray!');
+    // add setTimeOut to wipe out this  message after 5 secs
+    setTimeout(() => {
+      messageDiv.innerText = '';
+    }, 5000);
   }
 };
 
