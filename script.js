@@ -1,12 +1,3 @@
-const grid = [
-  ['A', 'B'],
-  ['Y', 'Z'],
-];
-
-const upperLeftPosition = grid[0][0]; // 'A'
-const upperRightPosition = grid[0][1]; // 'B'
-const lowerLeftPosition = grid[1][0]; // 'Y'
-const lowerRightPosition = grid[1][1]; // 'Z'
 // Global variables
 // boardSize has to be an even number
 const boardSize = 4;
@@ -35,7 +26,13 @@ const squareClick = (cardElement, column, row) => {
     console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
-    cardElement.innerText = firstCard.name;
+    cardElement.classList.add('cardStyle');
+
+    if (clickedCard.color === 'red') {
+      cardElement.classList.add('red');
+    }
+
+    cardElement.innerText = `${firstCard.name}\n${firstCard.symbol}`;
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
@@ -50,12 +47,27 @@ const squareClick = (cardElement, column, row) => {
       console.log('match');
 
       // turn this card over
-      cardElement.innerText = clickedCard.name;
+      cardElement.classList.add('cardStyle');
+
+      if (clickedCard.color === 'red') {
+        cardElement.classList.add('red');
+      }
+
+      cardElement.innerText = `${clickedCard.name}\n${clickedCard.symbol}`;
     } else {
       console.log('NOT a match');
+      // turn card over
+      cardElement.classList.add('cardStyle');
 
-      // turn this card back over
-      firstCardElement.innerText = '';
+      if (clickedCard.color === 'red') {
+        cardElement.classList.add('red');
+      }
+      cardElement.innerText = `${clickedCard.name}\n${clickedCard.symbol}`;
+      // after 3 sec, turn the card over
+      setTimeout(() => {
+        // turn this card back over
+        cardElement.innerText = '';
+      }, 3000);
     }
 
     // reset the first card
@@ -106,10 +118,12 @@ const buildBoardElements = (board) => {
 };
 
 // function to make the deck
-const makeDeck = (cardAmount) => {
+const makeDeck = () => {
   // create the empty deck at the beginning
   const newDeck = [];
   const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
+  let symbol;
+  let cardColor = '';
 
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
     // make a variable of the current suit
@@ -124,20 +138,36 @@ const makeDeck = (cardAmount) => {
 
       // 1, 11, 12 ,13
       if (cardName === '1') {
-        cardName = 'ace';
+        cardName = 'A';
       } else if (cardName === '11') {
-        cardName = 'jack';
+        cardName = 'J';
       } else if (cardName === '12') {
-        cardName = 'queen';
+        cardName = 'Q';
       } else if (cardName === '13') {
-        cardName = 'king';
+        cardName = 'K';
       }
 
-      // make a single card object variable
+      if (currentSuit === 'diamonds') {
+        symbol = '♦';
+        cardColor = 'red';
+      } else if (currentSuit === 'clubs') {
+        symbol = '♣';
+        cardColor = 'black';
+      } else if (currentSuit === 'hearts') {
+        symbol = '♥';
+        cardColor = 'red';
+      } else if (currentSuit === 'spades') {
+        symbol = '♠';
+        cardColor = 'black';
+      }
+
+      // Create a new card with the current name, suit, and rank
       const card = {
         name: cardName,
         suit: currentSuit,
         rank: rankCounter,
+        color: cardColor,
+        symbol,
       };
 
       console.log(`rank: ${rankCounter}`);
