@@ -1,3 +1,25 @@
 body {
   background-color: pink;
 }
+
+.square-old {
+  padding: 10px;
+  margin: 10px;
+  background-color: white;
+  display: inline-block;
+  height: 10px;
+  width: 10px;
+  vertical-align: top;
+}
+
+.square {
+  margin: 10px;
+  padding: 10px;
+  background-color: white;
+  display: inline-block;
+  height: 50px;
+  width: 50px;
+  text-align: center;
+  border-radius: 8px;
+  vertical-align: top;
+}
