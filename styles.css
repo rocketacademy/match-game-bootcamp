@@ -34,3 +34,8 @@ body {
   font-size: 23px;
   text-align: center;
 }
+.outputBox {
+  font-size: 36px;
+  color: red;
+  font-weight: bold;
+}

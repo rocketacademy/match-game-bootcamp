@@ -5,6 +5,14 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+// create a div element to display a message
+const messageDiv = document.createElement('div');
+messageDiv.classList.add('outputBox');
+document.body.appendChild(messageDiv);
+// helper function to display message
+const output = (message) => {
+  messageDiv.innerText = message;
+};
 
 // Gameplay logic
 const squareClick = (cardElement, column, row) => {
@@ -54,6 +62,13 @@ const squareClick = (cardElement, column, row) => {
       }
 
       cardElement.innerText = `${clickedCard.name}\n${clickedCard.symbol}`;
+      // add in the match message
+      output('MATCH!');
+
+      // add setTimeOut to empty the div after 3 secs
+      setTimeout(() => {
+        messageDiv.innerText = '';
+      }, 3000);
     } else {
       console.log('NOT a match');
       // turn card over
@@ -66,12 +81,13 @@ const squareClick = (cardElement, column, row) => {
       // after 3 sec, turn the card over
       setTimeout(() => {
         // turn this card back over
+        // reset the first card
         cardElement.innerText = '';
-      }, 3000);
+        firstCardElement.innerText = '';
+      }, 1000);
+      // reset the first card
+      firstCard = null;
     }
-
-    // reset the first card
-    firstCard = null;
   }
 };
 // create all the board elements that will go on the screen
