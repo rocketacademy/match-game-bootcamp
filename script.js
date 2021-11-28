@@ -7,6 +7,7 @@ let firstCardElement;
 let deck;
 let matchedPair = 0;
 let milliseconds = 180000;
+let userName = '';
 
 // create a div element to display a message
 const messageDiv = document.createElement('div');
@@ -20,23 +21,18 @@ const output = (message) => {
 const timeDiv = document.createElement('div');
 timeDiv.classList.add('timeBox');
 
+// create a input and submit button
+const userDiv = document.createElement('div');
+const userInput = document.createElement('input');
+const submitBtn = document.createElement('button');
+submitBtn.innerText = 'Submit';
+
 // helper function to convert mill to mins and sec
 function millisToMinutesAndSeconds(millis) {
   const minutes = Math.floor(millis / 60000);
   const seconds = ((millis % 60000) / 1000).toFixed(0);
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
-// function to set the countdown
-const ref = setInterval(() => {
-  const convertTime = millisToMinutesAndSeconds(milliseconds);
-  timeDiv.innerText = `Time Left: ${convertTime}`;
-
-  if (milliseconds <= 0) {
-    clearInterval(ref);
-  }
-
-  milliseconds -= 1000;
-}, 1000);
 
 // Gameplay logic
 const squareClick = (cardElement, column, row) => {
@@ -52,7 +48,6 @@ const squareClick = (cardElement, column, row) => {
   if (cardElement.innerText !== '') {
     return;
   }
-
   // first turn
   if (firstCard === null) {
     console.log('first turn');
@@ -165,6 +160,32 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
+// function to get userName
+const getUserName = () => {
+  userName = userInput.value;
+
+  if (userInput === '') {
+    output('Please enter a name');
+  } else userDiv.remove();
+  output(`Hi ${userName}, match all the cards within 3 mins to win the game!`);
+  const boardEl = buildBoardElements(board);
+  document.body.appendChild(boardEl);
+  // timer to run when button is clicked
+  const ref = setInterval(() => {
+    const convertTime = millisToMinutesAndSeconds(milliseconds);
+    timeDiv.innerText = `Time Left: ${convertTime}`;
+
+    if (milliseconds <= 0) {
+      clearInterval(ref);
+    }
+
+    milliseconds -= 1000;
+  }, 1000);
+  document.body.appendChild(timeDiv);
+};
+// add event listener to get the submit btn to work
+submitBtn.addEventListener('click', getUserName);
+
 // function to make the deck
 const makeDeck = () => {
   // create the empty deck at the beginning
@@ -262,11 +283,10 @@ const initGame = () => {
       board[i].push(deck.pop());
     }
   }
+  document.body.appendChild(userDiv);
+  userDiv.appendChild(userInput);
+  userDiv.appendChild(submitBtn);
 
-  const boardEl = buildBoardElements(board);
-
-  document.body.appendChild(boardEl);
-
-  document.body.appendChild(timeDiv);
+  output('Hi player! Please key in a username!');
 };
 initGame();
