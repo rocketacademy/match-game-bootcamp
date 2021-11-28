@@ -5,6 +5,8 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let milliseconds = 180000;
+
 // create a div element to display a message
 const messageDiv = document.createElement('div');
 messageDiv.classList.add('outputBox');
@@ -13,6 +15,27 @@ document.body.appendChild(messageDiv);
 const output = (message) => {
   messageDiv.innerText = message;
 };
+// create a div to display the time left
+const timeDiv = document.createElement('div');
+timeDiv.classList.add('timeBox');
+
+// helper function to convert mill to mins and sec
+function millisToMinutesAndSeconds(millis) {
+  const minutes = Math.floor(millis / 60000);
+  const seconds = ((millis % 60000) / 1000).toFixed(0);
+  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
+// function to set the countdown
+const ref = setInterval(() => {
+  const convertTime = millisToMinutesAndSeconds(milliseconds);
+  timeDiv.innerText = `Time Left: ${convertTime}`;
+
+  if (milliseconds <= 0) {
+    clearInterval(ref);
+  }
+
+  milliseconds -= 1000;
+}, 1000);
 
 // Gameplay logic
 const squareClick = (cardElement, column, row) => {
@@ -32,6 +55,7 @@ const squareClick = (cardElement, column, row) => {
   // first turn
   if (firstCard === null) {
     console.log('first turn');
+    // assign the clicked card to firstcard
     firstCard = clickedCard;
     // turn this card over
     cardElement.classList.add('cardStyle');
@@ -81,15 +105,15 @@ const squareClick = (cardElement, column, row) => {
       // after 3 sec, turn the card over
       setTimeout(() => {
         // turn this card back over
-        // reset the first card
-        cardElement.innerText = '';
         firstCardElement.innerText = '';
+        cardElement.innerText = '';
       }, 1000);
-      // reset the first card
-      firstCard = null;
     }
+    // reset the first card back to null
+    firstCard = null;
   }
 };
+
 // create all the board elements that will go on the screen
 // return the built board
 const buildBoardElements = (board) => {
@@ -234,5 +258,7 @@ const initGame = () => {
   const boardEl = buildBoardElements(board);
 
   document.body.appendChild(boardEl);
+
+  document.body.appendChild(timeDiv);
 };
 initGame();
