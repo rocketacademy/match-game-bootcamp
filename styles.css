@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Odibee+Sans&family=Poppins&display=swap");
 body {
-  background-image: url("https://media.istockphoto.com/photos/green-felt-and-playing-chips-abstract-background-picture-id672556284?k=20&m=672556284&s=612x612&w=0&h=Eh62_3jBb3TdkEkWz8G4oonuEAdqPrneAbYjibj3lhk=");
+  background-image: url("https://i.pinimg.com/564x/9a/b9/d2/9ab9d210c745e2a3d588a29c10fa440f.jpg");
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
@@ -9,6 +9,7 @@ body {
   box-sizing: border-box;
   align-items: center;
   height: 97.8vh;
+  font-family: "Poppins";
 }
 
 .hide {
@@ -17,7 +18,7 @@ body {
 }
 
 #header {
-  margin-top: 30px;
+  margin-top: -4px;
   color: #f5f5f5;
 }
 
@@ -70,7 +71,7 @@ body {
 }
 .modal .modal-container .form-container .form-item #form-player-name,
 .modal .modal-container .form-container .form-item #form-time-selection,
-.modal .modal-container .form-container .form-item #form-grid-size {
+.modal .modal-container .form-container .form-item #form-board-size {
   font-size: 1.3rem;
   width: 50%;
   border: 2px solid black;
@@ -111,4 +112,89 @@ body {
 
 #game-title {
   text-transform: capitalize;
+}
+
+.center-middle {
+  color: mintcream;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 30px;
+}
+
+.content-top,
+.content-bottom {
+  color: mintcream;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  margin: 5px;
+  padding: 5px;
+  width: 25px;
+  height: 35px;
+  text-align: center;
+  border: solid 2px;
+  border-radius: 8px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.face-down {
+  background: repeating-linear-gradient(
+    45deg,
+    LightGoldenRodYellow 0px,
+    LightGoldenRodYellow 15px,
+    black 17px,
+    red 20px
+  );
+}
+
+.face-up {
+  background: white;
+}
+
+.suit {
+  margin: 3px;
+  font-size: 14px;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: bold;
+  font-family: sans-serif;
+}
+
+.red {
+  color: red;
+}
+
+.black {
+  color: black;
+}
+
+#timer {
+  background-color: aliceblue;
+  width: 60px;
+  border: solid 2px black;
+  border-radius: 20%;
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+#board {
+  margin-top: 10px;
+}
+
+.match {
+  border: solid 2px cornsilk;
+}
+
+.no-match {
+  border: solid 2px red;
 }
