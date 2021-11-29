@@ -145,11 +145,11 @@ body {
 
 .face-down {
   background: repeating-linear-gradient(
-    45deg,
+    135deg,
     LightGoldenRodYellow 0px,
     LightGoldenRodYellow 15px,
-    black 17px,
-    red 20px
+    black 30px,
+    red 60px
   );
 }
 
@@ -176,23 +176,12 @@ body {
   color: black;
 }
 
-#timer {
-  background-color: aliceblue;
-  width: 60px;
-  border: solid 2px black;
-  border-radius: 20%;
-  font-weight: bold;
-  font-family: monospace;
-  font-size: 16px;
-  margin-top: 10px;
-}
-
 #board {
   margin-top: 10px;
 }
 
 .match {
-  border: solid 2px cornsilk;
+  border: solid 2px gold;
 }
 
 .no-match {

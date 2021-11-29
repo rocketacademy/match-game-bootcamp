@@ -122,7 +122,12 @@ const resetBoardFunction = () => {
   totalPairs = 0;
   matchedPairs = 0;
 }
-
+// Check win 
+const checkWin = () => {
+  if (matchedPairs == totalPairs) {
+    printMessage('You win!!!<br> Hit Reset Board to play again.')
+  }
+}
 // Create the appearance of a card by adding name and suit to the existing face-down cards
 const createCardUI = (card, cardElement) => {
   const suit = document.createElement('div');
