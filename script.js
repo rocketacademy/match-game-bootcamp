@@ -4,6 +4,7 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+const intervalInMS = 1000;
 
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
@@ -32,6 +33,7 @@ const squareClick = (cardElement, column, row) => {
     // second turn
   } else {
     console.log('second turn');
+    cardElement.innerText = clickedCard.name;
     if (
       clickedCard.name === firstCard.name &&
       clickedCard.suit === firstCard.suit
@@ -41,10 +43,13 @@ const squareClick = (cardElement, column, row) => {
       // turn this card over
       cardElement.innerText = clickedCard.name;
     } else {
-      console.log('NOT a match');
+      setTimeout(() => {
+        console.log('NOT a match');
 
-      // turn this card back over
-      firstCardElement.innerText = '';
+        // turn this card back over
+        firstCardElement.innerText = '';
+        cardElement.innerText = '';
+      }, intervalInMS);
     }
 
     // reset the first card
