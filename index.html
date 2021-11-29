@@ -6,8 +6,37 @@
   </head>
 
   <body>
-    <h1 id="header">SWE101! 🚀</h1>
-    <!-- Import program logic -->
+    <h1 id="header">🃏 Match Game 🃏</h1>
+    <section class="modal">
+      <div class="modal-container">
+        <div class="modal-title">Game Details</div>
+        <div class="form-container">
+          <div class="form-item">
+            <label for="form-player-name" class="label">Who are you?:</label>
+            <input type="text" id="form-player-name" name="form-player-name" />
+          </div>
+          <div class="form-item">
+            <label for="form-grid-size" class="label">Grid Size:</label>
+            <select id="form-grid-size" name="form-grid-size">
+              <option value="2">2</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+              <option value="8">8</option>
+            </select>
+          </div>
+
+          <div class="form-item">
+            <label for="form-time-selection" class="label">Timer:</label>
+            <select id="form-time-selection" name="form-time-selection">
+              <option value="1">1 minute</option>
+              <option value="2">2 minutes</option>
+              <option value="3">3l minutes</option>
+            </select>
+          </div>
+          <button class="form-submit">Start the Game!</button>
+        </div>
+      </div>
+    </section>
     <script src="script.js"></script>
   </body>
 </html>
