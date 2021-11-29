@@ -1,13 +1,14 @@
 // Global variables
 // boardSize has to be an even number
 const boardSize = 4;
-const board = [];
+let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
 let matchedPair = 0;
 let milliseconds = 180000;
 let userName = '';
+let winCount = 0;
 
 // create a div element to display a message
 const messageDiv = document.createElement('div');
@@ -23,6 +24,7 @@ timeDiv.classList.add('timeBox');
 
 // create a input and submit button
 const userDiv = document.createElement('div');
+userDiv.classList.add('userBox');
 const userInput = document.createElement('input');
 const submitBtn = document.createElement('button');
 submitBtn.innerText = 'Submit';
@@ -33,6 +35,10 @@ function millisToMinutesAndSeconds(millis) {
   const seconds = ((millis % 60000) / 1000).toFixed(0);
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
+
+// create a reset button
+const resetBtn = document.createElement('button');
+resetBtn.innerText = 'Reset Game';
 
 // Gameplay logic
 const squareClick = (cardElement, column, row) => {
@@ -109,7 +115,8 @@ const squareClick = (cardElement, column, row) => {
     firstCard = null;
   }
   if (matchedPair >= ((boardSize * boardSize) / 2)) {
-    output('Congrats, You matched everything! Hurray!');
+    winCount += 1;
+    output(`Hi ${userName}, you won the game ${winCount} times!`);
     // add setTimeOut to wipe out this  message after 5 secs
     setTimeout(() => {
       messageDiv.innerText = '';
@@ -119,7 +126,7 @@ const squareClick = (cardElement, column, row) => {
 
 // create all the board elements that will go on the screen
 // return the built board
-const buildBoardElements = (board) => {
+const buildBoardElements = () => {
   // create the element that everything will go inside of
   const boardElement = document.createElement('div');
 
@@ -168,6 +175,7 @@ const getUserName = () => {
     output('Please enter a name');
   } else userDiv.remove();
   output(`Hi ${userName}, match all the cards within 3 mins to win the game!`);
+  // after user submit username, make the board,timer and reset button appear
   const boardEl = buildBoardElements(board);
   document.body.appendChild(boardEl);
   // timer to run when button is clicked
@@ -181,9 +189,12 @@ const getUserName = () => {
 
     milliseconds -= 1000;
   }, 1000);
+
   document.body.appendChild(timeDiv);
+  document.body.appendChild(resetBtn);
 };
-// add event listener to get the submit btn to work
+
+// wrap the get userName and ref into the submit button
 submitBtn.addEventListener('click', getUserName);
 
 // function to make the deck
@@ -290,3 +301,63 @@ const initGame = () => {
   output('Hi player! Please key in a username!');
 };
 initGame();
+
+const reInitGame = () => {
+  // create this special deck by getting the doubled cards and
+  // making a smaller array that is ( boardSize squared ) number of cards
+  const doubleDeck = makeDeck();
+  const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  deck = shuffleCards(deckSubset);
+
+  // deal the cards out to the board data structure
+  for (let i = 0; i < boardSize; i += 1) {
+    board.push([]);
+    for (let j = 0; j < boardSize; j += 1) {
+      board[i].push(deck.pop());
+    }
+  }
+  const boardEl = buildBoardElements(board);
+  document.body.appendChild(boardEl);
+  // timer to run when button is clicked
+  const ref = setInterval(() => {
+    const convertTime = millisToMinutesAndSeconds(milliseconds);
+    timeDiv.innerText = `Time Left: ${convertTime}`;
+
+    if (milliseconds <= 0) {
+      clearInterval(ref);
+    }
+
+    milliseconds -= 1000;
+  }, 1000);
+
+  document.body.appendChild(timeDiv);
+  document.body.appendChild(resetBtn);
+
+  output(`Hi ${userName}! Welcome Back!`);
+};
+
+// helper function to remove the squares after the game has ended
+function removeElementsByClass(className) {
+  const elements = document.getElementsByClassName(className);
+  while (elements.length > 0) {
+    elements[0].parentNode.removeChild(elements[0]);
+  }
+}
+// reset game logic
+const resetGame = (() => {
+  clearInterval();
+  removeElementsByClass('square');
+  timeDiv.remove();
+  board = [];
+  firstCard = null;
+  firstCardElement = '';
+  deck = [];
+  matchedPair = 0;
+  // reset timer
+  milliseconds = 180000;
+  reInitGame();
+});
+
+// when btn is clicked, will run resetGame function
+resetBtn.setAttribute('id', 'resetButton');
+resetBtn.addEventListener('click', resetGame);
