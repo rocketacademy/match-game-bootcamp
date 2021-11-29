@@ -33,6 +33,8 @@ const displayMessage = (message, color = 'black') => {
  * @returns Card
  */
 const revealCard = (cardElement, cardInfo) => {
+  cardElement.innerText = '';
+
   const name = document.createElement('div');
   name.classList.add('name', cardInfo.colour);
   name.innerText = cardInfo.displayName;
@@ -47,6 +49,14 @@ const revealCard = (cardElement, cardInfo) => {
   return cardElement;
 };
 
+const closeCard = (cardElement) => {
+  const frontOfCard = document.createElement('div');
+  frontOfCard.innerText = '⭘△☐';
+  frontOfCard.style.setProperty('writing-mode', 'vertical-rl');
+  frontOfCard.style.setProperty('text-orientation', 'sideways');
+  cardElement.appendChild(frontOfCard);
+};
+
 /**
  * Check if all cards have been matched.
  * @returns True, if match is done. False, otherwise.
@@ -54,7 +64,7 @@ const revealCard = (cardElement, cardInfo) => {
 const isMatchDone = () => {
   const cards = document.querySelectorAll('.card');
   for (let i = 0; i < cards.length; i += 1) {
-    if (cards[i].innerHTML === '') return false;
+    if (cards[i].innerText === '⭘△☐') return false;
   }
   return true;
 };
@@ -98,7 +108,7 @@ const cardClick = (cardElement, column, row) => {
   const clickedCard = board[column][row];
 
   // the user already clicked on this square
-  if ((cardElement.innerText !== '') || isMatching) {
+  if (((cardElement.innerText !== '') && (cardElement.innerText !== '⭘△☐')) || isMatching) {
     return;
   }
 
@@ -153,6 +163,8 @@ const cardClick = (cardElement, column, row) => {
       mismatchTimeout = setTimeout(() => {
         firstCardElement.innerHTML = '';
         cardElement.innerHTML = '';
+        closeCard(firstCardElement);
+        closeCard(cardElement);
         displayMessage('Click any card 🤔 to play.');
         isMatching = false;
       }, 3000);
@@ -349,10 +361,7 @@ const buildBoardElements = () => {
 
     // make all the squares for this row
     for (let j = 0; j < row.length; j += 1) {
-      // create the card element
       const card = document.createElement('div');
-
-      // set a class for CSS purposes
       card.classList.add('card');
 
       // set the click event
@@ -363,6 +372,8 @@ const buildBoardElements = () => {
         // "turn the card over"
         cardClick(event.currentTarget, i, j);
       });
+
+      closeCard(card);
 
       rowElement.appendChild(card);
     }
@@ -447,7 +458,7 @@ const makeDeck = () => {
 const askName = () => {
   // TODO: replace prompt with something more elegant
   let name = prompt('What is your name?');
-  if (name.trim() === '') name = 'Player';
+  if ((name === null) || (name.trim() === '')) name = 'Player';
 
   const nameInfoElement = document.createElement('div');
   nameInfoElement.classList.add('name');
