@@ -10,11 +10,13 @@
     <section class="modal">
       <div class="modal-container">
         <div class="modal-title">Game Details</div>
+
         <div class="form-container">
           <div class="form-item">
             <label for="form-player-name" class="label">Who are you?:</label>
             <input type="text" id="form-player-name" name="form-player-name" />
           </div>
+
           <div class="form-item">
             <label for="form-grid-size" class="label">Grid Size:</label>
             <select id="form-grid-size" name="form-grid-size">
@@ -33,7 +35,29 @@
               <option value="3">3l minutes</option>
             </select>
           </div>
-          <button class="form-submit">Start the Game!</button>
+
+          <button class="form-submit">Start Game!</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="container hide" id="main-container">
+      <div class="content-top">
+        <div class="title" id="game-title"></div>
+        <div class="title-desc" id="player-wins"></div>
+        <div class="title-desc" id="player-win-rate"></div>
+        <div class="title-desc" id="player-timer"></div>
+      </div>
+
+      <div class="center-middle">
+        <div class="grid-container"></div>
+      </div>
+
+      <div class="content-bottom">
+        <div class="content-message" id="output-message">Find the Pairs</div>
+        <div class="content-buttons">
+          <button class="controls reset" id="reset">Reset Grid</button>
+          <button class="controls" id="total-reset">Reset Game</button>
         </div>
       </div>
     </section>
