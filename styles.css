@@ -23,3 +23,15 @@ body {
   display: inline-block;
   vertical-align: top;
 }
+
+.name {
+  margin-bottom: 10px;
+}
+
+.game-state {
+  margin-bottom: 10px;
+}
+
+.button {
+  margin-right: 10px;
+}
