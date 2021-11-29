@@ -7,10 +7,11 @@ let firstCard = null;
 let firstCardElement;
 let deck;
 let canClick = true;
-// eslint-disable-next-line prefer-const
 let playerName;
 let input;
 let numPairs = 0;
+let minutes = 2;
+let seconds = 60;
 
 const gameInfo = document.createElement('div');
 gameInfo.classList.add('messages');
@@ -23,12 +24,11 @@ const inputField = document.createElement('input');
 input = inputField.innerText;
 
 const submitButton = document.createElement('button');
-submitButton.innerText = 'Submit';
+submitButton.innerText = 'Start!';
 submitButton.classList.add('button');
 
-// const timerContainer = document.createElement('div');
-
-// const timer = document.createElement('div');
+const timer = document.createElement('div');
+timer.classList.add('timer');
 
 // <--------- HELPER FUNCTIONS --------->
 // Function for output to abstract complexity of DOM manipulation away from game logic
@@ -165,6 +165,7 @@ const squareClick = (cardElement, column, row) => {
           // output respective message
           if (numPairs === 8) {
             output('Congratulations! You win!');
+            timer.remove();
           } else {
             output('Now click another card!');
             canClick = true;
@@ -192,6 +193,7 @@ const squareClick = (cardElement, column, row) => {
 // Function to create all the board elements that will go on the screen and return the built board
 const buildBoardElements = () => {
   // give it a class for CSS purposes
+  gameInfo.after(timer);
   boardElement.classList.add('board');
 
   // use the board data structure we passed in to create the correct size board
@@ -240,13 +242,28 @@ const getPlayerName = () => {
     output(`Hi ${playerName}! Click a card and find its matching pair!`);
     const boardEl = buildBoardElements(board);
     document.body.appendChild(boardEl);
+
+    const ref = setInterval(() => {
+      timer.innerText = `You have ${minutes} mins and ${seconds} secs left`;
+      if (seconds <= 0) {
+        seconds = 60;
+        minutes -= 1;
+
+        if (minutes <= 0) {
+          clearInterval(ref);
+          timer.innerText = 'Oh man, time\'s up! You didn\'t finish in time';
+          boardEl.remove();
+        }
+      }
+      seconds -= 1;
+    }, 10);
   }
 };
 
 // GAME INITIALISATION
 
 const initGame = () => {
-  output('Welcome! Let\'s get your name before we begin :)');
+  output('You have 3 minutes to match all the cards! Type your name in to begin!');
   document.body.appendChild(gameInfo);
   inputContainer.appendChild(inputField);
   inputContainer.appendChild(submitButton);
