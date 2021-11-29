@@ -91,10 +91,10 @@ const squareClick = (cardElement, column, row) => {
       // add in the match message
       output('MATCH!');
 
-      // add setTimeOut to empty the div after 3 secs
+      // add setTimeOut to empty the div after 2 secs
       setTimeout(() => {
         messageDiv.innerText = '';
-      }, 3000);
+      }, 2000);
     } else {
       console.log('NOT a match');
       // turn card over
@@ -120,7 +120,7 @@ const squareClick = (cardElement, column, row) => {
     // add setTimeOut to wipe out this  message after 5 secs
     setTimeout(() => {
       messageDiv.innerText = '';
-    }, 5000);
+    }, 10000);
   }
 };
 
