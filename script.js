@@ -9,6 +9,12 @@ let matchedPair = 0;
 let milliseconds = 180000;
 let userName = '';
 let winCount = 0;
+let canClick = true;
+
+const playMusic = () => {
+  const audio = new Audio('https://notification-sounds.com/soundsfiles/Card-flip-sound-effect.mp3');
+  audio.play();
+};
 
 // create a div element to display a message
 const messageDiv = document.createElement('div');
@@ -42,44 +48,25 @@ resetBtn.innerText = 'Reset Game';
 
 // Gameplay logic
 const squareClick = (cardElement, column, row) => {
-  console.log(cardElement);
+  if (canClick === true && (matchedPair <= ((boardSize * boardSize) / 2))) {
+  // console.log(cardElement);
 
-  console.log('FIRST CARD DOM ELEMENT', firstCard);
+    // console.log('FIRST CARD DOM ELEMENT', firstCard);
 
-  console.log('BOARD CLICKED CARD', board[column][row]);
-
-  const clickedCard = board[column][row];
-
-  // the user already clicked on this square
-  if (cardElement.innerText !== '') {
-    return;
-  }
-  // first turn
-  if (firstCard === null) {
-    console.log('first turn');
-    // assign the clicked card to firstcard
-    firstCard = clickedCard;
-    // turn this card over
-    cardElement.classList.add('cardStyle');
-
-    if (clickedCard.color === 'red') {
-      cardElement.classList.add('red');
+    // console.log('BOARD CLICKED CARD', board[column][row]);
+    canClick = false;
+    const clickedCard = board[column][row];
+    // the user already clicked on this square
+    if (cardElement.innerText !== '') {
+      canClick = true;
+      return;
     }
-
-    cardElement.innerText = `${firstCard.name}\n${firstCard.symbol}`;
-
-    // hold onto this for later when it may not match
-    firstCardElement = cardElement;
-
-    // second turn
-  } else {
-    console.log('second turn');
-    if (
-      clickedCard.name === firstCard.name
-        && clickedCard.suit === firstCard.suit
-    ) {
-      console.log('match');
-      matchedPair += 1;
+    // first turn
+    if (firstCard === null) {
+      console.log('first turn');
+      canClick = true;
+      // assign the clicked card to firstcard
+      firstCard = clickedCard;
       // turn this card over
       cardElement.classList.add('cardStyle');
 
@@ -87,40 +74,64 @@ const squareClick = (cardElement, column, row) => {
         cardElement.classList.add('red');
       }
 
-      cardElement.innerText = `${clickedCard.name}\n${clickedCard.symbol}`;
-      // add in the match message
-      output('MATCH!');
+      cardElement.innerText = `${firstCard.name}\n${firstCard.symbol}`;
 
-      // add setTimeOut to empty the div after 2 secs
+      // hold onto this for later when it may not match
+      firstCardElement = cardElement;
+
+    // second turn
+    } else {
+      console.log('second turn');
+      if (
+        clickedCard.name === firstCard.name
+        && clickedCard.suit === firstCard.suit
+      ) {
+        console.log('match');
+        matchedPair += 1;
+        // turn this card over
+        cardElement.classList.add('cardStyle');
+
+        if (clickedCard.color === 'red') {
+          cardElement.classList.add('red');
+        }
+
+        cardElement.innerText = `${clickedCard.name}\n${clickedCard.symbol}`;
+        // add in the match message
+        output('MATCH!');
+        // add setTimeOut to empty the div after 2 secs
+        setTimeout(() => {
+          messageDiv.innerText = '';
+          canClick = true;
+        }, 2000);
+      } else {
+        console.log('NOT a match');
+        // turn card over
+        cardElement.classList.add('cardStyle');
+
+        if (clickedCard.color === 'red') {
+          cardElement.classList.add('red');
+        }
+        cardElement.innerText = `${clickedCard.name}\n${clickedCard.symbol}`;
+        // after 3 sec, turn the card over
+        setTimeout(() => {
+        // turn this card back over
+          firstCardElement.innerText = '';
+          cardElement.innerText = '';
+          canClick = true;
+        }, 1000);
+      }
+      // reset the first card back to null
+      firstCard = null;
+    }
+    if (matchedPair >= ((boardSize * boardSize) / 2)) {
+      canClick = false;
+      winCount += 1;
+      output(`Hi ${userName}, you won the game ${winCount} times!`);
+      // add setTimeOut to wipe out this  message after 5 secs
       setTimeout(() => {
         messageDiv.innerText = '';
-      }, 2000);
-    } else {
-      console.log('NOT a match');
-      // turn card over
-      cardElement.classList.add('cardStyle');
-
-      if (clickedCard.color === 'red') {
-        cardElement.classList.add('red');
-      }
-      cardElement.innerText = `${clickedCard.name}\n${clickedCard.symbol}`;
-      // after 3 sec, turn the card over
-      setTimeout(() => {
-        // turn this card back over
-        firstCardElement.innerText = '';
-        cardElement.innerText = '';
-      }, 1000);
+      }, 10000);
     }
-    // reset the first card back to null
-    firstCard = null;
-  }
-  if (matchedPair >= ((boardSize * boardSize) / 2)) {
-    winCount += 1;
-    output(`Hi ${userName}, you won the game ${winCount} times!`);
-    // add setTimeOut to wipe out this  message after 5 secs
-    setTimeout(() => {
-      messageDiv.innerText = '';
-    }, 10000);
   }
 };
 
@@ -156,7 +167,11 @@ const buildBoardElements = () => {
         // we will want to pass in the card element so
         // that we can change how it looks on screen, i.e.,
         // "turn the card over"
-        squareClick(event.currentTarget, i, j);
+        // if canClick = true allow the function below to run
+        if (canClick === true) {
+          squareClick(event.currentTarget, i, j);
+          playMusic();
+        }
       });
 
       rowElement.appendChild(square);
@@ -165,6 +180,20 @@ const buildBoardElements = () => {
   }
 
   return boardElement;
+};
+
+const newTimer = () => {
+  const ref = setInterval(() => {
+    // insert timer into timeDiv
+    const convertTime = millisToMinutesAndSeconds(milliseconds);
+    timeDiv.innerText = `Time Left: ${convertTime}`;
+
+    milliseconds -= 1000;
+  }, 1000);
+  if (milliseconds <= 0) {
+    clearInterval(ref);
+  }
+  return ref;
 };
 
 // function to get userName
@@ -179,16 +208,7 @@ const getUserName = () => {
   const boardEl = buildBoardElements(board);
   document.body.appendChild(boardEl);
   // timer to run when button is clicked
-  const ref = setInterval(() => {
-    const convertTime = millisToMinutesAndSeconds(milliseconds);
-    timeDiv.innerText = `Time Left: ${convertTime}`;
-
-    if (milliseconds <= 0) {
-      clearInterval(ref);
-    }
-
-    milliseconds -= 1000;
-  }, 1000);
+  newTimer();
 
   document.body.appendChild(timeDiv);
   document.body.appendChild(resetBtn);
@@ -355,6 +375,7 @@ const resetGame = (() => {
   matchedPair = 0;
   // reset timer
   milliseconds = 180000;
+  canClick = true;
   reInitGame();
 });
 
