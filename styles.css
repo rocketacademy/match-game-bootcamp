@@ -1,3 +1,144 @@
+@font-face {
+  font-family: "Christmas";
+  src: url("assets/font/Christmas.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Candy";
+  src: url("assets/font/Candcu__.ttf") format("truetype");
+}
+
+html {
+  min-height: 100vh;
+  cursor: url(https://cur.cursors-4u.net/holidays/hol-1/hol80.ani),
+    url(https://cur.cursors-4u.net/holidays/hol-1/hol80.png), auto !important;
+}
+
 body {
-  background-color: pink;
+  text-align: center;
+  font-family: "Christmas";
+  margin: 0;
+  background: radial-gradient(#eef1f3, #ccf1f8);
+}
+
+h1 {
+  color: #2f8d55;
+  margin-top: 40px;
+}
+.game-info {
+  margin-top: 100px;
+  font-size: 150%;
+}
+
+.grid-container {
+  font-size: 250%;
+  color: #2f8d55;
+  font-family: "Candy";
+  margin-bottom: 40px;
+  position: absolute;
+  right: 100px;
+  top: 100px;
+  z-index: 2;
+  display: grid;
+  text-align: right;
+}
+.square {
+  position: relative;
+  padding: 10px;
+  margin: 10px;
+  background-color: white;
+  display: inline-block;
+  height: 100px;
+  width: 75px;
+  vertical-align: top;
+  font-size: 180%;
+  font-family: "Candy";
+  color: #2f8d55;
+  box-shadow: 0px 0px 8px 3px #30aac1;
+  border-radius: 8px;
+}
+
+.square.matched {
+  animation: dance 1s linear infinite 500ms;
+}
+
+@keyframes dance {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-3deg);
+  }
+  75% {
+    transform: rotate(3deg);
+  }
+}
+
+.button-wrapper {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.button {
+  font-family: "Candy";
+  border: none;
+  width: 100px;
+  height: 20px;
+  margin: 10px;
+  box-shadow: 0px 0px 8px 3px #30aac1;
+  border-radius: 8px;
+}
+
+.card-deco {
+  position: absolute;
+  height: auto;
+  width: 125%;
+  margin: 50px 0px -20px 40px;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  transform: translate(-50%, -50%);
+  transition: width 100ms ease-in-out, height 100ms ease-in-out;
+}
+
+.square:hover .card-deco {
+  width: 140%;
+  height: auto;
+}
+
+.overlay-text {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: none;
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  position: fixed;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.8); /* Black background with opacity */
+  font-family: Candy;
+  color: #2f8d55;
+  transition: background-color 500ms, font-size 500ms;
+  font-size: 200%;
+}
+
+.overlay-text.visible {
+  display: flex;
+  animation: overlay-grow 500ms forwards;
+}
+
+.input {
+  margin-top: 20px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: white;
+  font-family: Candy;
+  font-size: 150%;
+  text-align: center;
 }
