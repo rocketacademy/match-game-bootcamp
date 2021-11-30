@@ -19,6 +19,9 @@ body {
 .score-container {
   border-color: red;
 }
+.reset-button {
+  margin-left: 5px;
+}
 .output {
   color: red;
   /* font-size: 1.5rem; */

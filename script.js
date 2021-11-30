@@ -1,12 +1,13 @@
 // boardSize has to be an even number
 const boardSize = 4;
-const board = [];
+let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
 let playerName = '';
 const timeToPlayInSecs = 180;
 const intervalInMS = 200;
+let startTimer;
 
 // DOM elements
 const outputEl = document.createElement('div');
@@ -18,6 +19,7 @@ const scoreContainer = document.createElement('div');
 const timerContainer = document.createElement('div');
 const timerLabel = document.createElement('label');
 const timerOutput = document.createElement('output');
+const resetGameBtn = document.createElement('button');
 
 const squareClick = (cardElement, column, row) => {
   // console.log(cardElement);
@@ -115,21 +117,60 @@ const buildBoardElements = (board) => {
         // "turn the card over"
         squareClick(event.currentTarget, i, j);
       });
-
       rowElement.appendChild(square);
     }
     boardElement.appendChild(rowElement);
   }
-
   return boardElement;
 };
+
+resetGameBtn.addEventListener('click', () => {
+  // reset board
+  board = [];
+  document.querySelector('.board').remove();
+  let doubleDeck = makeDeck();
+  let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  deck = shuffleCards(deckSubset);
+  // deal the cards out to the board data structure
+  for (let i = 0; i < boardSize; i += 1) {
+    board.push([]);
+    for (let j = 0; j < boardSize; j += 1) {
+      board[i].push(deck.pop());
+    }
+  }
+  // board elements
+  const boardEl = buildBoardElements(board);
+  document.body.appendChild(outputEl);
+  document.body.appendChild(boardEl);
+  outputEl.classList.add('output');
+  // reset input
+  inputEl.value = '';
+  // reset timer
+  clearInterval(startTimer);
+  timerOutput.innerHTML = '';
+  // timerOutput.innerText = '';
+  // timer elements
+  document.body.appendChild(timerContainer);
+  timerContainer.classList.add('timer-container');
+  timerLabel.classList.add('timer-label');
+  timerLabel.innerText = 'Time left to play (secs):';
+  timerContainer.appendChild(timerLabel);
+  timerOutput.classList.add('timer-output');
+  timerContainer.appendChild(timerOutput);
+
+  // score elements
+  scoreContainer.classList.add('score-container');
+  document.body.append(scoreContainer);
+});
 
 const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
   let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  console.log(...deckSubset);
   deck = shuffleCards(deckSubset);
+  console.log(...deck);
 
   // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
@@ -150,6 +191,9 @@ const initGame = () => {
   inputBtn.classList.add('input-button');
   inputBtn.innerText = 'Submit';
   inputContainer.appendChild(inputBtn);
+  resetGameBtn.classList.add('reset-button');
+  resetGameBtn.innerText = 'Reset Game';
+  inputContainer.appendChild(resetGameBtn);
 
   // board elements
   const boardEl = buildBoardElements(board);
@@ -173,23 +217,16 @@ const initGame = () => {
   inputBtn.addEventListener('click', function () {
     playerName = inputEl.value;
     outputEl.innerText = `Hi ${playerName}! Please start matching the cards, note the timer at the bottom.`;
-
     // start match timer
-    matchTimer(timeToPlayInSecs);
+    let totalTimeInSecs = timeToPlayInSecs;
+    startTimer = setInterval(() => {
+      timerOutput.innerText = totalTimeInSecs;
+      if (totalTimeInSecs <= 0) {
+        clearInterval(matchTimer);
+      }
+      totalTimeInSecs -= 1;
+    }, 1000);
   });
-};
-
-const matchTimer = function (timeToPlayInSecs) {
-  let totalTimeInSecs = timeToPlayInSecs;
-  setInterval(() => {
-    timerOutput.innerText = totalTimeInSecs;
-
-    if (totalTimeInSecs <= 0) {
-      clearInterval(matchTimer);
-    }
-
-    totalTimeInSecs -= 1;
-  }, 1000);
 };
 
 const makeDeck = (cardAmount) => {
@@ -243,7 +280,7 @@ const shuffleCards = function (cards) {
     const randomIndex = getRandomIndex(cards);
     const randomCard = cards[randomIndex];
     cards[i] = randomCard;
-    cards[randomCard] = currentCard;
+    cards[randomIndex] = currentCard;
   }
   return cards;
 };
