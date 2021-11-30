@@ -6,10 +6,16 @@ let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
-let timer = 180000;
 let boardFull = "";
 let numberofWins = 0;
 let username = "";
+let minutes = 3;
+const delayInMilliseconds = 60000;
+
+//Timer
+const timerOutput = document.createElement("div");
+timerOutput.setAttribute("id", "timer-output");
+document.body.appendChild(timerOutput);
 
 //Number of wins tracker
 const winTracker = document.createElement("div");
@@ -27,6 +33,10 @@ document.body.appendChild(results);
 const inputDiv = document.createElement("div");
 inputDiv.setAttribute("id", "input-field");
 document.body.appendChild(inputDiv);
+
+const inputDescr = document.createElement("p");
+inputDescr.innerText = "Please input a username that you want to use";
+inputDiv.appendChild(inputDescr);
 
 const inputField = document.createElement("input");
 inputField.setAttribute("type", "text");
@@ -134,7 +144,12 @@ const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
-  let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  let sliceStart = getRandomIndex(53) * 2;
+  sliceStart = sliceStart - boardSize * boardSize;
+  let deckSubset = doubleDeck.slice(
+    sliceStart,
+    sliceStart + boardSize * boardSize
+  );
   deck = shuffleCards(deckSubset);
 
   // deal the cards out to the board data structure
@@ -215,6 +230,8 @@ const restartGame = () => {
   const boardEl = buildBoardElements(board);
   boardEl.setAttribute("id", "board");
   document.body.appendChild(boardEl);
+
+  minutes = 3;
   results.innerText = "Restarted Game";
 };
 
@@ -230,6 +247,21 @@ inputButton.addEventListener("click", function () {
   resetButton.innerText = "Reset";
   document.body.appendChild(resetButton);
   resetButton.addEventListener("click", restartGame);
+
+  //Timer functions
+  timerOutput.innerText = `Number of Minutes Left: ${minutes}`;
+
+  const ref = setInterval(() => {
+    console.log("starting....");
+    timerOutput.innerText = `Number of Minutes Left: ${minutes}`;
+
+    if (minutes == 0) {
+      clearInterval(ref);
+      restartGame();
+    }
+
+    minutes -= 1;
+  }, delayInMilliseconds);
+
   initGame();
-  setTimeout(restartGame, timer);
 });
