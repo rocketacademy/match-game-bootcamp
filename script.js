@@ -360,6 +360,8 @@ const refreshTimer = () => {
       "timeMessage"
     ).innerHTML = `${minutesDisplay}:${secondsDisplay}`;
   } else {
+    resetRound();
+    document.getElementById("message").innerText = "Time is up!";
     clearInterval(timeInterval);
   }
 };
