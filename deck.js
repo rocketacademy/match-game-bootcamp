@@ -69,7 +69,8 @@ export const makeDeck = () => {
         suitSymbol: currentSymbol,
       };
 
-      // Add the new card to the deck
+      // Add 2 of the same cards to the deck
+      newDeck.push(card);
       newDeck.push(card);
     }
   }

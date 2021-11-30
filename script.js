@@ -35,17 +35,19 @@ const squareClick = (cardElement, column, row) => {
   } else {
     console.log("second turn");
     console.log("SECOND CARD Clicked", clickedCard);
+
     if (
       clickedCard.name === firstCard.name &&
       clickedCard.suit === firstCard.suit
     ) {
       console.log("match");
-
-      // turn this card over
       cardElement.innerText = clickedCard.displayName;
+      const messageDiv = document.getElementById("message-block");
+      messageDiv.innerHTML = "MATCH";
+      setTimeout(() => (messageDiv.innerHTML = ""), 3000);
     } else {
       console.log("NOT a match");
-      // show second clicked card and then flip over after 3s
+      // show second clicked card and then flip over after 2s
       cardElement.innerText = clickedCard.displayName;
       setTimeout(() => {
         firstCardElement.innerText = "";
@@ -109,16 +111,6 @@ const initGame = () => {
   let deckSubset = doubleDeck.slice(0, boardSize * boardSize); // 16 cards
   deck = shuffleCards(deckSubset);
 
-  // let deck = makeDeck();
-  // deck = shuffleCards(deck);
-  // let deckSubset = deck.slice(0, boardSize * (boardSize / 2)); // pick 8 cards to be repeated for matching pairs
-  // let deckSubsetCopy = [...deckSubset];
-
-  // for (let k = 0; k < deckSubsetCopy.length; k++) {
-  //   deckSubsetCopy.push(deckSubsetCopy[k]);
-  // }
-  // deck = shuffleCards(deckSubsetCopy);
-
   // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
     board.push([]);
@@ -130,6 +122,10 @@ const initGame = () => {
   const boardEl = buildBoardElements(board);
 
   document.body.appendChild(boardEl);
+
+  const messageDiv = document.createElement("div");
+  messageDiv.id = "message-block";
+  document.body.appendChild(messageDiv);
 };
 
 initGame();
