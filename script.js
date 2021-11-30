@@ -4,15 +4,27 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
-const intervalInMS = 1000;
+let playerName = '';
+const timeToPlayInSecs = 180;
+const intervalInMS = 200;
+
+// DOM elements
 const outputEl = document.createElement('div');
+const inputContainer = document.createElement('div');
+const inputLabel = document.createElement('label');
+const inputEl = document.createElement('input');
+const inputBtn = document.createElement('button');
+const scoreContainer = document.createElement('div');
+const timerContainer = document.createElement('div');
+const timerLabel = document.createElement('label');
+const timerOutput = document.createElement('output');
 
 const squareClick = (cardElement, column, row) => {
-  console.log(cardElement);
+  // console.log(cardElement);
+  // console.log('FIRST CARD DOM ELEMENT', firstCard);
+  // console.log('BOARD CLICKED CARD', board[column][row]);
 
-  console.log('FIRST CARD DOM ELEMENT', firstCard);
-
-  console.log('BOARD CLICKED CARD', board[column][row]);
+  // start countdown timer upon 1st click
 
   const clickedCard = board[column][row];
 
@@ -41,17 +53,15 @@ const squareClick = (cardElement, column, row) => {
     ) {
       console.log('match');
 
-      // display 'match' and remove 'match' after 3 seconds
+      // display 'match' immediately and remove 'match' after 3 seconds
       let counter = 3;
+      outputEl.innerText = 'Match🎉';
       const ref = setInterval(() => {
-        outputEl.innerText = 'Match';
         console.log(counter);
-
         if (counter <= 1) {
           outputEl.innerText = '';
           clearInterval(ref);
         }
-
         counter -= 1;
       }, 1000);
 
@@ -129,10 +139,57 @@ const initGame = () => {
     }
   }
 
+  // input elements
+  document.body.appendChild(inputContainer);
+  inputContainer.classList.add('input-container');
+  inputLabel.classList.add('input-label');
+  inputLabel.innerText = 'Player Name: ';
+  inputContainer.appendChild(inputLabel);
+  inputEl.classList.add('input-field');
+  inputContainer.appendChild(inputEl);
+  inputBtn.classList.add('input-button');
+  inputBtn.innerText = 'Submit';
+  inputContainer.appendChild(inputBtn);
+
+  // board elements
   const boardEl = buildBoardElements(board);
+  document.body.appendChild(outputEl);
   document.body.appendChild(boardEl);
   outputEl.classList.add('output');
-  document.body.appendChild(outputEl);
+
+  // timer elements
+  document.body.appendChild(timerContainer);
+  timerContainer.classList.add('timer-container');
+  timerLabel.classList.add('timer-label');
+  timerLabel.innerText = 'Time left to play (secs):';
+  timerContainer.appendChild(timerLabel);
+  timerOutput.classList.add('timer-output');
+  timerContainer.appendChild(timerOutput);
+
+  // score elements
+  scoreContainer.classList.add('score-container');
+  document.body.append(scoreContainer);
+
+  inputBtn.addEventListener('click', function () {
+    playerName = inputEl.value;
+    outputEl.innerText = `Hi ${playerName}! Please start matching the cards, note the timer at the bottom.`;
+
+    // start match timer
+    matchTimer(timeToPlayInSecs);
+  });
+};
+
+const matchTimer = function (timeToPlayInSecs) {
+  let totalTimeInSecs = timeToPlayInSecs;
+  setInterval(() => {
+    timerOutput.innerText = totalTimeInSecs;
+
+    if (totalTimeInSecs <= 0) {
+      clearInterval(matchTimer);
+    }
+
+    totalTimeInSecs -= 1;
+  }, 1000);
 };
 
 const makeDeck = (cardAmount) => {
