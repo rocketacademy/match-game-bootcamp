@@ -23,11 +23,11 @@ body {
 }
 
 .modal {
+  margin-top: 80px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 1.1rem;
-  transition: all 1s ease;
 }
 .modal .modal-container {
   width: 500px;
@@ -109,7 +109,10 @@ body {
     inset rgba(255, 255, 255, 0.7) 0 2px 1px 7px,
     rgba(243, 30, 30, 0.8) 0 0px 3px 2px;
 }
-
+.container {
+  margin-top: 10px;
+  font-size: 18px;
+}
 #game-title {
   text-transform: capitalize;
 }
@@ -186,4 +189,14 @@ body {
 
 .no-match {
   border: solid 2px red;
+}
+
+button {
+  font-family: "Poppins";
+  border-radius: 10px;
+}
+button:hover {
+  transform: scale(0.98);
+  background-color: red;
+  color: whitesmoke;
 }
