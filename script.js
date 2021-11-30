@@ -14,16 +14,6 @@ let timeInterval;
 let matchedCards = 0;
 let matchesWon = 0;
 
-const grid = [
-  ["A", "B"],
-  ["Y", "Z"],
-];
-
-const upperLeftPosition = grid[0][0]; // 'A'
-const upperRightPosition = grid[0][1]; // 'B'
-const lowerLeftPosition = grid[1][0]; // 'Y'
-const lowerRightPosition = grid[1][1]; // 'Z'
-
 const cardClick = (cardElement, row, column) => {
   canClick = false;
   const clickedCard = board[row][column];
@@ -32,20 +22,18 @@ const cardClick = (cardElement, row, column) => {
   if (firstCard === null) {
     document.getElementById(clickedCard.id).classList.toggle("is-flipped");
     firstCard = clickedCard;
-    // turn this card over
-    // cardElement.innerText = firstCard.name;
-
-    // hold onto this for later when it may not match
     firstCardElement = cardElement;
-    // second turn
     canClick = true;
     document.getElementById("message").innerText = "Select the second card";
   } else {
+    // second turn if user click the same card again
     if (clickedCard.id === firstCard.id) {
       document.getElementById("message").innerText = "Select the second card";
       // reset();
       canClick = true;
-    } else if (
+    }
+    // if user matches both cards
+    else if (
       clickedCard.name === firstCard.name &&
       clickedCard.suit === firstCard.suit
     ) {
@@ -57,6 +45,7 @@ const cardClick = (cardElement, row, column) => {
 
       matchedCards += 2;
 
+      // if user matches all cards
       if (matchedCards == cardSize) {
         document.getElementById("message").innerText = "You win this round!";
         document.getElementById(
@@ -68,7 +57,9 @@ const cardClick = (cardElement, row, column) => {
           document.getElementById("message").innerText =
             "Press play to start round";
         }, 5000);
-      } else {
+      }
+      // if user's first and second card does not match
+      else {
         document.getElementById("message").innerText = "Card is a match!";
         matchesWon++;
         setTimeout(() => {
@@ -92,6 +83,7 @@ const cardClick = (cardElement, row, column) => {
   }
 };
 
+//
 const reset = () => {
   firstCard = null;
   canClick = true;
@@ -183,7 +175,7 @@ const shuffleCards = (cards) => {
   return cards;
 };
 
-const makeDeck = (cardAmount) => {
+const makeDeck = () => {
   // create the empty deck at the beginning
   const newDeck = [];
   const suits = ["hearts", "diamonds", "clubs", "spades"];
@@ -228,6 +220,7 @@ const makeDeck = (cardAmount) => {
   return newDeck;
 };
 
+// shuffle the main deck first before choosing the cards to build the board
 const cutDeck = () => {
   const singleDeck = shuffleCards(makeDeck());
   const boardLength = (boardSize * boardSize) / 2;
@@ -330,6 +323,7 @@ const initGame = () => {
   document.body.appendChild(gameDiv);
 };
 
+// if user gives up and wants to restart round
 const resetRound = () => {
   timeLeftInSeconds = 180;
   clearInterval(timeInterval);
@@ -345,6 +339,7 @@ const resetRound = () => {
   initGame();
 };
 
+// once user presses play button to start round
 const startRound = () => {
   canClick = true;
   document.getElementById("message").innerHTML = `Select the first card`;
@@ -354,6 +349,7 @@ const startRound = () => {
   }, 1000);
 };
 
+// to run every second and put a timer on the screen
 const refreshTimer = () => {
   if (timeLeftInSeconds > 1) {
     timeLeftInSeconds--;
@@ -368,6 +364,7 @@ const refreshTimer = () => {
   }
 };
 
+// to receive the player's name once he/she presses enter
 document.addEventListener("keydown", function (event) {
   if (event.key == "Enter" && playerName.length == 0) {
     playerName = document.getElementById("name-input").value;
