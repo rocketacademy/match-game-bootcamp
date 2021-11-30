@@ -1,4 +1,6 @@
-// Please implement exercise logic here
+// Notes:
+// ### to indicate for Comfortable exercise
+// ##### to indicate for Comfortable exercise
 
 // create a card-matching game
 // the user turns cards over one at a time to find the matching pair of cards
@@ -200,8 +202,27 @@ const buildBoardElements = (board) => {
   // ### create a messageboard element
   const messageBoard = document.createElement('div');
   messageBoard.classList.add('messageBoard');
-  messageBoard.innerText = '';
+  messageBoard.innerText =
+    'Please click on the boxes. You have 3 minutes for the game!';
   boardElement.appendChild(messageBoard);
+
+  // ##### create a 3 minutes timer element
+  let milliseconds = 18000;
+  const delayInMilliseconds = 1;
+  const output = document.createElement('div');
+  output.innerText = milliseconds;
+  boardElement.appendChild(output);
+
+  // #### use the timer functions
+  const ref = setInterval(() => {
+    output.innerText = milliseconds;
+
+    if (milliseconds <= 0) {
+      clearInterval(ref);
+      output.innerText = 'Time is Up!';
+    }
+    milliseconds -= 1;
+  }, delayInMilliseconds);
 
   // use the board data structure we passed in to create the correct size board
   for (let i = 0; i < board.length; i += 1) {
