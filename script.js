@@ -24,10 +24,8 @@ document.body.appendChild(winTracker);
 
 //components of the page
 const description = document.createElement("div");
+description.setAttribute("id", "description");
 document.body.appendChild(description);
-const results = document.createElement("div");
-results.setAttribute("id", "results");
-document.body.appendChild(results);
 
 //inputfield
 const inputDiv = document.createElement("div");
@@ -216,21 +214,7 @@ const shuffleCards = (cards) => {
 const restartGame = () => {
   document.getElementById("board").remove();
   board = [];
-  let doubleDeck = makeDeck();
-  let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
-  deck = shuffleCards(deckSubset);
-
-  // deal the cards out to the board data structure
-  for (let i = 0; i < boardSize; i += 1) {
-    board.push([]);
-    for (let j = 0; j < boardSize; j += 1) {
-      board[i].push(deck.pop());
-    }
-  }
-  const boardEl = buildBoardElements(board);
-  boardEl.setAttribute("id", "board");
-  document.body.appendChild(boardEl);
-
+  initGame();
   minutes = 3;
   results.innerText = "Restarted Game";
 };
@@ -241,6 +225,10 @@ inputButton.addEventListener("click", function () {
   inputDiv.remove();
   description.innerText =
     "You are given 3 minutes to finish matching the cards before the game will be automatically restarted.";
+
+  const results = document.createElement("div");
+  results.setAttribute("id", "results");
+  document.body.appendChild(results);
 
   //Reset button
   const resetButton = document.createElement("button");

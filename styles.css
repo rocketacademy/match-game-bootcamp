@@ -1,6 +1,8 @@
 body {
   background-color: pink;
   font-family: "Roboto", sans-serif;
+  height: 100%;
+  text-align: center;
 }
 
 .square {
@@ -23,9 +25,15 @@ img {
 
 #results {
   font-size: 18px;
+  height: 20px;
   background-color: lightgray;
   border-radius: 6px;
-  margin: 10px 0px 10px 0px;
-  width: 450px;
+  margin: auto;
+  width: 50%;
   padding: 6px;
+}
+
+#description {
+  margin: auto;
+  width: 50%;
 }
