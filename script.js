@@ -11,12 +11,22 @@ const lowerRightPosition = grid[1][1]; // 'Z'
 
 // boardSize has to be an even number
 const boardSize = 4;
-const board = [];
+let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+// create the element that everything will go inside of
+const boardElement = document.createElement('div');
+
 // delay or sleep function
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const announcement = document.createElement('div');
+document.body.appendChild(announcement)
+
+const clock = document.createElement('div');
+document.body.appendChild(clock);
+clock.innerText = ""
+
 
 // Gameplay Logic
 const squareClick = async (cardElement, column, row) => {
@@ -38,8 +48,8 @@ const squareClick = async (cardElement, column, row) => {
     console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
-    cardElement.innerText = firstCard.name;
-
+    cardElement.innerText = (firstCard.name)
+    
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
 
@@ -51,6 +61,12 @@ const squareClick = async (cardElement, column, row) => {
       clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
+      announcement.innerText = 'There is a match.';
+      setTimeout(() => {
+        // remove announcement
+        announcement.innerText = '';
+       
+      }, 2000);
 
       // turn this card over
       cardElement.innerText = clickedCard.name;
@@ -65,7 +81,7 @@ const squareClick = async (cardElement, column, row) => {
         // turn this card back over
         firstCardElement.innerText = '';
         cardElement.innerText = '';
-      }, 2000);
+      }, 1000);
 
       // await sleep(1000);
 
@@ -79,12 +95,34 @@ const squareClick = async (cardElement, column, row) => {
   }
 };
 
+
+console.log('starting...');
+
+const delayInMilliseconds = 1000; // 3 mins to complete
+let counter = delayInMilliseconds;
+
+const ref = setInterval(() => {
+  clock.innerText = counter;
+  counter -= 1;
+  
+
+  if (counter === 0) {
+    clearInterval(ref);
+    announcement.innerText = "stop playing. game over"
+    boardElement.innerText = "";
+
+
+  }
+}, 1);
+
+console.log('bananas!');
+
 // Game Initialisation Logic
 // create all the board elements that will go on the screen
 // return the built board
 const buildBoardElements = (board) => {
-  // create the element that everything will go inside of
-  const boardElement = document.createElement('div');
+  // // create the element that everything will go inside of
+  // const boardElement = document.createElement('div');
 
   // give it a class for CSS purposes
   boardElement.classList.add('board');
