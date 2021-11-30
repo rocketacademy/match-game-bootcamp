@@ -1,3 +1,110 @@
+:root {
+  --red: #e74c3c;
+  --blue: #3498db;
+  --orange: #ffc312;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  background-color: pink;
+  background-color: var(--blue);
+  text-align: center;
+}
+
+.card {
+  padding: 2.5px;
+  border-radius: 10px;
+  margin: 10px;
+  background-color: var(--blue);
+  display: inline-block;
+  height: 145px;
+  width: 100px;
+  vertical-align: top;
+  perspective: 1000px;
+}
+
+.card__inner {
+  width: 100%;
+  height: 100%;
+  transition: transform 1s;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  position: relative;
+}
+
+.card__inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.card__face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  overflow: hidden;
+  box-shadow: 0px 3px 18px 3px rgba(0, 0, 0, 0.2);
+}
+
+.card__face--front {
+  background-color: var(--light);
+  transform: rotateY(180deg);
+}
+
+.card__face--back {
+  background-image: linear-gradient(
+    to bottom right,
+    var(--primary),
+    var(--secondary)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orange {
+  border: 3px solid var(--orange);
+  border-radius: 7px;
+}
+
+.card-pic {
+  width: 100%;
+}
+
+.bangers {
+  font-family: "Bangers", cursive;
+  letter-spacing: 2.5px;
+}
+
+.name-input {
+  outline: 0;
+  width: 20%;
+  border-width: 0 0 5px;
+  border-color: black;
+  background: transparent;
+  text-align: center;
+  font-size: 1.5em;
+}
+
+.reset-button {
+  height: 25px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.start-button {
+  height: 25px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+#timeMessage {
+  margin-bottom: 10px;
+}
+
+#matchesWon {
+  margin-bottom: 10px;
 }
