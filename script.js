@@ -15,12 +15,26 @@ const threeminutes = 180000;
 let timer;
 let milliseconds = threeminutes;
 
+// store timeout variable so we can cancel when needed
+let matchTimeout;
+let mismatchTimeout;
+
+/**
+ * Clear all timeouts.
+ */
+const clearTimeouts = () => {
+  clearTimeout(matchTimeout);
+  clearTimeout(mismatchTimeout);
+};
+
 /**
  * Display game state message.
  * @param {*} message Message
  * @param {*} color Color of message text
  */
 const displayMessage = (message, color = 'black') => {
+  clearTimeouts();
+
   const gameState = document.getElementById('game-state');
   gameState.innerText = message;
   gameState.style.color = color;
@@ -90,10 +104,6 @@ const switchButtons = () => {
   document.getElementById('start-button').disabled = (isGameInProgress) ? 'disabled' : '';
 };
 
-// store timeout variable so we can cancel when needed
-let matchTimeout;
-let mismatchTimeout;
-
 /**
  * Handle card click
  * @param {*} cardElement Card
@@ -142,8 +152,6 @@ const cardClick = (cardElement, column, row) => {
         clearInterval(timer);
         updateScore();
         switchButtons();
-        clearTimeout(matchTimeout);
-        clearTimeout(mismatchTimeout);
         displayMessage('🎉Congratulations! You\'ve won the game.🎉');
 
         setTimeout(() => {
