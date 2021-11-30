@@ -18,7 +18,7 @@ const lowerRightPosition = grid[1][1]; // 'Z'
 const makeDeck = (cardAmount) => {
   // create the empty deck at the beginning
   const newDeck = [];
-  const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
+  const suits = ['❤', '♦', '♣', '♠'];
 
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
     // make a variable of the current suit
@@ -33,13 +33,18 @@ const makeDeck = (cardAmount) => {
 
       // 1, 11, 12 ,13
       if (cardName === '1') {
-        cardName = 'ace';
+        cardName = 'A';
       } else if (cardName === '11') {
-        cardName = 'jack';
+        cardName = 'J';
       } else if (cardName === '12') {
-        cardName = 'queen';
+        cardName = 'Q';
       } else if (cardName === '13') {
-        cardName = 'king';
+        cardName = 'K';
+      }
+      if (currentSuit === '❤' || currentSuit ==='♦'){
+        var color = 'red';
+      } else if (currentSuit === '♣' || currentSuit === '♠'){
+        var color = 'black'
       }
 
       // make a single card object variable
@@ -47,17 +52,22 @@ const makeDeck = (cardAmount) => {
         name: cardName,
         suit: currentSuit,
         rank: rankCounter,
+        cardColor: color
       };
 /* 
       console.log(`rank: ${rankCounter}`); */
 
       // add the card to the deck
       newDeck.push(card); // add double the cards to the deck
-      newDeck.push(card);
+     /*  newDeck.push(card); */
     }
   }
-
-  return newDeck;
+let shuffledCards = shuffleCards(newDeck);
+let zeroToEight = shuffledCards.slice(0,8)
+let zeroToEight2 = shuffledCards.slice(0,8)
+Array.prototype.push.apply(zeroToEight,zeroToEight2); 
+console.log(zeroToEight)
+  return zeroToEight;
 };
 
 const getRandomIndex = (max) => Math.floor(Math.random() * max);
@@ -97,6 +107,8 @@ const squareClick = (cardElement, column, row) => {
       firstCard = clickedCard;
       // turn this card over
       cardElement.innerText = firstCard.name;  
+      cardElement.innerText += firstCard.suit;  
+
       // hold onto this for later when it may not match
       firstCardElement = cardElement;
     // second turn
@@ -111,8 +123,12 @@ const squareClick = (cardElement, column, row) => {
     
         // turn this card over
         cardElement.innerText = clickedCard.name;
+        cardElement.innerText += clickedCard.suit;
+
       } else {
         cardElement.innerText = clickedCard.name;
+        cardElement.innerText += clickedCard.suit;
+
         setTimeout(() => {
           cardElement.innerText = '';
           // turn this card back over
@@ -176,8 +192,9 @@ const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
-  let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
-  deck = shuffleCards(deckSubset);
+  /* let deckSubset = doubleDeck.slice(0, boardSize * boardSize); */
+  deck = shuffleCards(doubleDeck);
+  
 
   // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
@@ -186,7 +203,7 @@ const initGame = () => {
       board[i].push(deck.pop());
     }
   }
-
+console.log(board)
   const boardEl = buildBoardElements(board);
   document.body.appendChild(boardEl);
   
