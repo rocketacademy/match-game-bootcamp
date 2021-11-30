@@ -1,14 +1,11 @@
 // Please implement exercise logic here
-// =~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//   Global Variables!!
-// =========================
 
 // create a card-matching game
 // the user turns cards over one at a time to find the matching pair of cards
 
-// =========================
-//   Global Variables!!
-// =========================
+// ===================================================
+// ### Global Variables ###
+// ===================================================
 
 // boardSize has to be an even number
 const boardSize = 4;
@@ -16,10 +13,12 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let secondCard;
+let secondCardElement;
 
-// =========================
+// ===================================================
 //   Gameplay Logic!!
-// =========================
+// ===================================================
 
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
@@ -54,28 +53,39 @@ const squareClick = (cardElement, column, row) => {
   } else {
     console.log('second turn');
     if (
+      // clickedCard here refers to the second card clicked
       clickedCard.name === firstCard.name &&
       clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
+      console.log(clickedCard);
+      console.log(firstCard);
 
       // turn this card over
       cardElement.innerText = clickedCard.name;
     } else {
+      secondCard = clickedCard;
+      cardElement.innerText = secondCard.name;
+      secondCardElement = cardElement;
       console.log('NOT a match');
+      // console.log(firstCard);
+      // console.log(clickedCard);
 
-      // turn this card back over
-      firstCardElement.innerText = '';
+      // add setTimeout function to turn both cards over when they are not a match
+      setTimeout(() => {
+        // both functions inside setTimeout are to turn the cards back over
+        firstCardElement.innerText = '';
+        secondCardElement.innerText = '';
+      }, 3000);
+      // reset the first card
+      firstCard = null;
     }
-
-    // reset the first card
-    firstCard = null;
   }
 };
 
-// =============================
-//  Helper Functions
-// =============================
+// ===================================================
+//  ### Helper Functions ###
+// ===================================================
 
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
 const getRandomIndex = (max) => Math.floor(Math.random() * max);
@@ -98,9 +108,9 @@ const shuffleCards = (cards) => {
   return cards;
 };
 
-// =============================
-//  New Make Deck!!
-// =============================
+// ===================================================
+// ### New Make Deck ###
+// ===================================================
 
 const makeDeck = (cardAmount) => {
   // create the empty deck at the beginning
@@ -155,9 +165,9 @@ const makeDeck = (cardAmount) => {
   return newDeck;
 };
 
-// =============================
-//   Game Initialisation Logic!!
-// =============================
+// ===================================================
+// ### Game Initialisation Logic ###
+// ===================================================
 
 // create all the board elements that will go on the screen
 // return the built board
@@ -205,9 +215,9 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
-// =============================
-//  Initiate the game!!
-// =============================
+// ===================================================
+//  ### Initiate the game ###
+// ===================================================
 const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
