@@ -21,12 +21,11 @@ const boardElement = document.createElement('div');
 // delay or sleep function
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const announcement = document.createElement('div');
-document.body.appendChild(announcement)
+document.body.appendChild(announcement);
 
 const clock = document.createElement('div');
 document.body.appendChild(clock);
-clock.innerText = ""
-
+clock.innerText = '';
 
 // Gameplay Logic
 const squareClick = async (cardElement, column, row) => {
@@ -48,8 +47,8 @@ const squareClick = async (cardElement, column, row) => {
     console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
-    cardElement.innerText = (firstCard.name)
-    
+    cardElement.innerText = firstCard.name;
+
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
 
@@ -65,7 +64,6 @@ const squareClick = async (cardElement, column, row) => {
       setTimeout(() => {
         // remove announcement
         announcement.innerText = '';
-       
       }, 2000);
 
       // turn this card over
@@ -75,7 +73,7 @@ const squareClick = async (cardElement, column, row) => {
 
       // turn this card over
       cardElement.innerText = clickedCard.name;
-   
+
       // delay time to turn over the 2 exposed wrong cards
       setTimeout(() => {
         // turn this card back over
@@ -95,23 +93,19 @@ const squareClick = async (cardElement, column, row) => {
   }
 };
 
-
 console.log('starting...');
 
-const delayInMilliseconds = 1000; // 3 mins to complete
+const delayInMilliseconds = 180000; // 3 mins to complete
 let counter = delayInMilliseconds;
 
 const ref = setInterval(() => {
   clock.innerText = counter;
   counter -= 1;
-  
 
   if (counter === 0) {
     clearInterval(ref);
-    announcement.innerText = "stop playing. game over"
-    boardElement.innerText = "";
-
-
+    announcement.innerText = 'stop playing. game over';
+    boardElement.innerText = '';
   }
 }, 1);
 
@@ -161,23 +155,37 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
-const makeDeck = (cardAmount) => {
-  // create the empty deck at the beginning
+const makeDeck = () => {
+  // Initialise an empty deck array
   const newDeck = [];
+
+  // exercise solution: include symbol. Same order as suit
+  const symbol = ['♥', '♦', '♣', '♠'];
+  // Initialise an array of the 4 suits in our deck. We will loop over this array.
   const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
 
+  // Loop over the suits array
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
-    // make a variable of the current suit
-    const currentSuit = suits[suitIndex];
-    console.log(`current suit: ${currentSuit}`);
+    // exercise solution: Store the current suitSymbol in a variable
+    const currentSuitSymbol = symbol[suitIndex];
 
-    // loop to create all cards in this suit
-    // rank 1-13
+    // Store the current suit in a variable
+    const currentSuit = suits[suitIndex];
+
+    let suitColour = '';
+    if (currentSuit == 'hearts' || currentSuit == 'diamonds') {
+      suitColour = 'red';
+    } else {
+      suitColour = 'black';
+    }
+    // Loop from 1 to 13 to create all cards for a given suit
+    // Notice rankCounter starts at 1 and not 0, and ends at 13 and not 12.
+    // This is an example of a loop without an array.
     for (let rankCounter = 1; rankCounter <= 13; rankCounter += 1) {
-      // Convert rankCounter to string
+      // By default, the card name is the same as rankCounter
       let cardName = `${rankCounter}`;
 
-      // 1, 11, 12 ,13
+      // If rank is 1, 11, 12, or 13, set cardName to the ace or face card's name
       if (cardName === '1') {
         cardName = 'ace';
       } else if (cardName === '11') {
@@ -188,21 +196,37 @@ const makeDeck = (cardAmount) => {
         cardName = 'king';
       }
 
-      // make a single card object variable
+      // exercise solution : By default, the display name is the same as card name
+      let cardDisplayName = `${cardName}`;
+      // If cardName is ace, jack, queen, king, set displayName to a, j , q, k
+      if (cardDisplayName === 'ace') {
+        cardDisplayName = 'A';
+      } else if (cardDisplayName === 'jack') {
+        cardDisplayName = 'J';
+      } else if (cardDisplayName === 'queen') {
+        cardDisplayName = 'Q';
+      } else if (cardDisplayName === 'king') {
+        cardDisplayName = 'K';
+      }
+
+      // Create a new card with the current name, suit, and rank
       const card = {
-        name: cardName,
+        // exercise solution: add suitSymbol, displayName, colour
+        suitSymbol: currentSuitSymbol,
         suit: currentSuit,
+        name: cardName,
+        displayName: cardDisplayName,
+        colour: suitColour,
         rank: rankCounter,
       };
 
-      console.log(`rank: ${rankCounter}`);
-
-      // add the card to the deck
-      newDeck.push(card); // add double the cards to the deck
+      // Add the new card to the deck
+      newDeck.push(card);
       newDeck.push(card);
     }
   }
 
+  // Return the completed card deck
   return newDeck;
 };
 
@@ -210,7 +234,9 @@ const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
-  let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  let randomIndex = getRandomIndex(104)
+  let lastCardIndex = randomIndex + boardSize * boardSize;
+  let deckSubset = doubleDeck.slice(randomIndex, lastCardIndex);
   deck = shuffleCards(deckSubset);
 
   // deal the cards out to the board data structure
