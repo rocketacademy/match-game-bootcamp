@@ -63,6 +63,10 @@ const revealCard = (cardElement, cardInfo) => {
   return cardElement;
 };
 
+/**
+ * Close the cards that have been revealed.
+ * @param {*} cardElement The card.
+ */
 const closeCard = (cardElement) => {
   const frontOfCard = document.createElement('div');
   frontOfCard.innerText = '⭘△☐';
