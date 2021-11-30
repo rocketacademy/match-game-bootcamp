@@ -67,7 +67,7 @@ const generateCard = (cardRank, suit) => {
       rank: cardRank,
     };
   return card;
-};
+}
           
 // generate the deck for gameplay
 const makeDeck = () => {
@@ -85,7 +85,7 @@ const makeDeck = () => {
     deck.splice(getRandomIndex(deck.length + 1), 0, randCard);
     deck.splice(getRandomIndex(deck.length + 1), 0, randCard);
   }
-};
+}
 
 // ### HELPER FUNCTIONS ###
 //win rate calculator
@@ -135,7 +135,7 @@ const createCardUI = (card, cardElement) => {
   cardElement.appendChild(name)
   cardElement.appendChild(suit)
   cardElement.classList.add('face-up')
-};
+}
 
 const setUIEffects = (clickedCard, cardElement) => {
   const match = clickedCard.name === firstCard.name && clickedCard.suit === firstCard.suit;
@@ -176,8 +176,8 @@ const setUIEffects = (clickedCard, cardElement) => {
     firstCard = null
     canClick = true
     printMessage(`Find the Pairs.`)
-  }, 1000);
-};
+  }, 1000)
+}
 
 const cardClick = (cardElement, row, column) => {
   if (canClick) {
@@ -201,7 +201,7 @@ const cardClick = (cardElement, row, column) => {
       setUIEffects(clickedCard, cardElement)
     }
   }
-};
+}
 
 // Create all the board elements that will go on the screen
 const buildBoardElements = () => {
@@ -223,7 +223,7 @@ const buildBoardElements = () => {
     }
     boardElement.appendChild(rowElement)
   }
-};
+}
 
 const initBoard = () => {
   numOfGames += 1
@@ -249,7 +249,7 @@ const initBoard = () => {
     }
   }
   buildBoardElements(board);
-};
+}
 
 const initTimer = () => {
   const minutes = formTimeSelection.value 
@@ -273,8 +273,7 @@ const initTimer = () => {
       setTimeout(resetBoardFunction, 1000)
     }
   }, 1000)
-};
-
+}
 
 // ### INITIALISE GAME PROPER ###
 const initGame = () => {
