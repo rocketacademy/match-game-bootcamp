@@ -5,6 +5,7 @@ let firstCard = null;
 let firstCardElement;
 let deck;
 const intervalInMS = 1000;
+const outputEl = document.createElement('div');
 
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
@@ -39,6 +40,20 @@ const squareClick = (cardElement, column, row) => {
       clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
+
+      // display 'match' and remove 'match' after 3 seconds
+      let counter = 3;
+      const ref = setInterval(() => {
+        outputEl.innerText = 'Match';
+        console.log(counter);
+
+        if (counter <= 1) {
+          outputEl.innerText = '';
+          clearInterval(ref);
+        }
+
+        counter -= 1;
+      }, 1000);
 
       // turn this card over
       cardElement.innerText = clickedCard.name;
@@ -115,8 +130,9 @@ const initGame = () => {
   }
 
   const boardEl = buildBoardElements(board);
-
   document.body.appendChild(boardEl);
+  outputEl.classList.add('output');
+  document.body.appendChild(outputEl);
 };
 
 const makeDeck = (cardAmount) => {
