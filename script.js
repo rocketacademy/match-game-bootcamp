@@ -146,6 +146,7 @@ const countDown = () => {
     if (minute === 0 && sec < 0) {
       gameInfo.innerText = "Game over!";
       console.log("game is over");
+      lockBoard = true;
       clearInterval(handle);
       setTimeout(gameReset, 3000);
     }
