@@ -6,6 +6,10 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let min = 2,
+  sec = 59;
+let interval;
+let gameStarted = false;
 
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
@@ -24,6 +28,10 @@ const squareClick = (cardElement, column, row) => {
   // first turn
   if (firstCard === null) {
     console.log("first turn");
+
+    if (!gameStarted) {
+      startTimer();
+    }
     firstCard = clickedCard;
     // turn this card over
     cardElement.innerText = firstCard.displayName;
@@ -102,7 +110,29 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
+const startTimer = () => {
+  const timer = document.getElementById("timer-div");
+  interval = setInterval(() => {
+    timer.innerHTML = `TIME LEFT: ${min} min , ${sec} seconds`; // count down from 2:59
+    sec--;
+    if (sec == 0) {
+      min--;
+      sec = 59;
+    }
+    if (min < 0) {
+      clearInterval(interval);
+    }
+  }, 1000);
+  gameStarted = true;
+};
+
 const initGame = () => {
+  // for timer div
+  const timerDiv = document.createElement("div");
+  timerDiv.id = "timer-div";
+  document.body.appendChild(timerDiv);
+
+  // for board creation
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
 
@@ -120,9 +150,9 @@ const initGame = () => {
   }
 
   const boardEl = buildBoardElements(board);
-
   document.body.appendChild(boardEl);
 
+  // message div
   const messageDiv = document.createElement("div");
   messageDiv.id = "message-block";
   document.body.appendChild(messageDiv);
