@@ -38,24 +38,24 @@ let numOfGames = -1
 
 // ### CARD FUNCTIONS ### 
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
-const getRandomIndex = (max) => Math.floor(Math.random() * max);
+const getRandomIndex = (max) => Math.floor(Math.random() * max)
 
 const generateCard = (cardRank, suit) => {
-  const symbols = ['♥', '♦', '♣', '♠'];
-  let cardName = '';
+  const symbols = ['♥', '♦', '♣', '♠']
+  let cardName = ''
   switch (cardRank) {
     case 1:
-    cardName = 'A';
-    break;
+    cardName = 'A'
+    break
     case 11:
-    cardName = 'J';
-    break;
+    cardName = 'J'
+    break
     case 12:
-    cardName = 'Q';
-    break;
+    cardName = 'Q'
+    break
     case 13:
-    cardName = 'K';
-    break;
+    cardName = 'K'
+    break
     default:
     cardName = cardRank;
     }
@@ -106,7 +106,7 @@ const printMessage = message => {
 //reset game
 const resetGameFunction = () => {
   if (confirm("Reset Game? Your data will be erased.")) {
-    window.location = window.location;
+    window.location = window.location
   } else {
     alert('Game reset fail.')
   }
@@ -114,72 +114,68 @@ const resetGameFunction = () => {
 
 //reset board
 const resetBoardFunction = () => {
-  board = [];
-  firstCard = null;
-  firstCardElement = null;
-  deck = [];
-  canClick = true;
-  totalPairs = 0;
-  matchedPairs = 0;
-}
-// Check win 
-const checkWin = () => {
-  if (matchedPairs == totalPairs) {
-    printMessage('You win!!!<br> Hit Reset Board to play again.')
-  }
+  board = []
+  firstCard = null
+  firstCardElement = null
+  deck = []
+  canClick = true
+  totalPairs = 0
+  matchedPairs = 0
 }
 // Create the appearance of a card by adding name and suit to the existing face-down cards
 const createCardUI = (card, cardElement) => {
-  const suit = document.createElement('div');
-  suit.classList.add('suit', card.colour);
-  suit.innerText = card.suit;
+  const suit = document.createElement('div')
+  suit.classList.add('suit', card.colour)
+  suit.innerText = card.suit
 
-  const name = document.createElement('div');
-  name.classList.add('name', card.colour);
-  name.innerText = card.name;
+  const name = document.createElement('div')
+  name.classList.add('name', card.colour)
+  name.innerText = card.name
 
-  cardElement.appendChild(name);
-  cardElement.appendChild(suit);
-  cardElement.classList.add('face-up');
+  cardElement.appendChild(name)
+  cardElement.appendChild(suit)
+  cardElement.classList.add('face-up')
 };
 
 const setUIEffects = (clickedCard, cardElement) => {
   const match = clickedCard.name === firstCard.name && clickedCard.suit === firstCard.suit;
   if (match) {
     matchedPairs += 1;
-    let message = `It's a match!`;
-    cardElement.classList.add('match');
-    firstCardElement.classList.add('match');
+    let message = `It's a match!`
+    cardElement.classList.add('match')
+    firstCardElement.classList.add('match')
     if (matchedPairs === totalPairs) {
       // This means user won, clear timer
       winCounter +=1
-      message += '<br>You win!!!';
-      clearInterval(timer);
+      message += '<br>You win!!!'
+      clearInterval(timer)
     }
-    printMessage(message);
+    printMessage(message)
   } else {
-    cardElement.classList.add('no-match');
-    firstCardElement.classList.add('no-match');
-    printMessage(`No match! Try again.`);
+    cardElement.classList.add('no-match')
+    firstCardElement.classList.add('no-match')
+    printMessage(`No match! Try again.`)
   }
 
   setTimeout(() => {
     // The effects set above last for 1 sec and will be removed here
-    cardElement.classList.remove('match');
-    firstCardElement.classList.remove('match');
-    cardElement.classList.remove('no-match');
-    firstCardElement.classList.remove('no-match');
+    cardElement.classList.remove('match')
+    firstCardElement.classList.remove('match')
+    cardElement.classList.remove('no-match')
+    firstCardElement.classList.remove('no-match')
 
-    if (matchedPairs === totalPairs) { resetBoardFunction(); }
-    else if (!match) {
-      cardElement.innerHTML = '';
-      firstCardElement.innerHTML = '';
-      cardElement.classList.remove('face-up');
-      firstCardElement.classList.remove('face-up');
+    if (matchedPairs === totalPairs) { 
+      resetBoardFunction()
     }
-    firstCard = null;
-    canClick = true;
-    printMessage(`Find the Pairs.`);
+    else if (!match) {
+      cardElement.innerHTML = ''
+      firstCardElement.innerHTML = ''
+      cardElement.classList.remove('face-up')
+      firstCardElement.classList.remove('face-up')
+    }
+    firstCard = null
+    canClick = true
+    printMessage(`Find the Pairs.`)
   }, 1000);
 };
 
@@ -188,21 +184,21 @@ const cardClick = (cardElement, row, column) => {
     const clickedCard = board[row][column];
     // the user already clicked on this card
     if (cardElement.innerHTML !== '') {
-      return;
+      return
     }
     // first turn
     if (firstCard === null) {
-      firstCard = clickedCard;
+      firstCard = clickedCard
       // turn this card over
-      createCardUI(firstCard, cardElement);
+      createCardUI(firstCard, cardElement)
       // hold onto this for later when it may not match
-      firstCardElement = cardElement;
+      firstCardElement = cardElement
       // second turn
     } else {
       // don't allow the user to click until the ui effects are done
       canClick = false;
-      createCardUI(clickedCard, cardElement);
-      setUIEffects(clickedCard, cardElement);
+      createCardUI(clickedCard, cardElement)
+      setUIEffects(clickedCard, cardElement)
     }
   }
 };
@@ -211,21 +207,21 @@ const cardClick = (cardElement, row, column) => {
 const buildBoardElements = () => {
   for (let i = 0; i < board.length; i += 1) {
     // make a container for a row of cards
-    const rowElement = document.createElement('div');
-    rowElement.classList.add('row');
+    const rowElement = document.createElement('div')
+    rowElement.classList.add('row')
 
     // make all the cards for this row
     for (let j = 0; j < board[i].length; j += 1) {
       // create the card element
-      const card = document.createElement('div');
-      card.classList.add('card', 'face-down');
+      const card = document.createElement('div')
+      card.classList.add('card', 'face-down')
 
       card.addEventListener('click', (event) => {
-        cardClick(event.currentTarget, i, j);
+        cardClick(event.currentTarget, i, j)
       });
-      rowElement.appendChild(card);
+      rowElement.appendChild(card)
     }
-    boardElement.appendChild(rowElement);
+    boardElement.appendChild(rowElement)
   }
 };
 
@@ -256,27 +252,27 @@ const initBoard = () => {
 };
 
 const initTimer = () => {
-  const minutes = formTimeSelection.value ;
-  let seconds = minutes * 60;
-  playerTimer.innerText = `${minutes}:00`;
+  const minutes = formTimeSelection.value 
+  let seconds = minutes * 60
+  playerTimer.innerText = `${minutes}:00`
   timer = setInterval(() => {
-    seconds -= 1;
-    const secondsLeft = seconds % 60;
-    const minutesLeft = Math.floor(seconds / 60);
+    seconds -= 1
+    const secondsLeft = seconds % 60
+    const minutesLeft = Math.floor(seconds / 60)
 
     if (secondsLeft >= 10) {
-      playerTimer.innerText = `${minutesLeft}:${secondsLeft}`;
+      playerTimer.innerText = `${minutesLeft}:${secondsLeft}`
     } else {
-      playerTimer.innerText = `${minutesLeft}:0${secondsLeft}`;
+      playerTimer.innerText = `${minutesLeft}:0${secondsLeft}`
     }
 
     if (seconds <= 0) {
-      clearInterval(timer);
-      canClick = false;
-      printMessage("Time's up! You lose.");
-      setTimeout(resetBoardFunction, 1000);
+      clearInterval(timer)
+      canClick = false
+      printMessage("Time's up! You lose.")
+      setTimeout(resetBoardFunction, 1000)
     }
-  }, 1000);
+  }, 1000)
 };
 
 
@@ -286,7 +282,6 @@ const initGame = () => {
     alert('Please input your name')
   }
   else {
-
    // Hide modal & unhide container
   modal.classList.add("hide")
   modalContainer.classList.add("hide")
