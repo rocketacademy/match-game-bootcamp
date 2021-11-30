@@ -28,15 +28,9 @@ const cardClick = (cardElement, row, column) => {
   canClick = false;
   const clickedCard = board[row][column];
 
-  document.getElementById(clickedCard.id).classList.toggle("is-flipped");
-
-  // the user already clicked on this square
-  // if (cardElement.innerText !== "") {
-  //   return;
-  // }
-
   // first turn
   if (firstCard === null) {
+    document.getElementById(clickedCard.id).classList.toggle("is-flipped");
     firstCard = clickedCard;
     // turn this card over
     // cardElement.innerText = firstCard.name;
@@ -48,12 +42,15 @@ const cardClick = (cardElement, row, column) => {
     document.getElementById("message").innerText = "Select the second card";
   } else {
     if (clickedCard.id === firstCard.id) {
-      document.getElementById("message").innerText = "Select the first card";
-      reset();
+      document.getElementById("message").innerText = "Select the second card";
+      // reset();
+      canClick = true;
     } else if (
       clickedCard.name === firstCard.name &&
       clickedCard.suit === firstCard.suit
     ) {
+      document.getElementById(clickedCard.id).classList.toggle("is-flipped");
+
       // turn this card over
       document.getElementById(firstCard.id).classList.toggle("orange");
       document.getElementById(clickedCard.id).classList.toggle("orange");
@@ -81,6 +78,7 @@ const cardClick = (cardElement, row, column) => {
         }, 3000);
       }
     } else {
+      document.getElementById(clickedCard.id).classList.toggle("is-flipped");
       // turn this card back over
       document.getElementById("message").innerText = "Card is not a match!";
       setTimeout(() => {
