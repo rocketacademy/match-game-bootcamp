@@ -10,6 +10,8 @@ let min = 2,
   sec = 59;
 let interval;
 let gameStarted = false;
+let pairs = 0;
+let sucessfulPairs = (boardSize * boardSize) / 2;
 
 const squareClick = (cardElement, column, row) => {
   console.log(cardElement);
@@ -53,6 +55,12 @@ const squareClick = (cardElement, column, row) => {
       const messageDiv = document.getElementById("message-block");
       messageDiv.innerHTML = "MATCH";
       setTimeout(() => (messageDiv.innerHTML = ""), 3000);
+
+      pairs += 1;
+      if (pairs === sucessfulPairs) {
+        messageDiv.innerHTML = "MATCHED ALL CONGRATS!";
+        clearInterval(interval);
+      }
     } else {
       console.log("NOT a match");
       // show second clicked card and then flip over after 2s
