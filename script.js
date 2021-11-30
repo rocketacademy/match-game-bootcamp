@@ -4,12 +4,13 @@
 // the user turns cards over one at a time to find the matching pair of cards
 
 // ===================================================
-// ### Global Variables ###
+//           ### Global Variables ###
 // ===================================================
 
 // boardSize has to be an even number
 const boardSize = 4;
 const board = [];
+// let messageBoard;
 let firstCard = null;
 let firstCardElement;
 let deck;
@@ -17,10 +18,10 @@ let secondCard;
 let secondCardElement;
 
 // ===================================================
-//   Gameplay Logic!!
+//             ### Gameplay Logic ###
 // ===================================================
 
-const squareClick = (cardElement, column, row) => {
+const squareClick = (messageBoard, cardElement, column, row) => {
   console.log(cardElement);
 
   console.log('FIRST CARD DOM ELEMENT', firstCard);
@@ -33,6 +34,10 @@ const squareClick = (cardElement, column, row) => {
   console.log(row);
 
   const clickedCard = board[column][row];
+
+  // create default messages for messageBoard when its a match
+  // messageBoard.innerText = 'Its a match!';
+  // console.log(messageBoard.innerText);
 
   // the user already clicked on this square
   if (cardElement.innerText !== '') {
@@ -61,6 +66,14 @@ const squareClick = (cardElement, column, row) => {
       console.log(clickedCard);
       console.log(firstCard);
 
+      // ### display match meesage
+      messageBoard.innerText = 'Congrats! Its a match!';
+
+      // ### add setTimeout to display the match message and disappear after 3s
+      setTimeout(() => {
+        messageBoard.innerText = '';
+      }, 3000);
+
       // turn this card over
       cardElement.innerText = clickedCard.name;
     } else {
@@ -71,11 +84,16 @@ const squareClick = (cardElement, column, row) => {
       // console.log(firstCard);
       // console.log(clickedCard);
 
+      // ### display not-match meesage
+      messageBoard.innerText = 'Sorry! Its not a match!';
+
       // add setTimeout function to turn both cards over when they are not a match
       setTimeout(() => {
         // both functions inside setTimeout are to turn the cards back over
         firstCardElement.innerText = '';
         secondCardElement.innerText = '';
+        // ### no-match message to disappear after 3s
+        messageBoard.innerText = '';
       }, 3000);
       // reset the first card
       firstCard = null;
@@ -84,7 +102,7 @@ const squareClick = (cardElement, column, row) => {
 };
 
 // ===================================================
-//  ### Helper Functions ###
+//           ### Helper Functions ###
 // ===================================================
 
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
@@ -109,7 +127,7 @@ const shuffleCards = (cards) => {
 };
 
 // ===================================================
-// ### New Make Deck ###
+//            ### New Make Deck ###
 // ===================================================
 
 const makeDeck = (cardAmount) => {
@@ -171,6 +189,7 @@ const makeDeck = (cardAmount) => {
 
 // create all the board elements that will go on the screen
 // return the built board
+// ### for comfortable qns > create a messageboard element
 const buildBoardElements = (board) => {
   // create the element that everything will go inside of
   const boardElement = document.createElement('div');
@@ -178,11 +197,16 @@ const buildBoardElements = (board) => {
   // give it a class for CSS purposes
   boardElement.classList.add('board');
 
+  // ### create a messageboard element
+  const messageBoard = document.createElement('div');
+  messageBoard.classList.add('messageBoard');
+  messageBoard.innerText = '';
+  boardElement.appendChild(messageBoard);
+
   // use the board data structure we passed in to create the correct size board
   for (let i = 0; i < board.length; i += 1) {
     // make a var for just this row of cards
     const row = board[i];
-
     // make an element for this row of cards
     const rowElement = document.createElement('div');
     rowElement.classList.add('row');
@@ -204,7 +228,7 @@ const buildBoardElements = (board) => {
 
         // ~~~ .currentTarget refers to the particular element
         // box at the moment out of the entire 16 element boxes
-        squareClick(event.currentTarget, i, j);
+        squareClick(messageBoard, event.currentTarget, i, j);
       });
 
       rowElement.appendChild(square);
@@ -216,7 +240,7 @@ const buildBoardElements = (board) => {
 };
 
 // ===================================================
-//  ### Initiate the game ###
+//           ### Initiate the game ###
 // ===================================================
 const initGame = () => {
   // create this special deck by getting the doubled cards and
