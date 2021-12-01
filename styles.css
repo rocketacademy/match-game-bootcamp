@@ -39,3 +39,8 @@ body {
   font-style: bold;
   margin-left: 10px;
 }
+.score-output {
+  color: red;
+  font-style: bold;
+  margin-left: 10px;
+}

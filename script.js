@@ -1,5 +1,5 @@
 // boardSize has to be an even number
-const boardSize = 4;
+const boardSize = 2;
 let board = [];
 let firstCard = null;
 let firstCardElement;
@@ -8,6 +8,8 @@ let playerName = '';
 const timeToPlayInSecs = 180;
 const intervalInMS = 200;
 let startTimer;
+let clearedSquares = 0;
+let playerScore = 0;
 
 // DOM elements
 const outputEl = document.createElement('div');
@@ -16,6 +18,8 @@ const inputLabel = document.createElement('label');
 const inputEl = document.createElement('input');
 const inputBtn = document.createElement('button');
 const scoreContainer = document.createElement('div');
+const scoreLabel = document.createElement('label');
+const scoreEL = document.createElement('output');
 const timerContainer = document.createElement('div');
 const timerLabel = document.createElement('label');
 const timerOutput = document.createElement('output');
@@ -55,7 +59,6 @@ const squareClick = (cardElement, column, row) => {
     ) {
       console.log('match');
 
-      // display 'match' immediately and remove 'match' after 3 seconds
       let counter = 3;
       outputEl.innerText = 'Match🎉';
       const ref = setInterval(() => {
@@ -66,7 +69,26 @@ const squareClick = (cardElement, column, row) => {
         }
         counter -= 1;
       }, 1000);
+      clearedSquares += 2;
 
+      // display 'match' immediately and remove 'match' after 3 seconds
+      if (finishGame() === true) {
+        playerScore += 1;
+        scoreEL.innerText = playerScore;
+        clearInterval(startTimer);
+
+        // adds an output to show that you won for 5 secs
+        let countdownTime = 5;
+        outputEl.innerText = '';
+        outputEl.innerText = 'You won!';
+        const timer = setInterval(() => {
+          if (countdownTime <= 0) {
+            clearInterval(timer);
+            outputEl.innerText = 'Press "Reset Game" to play again!';
+          }
+          countdownTime -= 1;
+        }, 1000);
+      }
       // turn this card over
       cardElement.innerText = clickedCard.name;
     } else {
@@ -83,6 +105,9 @@ const squareClick = (cardElement, column, row) => {
     firstCard = null;
   }
 };
+
+// TODO
+// stop timer when game finished
 
 // create all the board elements that will go on the screen
 // return the built board
@@ -128,6 +153,7 @@ resetGameBtn.addEventListener('click', () => {
   // reset board
   board = [];
   document.querySelector('.board').remove();
+  // remake board
   let doubleDeck = makeDeck();
   let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
   deck = shuffleCards(deckSubset);
@@ -138,7 +164,7 @@ resetGameBtn.addEventListener('click', () => {
       board[i].push(deck.pop());
     }
   }
-  // board elements
+  // rebuild board elements
   const boardEl = buildBoardElements(board);
   document.body.appendChild(outputEl);
   document.body.appendChild(boardEl);
@@ -163,14 +189,22 @@ resetGameBtn.addEventListener('click', () => {
   document.body.append(scoreContainer);
 });
 
+// helper function to check if player finished all squares
+const finishGame = () => {
+  const totalSquares = boardSize * boardSize;
+  if (totalSquares === clearedSquares) {
+    return true;
+  }
+};
+
 const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
   let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
-  console.log(...deckSubset);
+  // console.log(...deckSubset);
   deck = shuffleCards(deckSubset);
-  console.log(...deck);
+  // console.log(...deck);
 
   // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
@@ -212,21 +246,40 @@ const initGame = () => {
 
   // score elements
   scoreContainer.classList.add('score-container');
+  scoreLabel.classList.add('score-label');
+  scoreContainer.appendChild(scoreLabel);
+  scoreLabel.innerText = 'Times cleared:';
+  scoreEL.classList.add('score-output');
+  scoreEL.innerText = 0;
+  scoreContainer.appendChild(scoreEL);
   document.body.append(scoreContainer);
 
   inputBtn.addEventListener('click', function () {
     playerName = inputEl.value;
     outputEl.innerText = `Hi ${playerName}! Please start matching the cards, note the timer at the bottom.`;
     // start match timer
-    let totalTimeInSecs = timeToPlayInSecs;
-    startTimer = setInterval(() => {
-      timerOutput.innerText = totalTimeInSecs;
-      if (totalTimeInSecs <= 0) {
-        clearInterval(matchTimer);
-      }
-      totalTimeInSecs -= 1;
-    }, 1000);
+    // let totalTimeInSecs = timeToPlayInSecs;
+    // startTimer = setInterval(() => {
+    //   timerOutput.innerText = totalTimeInSecs;
+    //   if (totalTimeInSecs <= 0) {
+    //     clearInterval(matchTimer);
+    //   }
+    //   totalTimeInSecs -= 1;
+    // }, 1000);
+    timer();
   });
+};
+
+// function to start countdown timer
+const timer = () => {
+  let totalTimeInSecs = timeToPlayInSecs;
+  startTimer = setInterval(() => {
+    timerOutput.innerText = totalTimeInSecs;
+    if (totalTimeInSecs <= 0) {
+      clearInterval(startTimer);
+    }
+    totalTimeInSecs -= 1;
+  }, 1000);
 };
 
 const makeDeck = (cardAmount) => {
