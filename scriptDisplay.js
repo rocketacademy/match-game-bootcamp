@@ -21,13 +21,12 @@ const boardElement = document.createElement('div');
 // delay or sleep function
 // const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const announcement = document.createElement('div');
-document.body.appendChild(announcement)
+document.body.appendChild(announcement);
 
 // Timer to count dowm
 const clock = document.createElement('div');
 document.body.appendChild(clock);
-clock.innerText = ""
-
+clock.innerText = '';
 
 // Gameplay Logic
 const squareClick = async (cardElement, column, row) => {
@@ -49,15 +48,15 @@ const squareClick = async (cardElement, column, row) => {
     console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
-    cardElement.innerText = (firstCard.name)
-  
-    // cardElement = createCard(firstCard)
-    // boardElement.appendChild(cardElement)
-    
+    cardElement.innerText = firstCard.name;
+    // create card visually to show at clicked box
+    cardDisplay = createCard(clickedCard);
+    cardElement.appendChild(cardDisplay);
+
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
 
-    console.log(`firstCardElement`,firstCardElement);
+    console.log(`firstCardElement`, firstCardElement);
 
     // second turn
   } else {
@@ -71,18 +70,23 @@ const squareClick = async (cardElement, column, row) => {
       setTimeout(() => {
         // remove announcement
         announcement.innerText = '';
-       
       }, 2000);
 
       // turn this card over
       cardElement.innerText = clickedCard.name;
+      // create card visually to show at clicked box
+      cardDisplay = createCard(clickedCard);
+      cardElement.appendChild(cardDisplay);
     } else {
       console.log('NOT a match');
 
       // turn this card over
       cardElement.innerText = clickedCard.name;
+      // create card visually to show at clicked box
+      cardDisplay = createCard(clickedCard);
+      cardElement.appendChild(cardDisplay);
       // cardElement.innerHTML = createCard(clickedCard);
-   
+
       // delay time to turn over the 2 exposed wrong cards
       setTimeout(() => {
         // turn this card back over
@@ -102,7 +106,6 @@ const squareClick = async (cardElement, column, row) => {
   }
 };
 
-
 console.log('starting...');
 
 const delayInMilliseconds = 200000; // 3 mins to complete
@@ -111,14 +114,11 @@ let counter = delayInMilliseconds;
 const ref = setInterval(() => {
   clock.innerText = counter;
   counter -= 1;
-  
 
   if (counter === 0) {
     clearInterval(ref);
-    announcement.innerText = "stop playing. game over"
-    boardElement.innerText = "";
-
-
+    announcement.innerText = 'stop playing. game over';
+    boardElement.innerText = '';
   }
 }, 1);
 
@@ -132,7 +132,6 @@ const createCard = (cardInfo) => {
   name.classList.add(cardInfo.displayName, cardInfo.colour);
   name.innerText = cardInfo.displayName;
 
-  
   const card = document.createElement('div');
   card.classList.add('card');
 
@@ -140,7 +139,6 @@ const createCard = (cardInfo) => {
   card.appendChild(suit);
 
   return card;
-
 };
 
 // Game Initialisation Logic
@@ -266,8 +264,18 @@ const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
-  const getRandomIndex = (max) => Math.floor(Math.random() * max);
-  let deckSubset = doubleDeck.slice(getRandomIndex, (getRandomIndex)+boardSize * boardSize);
+  let randomIndex = getRandomIndex(104);
+  console.log(`generated index`, randomIndex);
+  if (randomIndex % 2 === 0) {
+    randomIndex = randomIndex;
+    console.log(`even index without fix`, randomIndex);
+  } else {
+    randomIndex = randomIndex + 1;
+    console.log(`convert to even index`, randomIndex);
+  }
+  let lastCardIndex = randomIndex + boardSize * boardSize;
+  console.log('lastCardIndex', lastCardIndex);
+  let deckSubset = doubleDeck.slice(randomIndex, lastCardIndex);
   deck = shuffleCards(deckSubset);
 
   // deal the cards out to the board data structure
