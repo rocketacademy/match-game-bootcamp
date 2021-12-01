@@ -9,23 +9,78 @@ let deck;
 let boardFull = "";
 let numberofWins = 0;
 let username = "";
-let minutes = 3;
-const delayInMilliseconds = 60000;
+let canClick = false;
 
-//Timer
-const timerOutput = document.createElement("div");
-timerOutput.setAttribute("id", "timer-output");
-document.body.appendChild(timerOutput);
+//timer elements
+let ref;
+let minutes = 3;
+let seconds = 0;
+let canStart = true;
+let timerDisplay = document.getElementById("timing");
+
+const startTimer = () => {
+  const delayInMilliseconds = 1000;
+  if (canStart === false) {
+    return;
+  }
+
+  results.innerHTML = "Please click on a square and try to match!";
+  canClick = true;
+
+  ref = setInterval(() => {
+    timerDisplay.innerText = `${minutes} min ${seconds} sec`;
+    if (seconds === 0) {
+      minutes -= 1;
+      seconds = 60;
+    }
+
+    if (minutes < 0) {
+      clearInterval(ref);
+      canClick = false;
+      canStart = true;
+      results.innerHTML = "Time is up! Please try again";
+    }
+
+    seconds -= 1;
+  }, delayInMilliseconds);
+
+  // this is to prevent user from clicking on the start button multiple times
+  canStart = false;
+};
+
+const stopTimer = () => {
+  clearInterval(ref);
+  canStart = true;
+  canClick = false;
+  results.innerText = "Click start to resume game";
+};
+
+const resetTimer = () => {
+  clearInterval(ref);
+  minutes = 3;
+  seconds = 0;
+  canStart = true;
+  canClick = false;
+  timerDisplay.innerHTML = `${minutes} min ${seconds} sec`;
+  document.querySelectorAll(".lap-timing").forEach((e) => e.remove());
+  results.innerHTML = "Click start to begin";
+};
+
+//timer html elements
+const startButton = document.getElementById("start-button");
+startButton.addEventListener("click", startTimer);
+const stopButton = document.getElementById("stop-button");
+stopButton.addEventListener("click", stopTimer);
+const resetButton = document.getElementById("reset-button");
+resetButton.addEventListener("click", resetTimer);
+const lapData = document.getElementById("lap-data");
+const lapButton = document.getElementById("lap-button");
 
 //Number of wins tracker
-const winTracker = document.createElement("div");
-winTracker.setAttribute("id", "win-tracker");
-document.body.appendChild(winTracker);
+const winTracker = document.getElementById("win-tracker");
 
-//components of the page
-const description = document.createElement("div");
-description.setAttribute("id", "description");
-document.body.appendChild(description);
+//restart game
+const resetGame = document.getElementById("reset-game-button");
 
 //inputfield
 const inputDiv = document.createElement("div");
@@ -41,6 +96,7 @@ inputField.setAttribute("type", "text");
 inputDiv.appendChild(inputField);
 
 const inputButton = document.createElement("button");
+inputButton.classList.add("button");
 inputButton.innerHTML = "Submit";
 inputDiv.appendChild(inputButton);
 
@@ -62,48 +118,55 @@ const checkForBoardFull = () => {
 
 //Game play logic
 const squareClick = (cardElement, column, row) => {
-  const clickedCard = board[column][row];
-  // the user already clicked on this square
-  if (cardElement.innerText !== "") {
-    return;
+  if (canClick === false) {
+    results.innerHTML = "Please start the timer first";
+    setTimeout(resetResults, 500);
   }
 
-  // first turn
-  if (firstCard === null) {
-    results.innerText = "First Turn!";
-    firstCard = clickedCard;
-    // turn this card over
-    cardElement.innerHTML = `<img src="${firstCard.pic}"/>`;
-    firstCardElement = cardElement;
-    // second turn
-  } else {
-    results.innerText = "Second Turn!";
-    cardElement.innerHTML = `<img src="${clickedCard.pic}"/>`;
-    if (
-      clickedCard.name === firstCard.name &&
-      clickedCard.suit === firstCard.suit
-    ) {
-      results.innerText = "Its a Match!";
-      setTimeout(resetResults, 500);
-    } else {
-      results.innerText = "Its NOT a Match!";
-      setTimeout(resetResults, 500);
-      setTimeout(function () {
-        // turn this card back over
-        firstCardElement.innerHTML = "";
-        cardElement.innerHTML = "";
-      }, 500);
+  if (canClick === true) {
+    const clickedCard = board[column][row];
+    // the user already clicked on this square
+    if (cardElement.innerText !== "") {
+      return;
     }
-    // reset the first card
-    firstCard = null;
-  }
 
-  let check = checkForBoardFull();
-  if (check === true) {
-    results.innerText = "Congrats! You completed";
-    numberofWins += 1;
-    winTracker.innerText = `${username} number of wins: ${numberofWins}`;
-    setTimeout(restartGame, 500);
+    // first turn
+    if (firstCard === null) {
+      results.innerText = "First Turn!";
+      firstCard = clickedCard;
+      // turn this card over
+      cardElement.innerHTML = `<img src="${firstCard.pic}"/>`;
+      firstCardElement = cardElement;
+      // second turn
+    } else {
+      results.innerText = "Second Turn!";
+      cardElement.innerHTML = `<img src="${clickedCard.pic}"/>`;
+      if (
+        clickedCard.name === firstCard.name &&
+        clickedCard.suit === firstCard.suit
+      ) {
+        results.innerText = "Its a Match!";
+        setTimeout(resetResults, 500);
+      } else {
+        results.innerText = "Its NOT a Match!";
+        setTimeout(resetResults, 500);
+        setTimeout(function () {
+          // turn this card back over
+          firstCardElement.innerHTML = "";
+          cardElement.innerHTML = "";
+        }, 500);
+      }
+      // reset the first card
+      firstCard = null;
+    }
+
+    let check = checkForBoardFull();
+    if (check === true) {
+      results.innerText = "Congrats! You completed";
+      numberofWins += 1;
+      winTracker.innerHTML = `${username} number of wins: ${numberofWins}`;
+      setTimeout(restartGame, 500);
+    }
   }
 };
 
@@ -212,44 +275,44 @@ const shuffleCards = (cards) => {
 
 // Give the user 3 minutes to complete the game. You can't display a countdown timer until we learn setInterval, so the user won't be able to see the time left.
 const restartGame = () => {
-  document.getElementById("board").remove();
-  board = [];
-  initGame();
-  minutes = 3;
-  results.innerText = "Restarted Game";
+  if (canClick === false) {
+    results.innerHTML = "Game has not been started!";
+  }
+
+  if (canClick === true) {
+    document.getElementById("board").remove();
+    board = [];
+    initGame();
+    results.innerText = "Restarted Game";
+  }
 };
+
+const addLap = () => {
+  let lapTiming;
+  if (seconds < 10) {
+    lapTiming = `${minutes}:0${seconds}`;
+  }
+  if ((seconds) => 10) {
+    lapTiming = `${minutes}:${seconds}`;
+  }
+
+  const lapTimingDisplay = document.createElement("p");
+  lapTimingDisplay.innerHTML = lapTiming;
+  lapTimingDisplay.classList.add("lap-timing");
+  lapData.appendChild(lapTimingDisplay);
+};
+
+lapButton.addEventListener("click", addLap);
 
 inputButton.addEventListener("click", function () {
   username = inputField.value;
-  winTracker.innerText = `${username} number of wins: ${numberofWins}`;
+  winTracker.innerHTML = `${username} number of wins: ${numberofWins}`;
   inputDiv.remove();
-  description.innerText =
-    "You are given 3 minutes to finish matching the cards before the game will be automatically restarted.";
 
   const results = document.createElement("div");
   results.setAttribute("id", "results");
   document.body.appendChild(results);
 
-  //Reset button
-  const resetButton = document.createElement("button");
-  resetButton.innerText = "Reset";
-  document.body.appendChild(resetButton);
-  resetButton.addEventListener("click", restartGame);
-
-  //Timer functions
-  timerOutput.innerText = `Number of Minutes Left: ${minutes}`;
-
-  const ref = setInterval(() => {
-    console.log("starting....");
-    timerOutput.innerText = `Number of Minutes Left: ${minutes}`;
-
-    if (minutes == 0) {
-      clearInterval(ref);
-      restartGame();
-    }
-
-    minutes -= 1;
-  }, delayInMilliseconds);
-
+  resetGame.addEventListener("click", restartGame);
   initGame();
 });
