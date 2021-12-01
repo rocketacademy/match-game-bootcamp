@@ -105,6 +105,7 @@ const squareClick = (cardElement, column, row) => {
     if (firstCard === null) {
       console.log('first turn');
       firstCard = clickedCard;
+      
       // turn this card over
       cardElement.innerText = firstCard.name;  
       cardElement.innerText += firstCard.suit;  
@@ -136,12 +137,26 @@ const squareClick = (cardElement, column, row) => {
           /* // turn this card over
           cardElement.innerText = ''; */
          
-        }, 3000);
+        }, 500);
         console.log('NOT a match');
       }
        // reset the first card
       firstCard = null;
     }
+};
+
+const createCard = (cardInfo) => {
+  const suit = document.createElement('div');
+  suit.classList.add('suit',cardInfo.cardColor);
+  suit.innerText = cardInfo.suit;
+  const name = document.createElement('div');
+  name.classList.add('name');
+  name.innerText = cardInfo.name;
+  const card = document.createElement('div');
+  card.classList.add('card');
+  card.appendChild(name);
+  card.appendChild(suit);
+  return card;
 };
 
 // create all the board elements that will go on the screen
@@ -187,7 +202,6 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
-
 const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
@@ -212,3 +226,29 @@ console.log(board)
 initGame()
 
 
+const startButton= document.createElement('button')
+startButton.setAttribute("class","start-button")
+startButton.innerText = "CLICK TO BEGIN";
+document.body.appendChild(startButton)
+startButton.addEventListener("click", () => {
+startButton.style.display ="none"
+let seconds = 60
+const delayInseconds =1;
+const output = document.createElement('div')
+output.setAttribute("class","timer")
+output.innerText = seconds
+document.body.appendChild(output)
+// setting timer to 20s (20000)
+const timer = setInterval(() => {
+output.innerText = seconds.toFixed(1)
+if(seconds <= 0){
+  clearInterval(timer)
+  output.innerText=""
+  startButton.style.display =""
+}
+seconds -= 0.01;
+  
+}, delayInseconds);
+}
+
+)
