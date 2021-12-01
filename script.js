@@ -5,10 +5,9 @@ let firstCard = null;
 let firstCardElement;
 let deck;
 
-
 const grid = [
-  ['A', 'B'],
-  ['Y', 'Z'],
+  ["A", "B"],
+  ["Y", "Z"],
 ];
 
 const upperLeftPosition = grid[0][0]; // 'A'
@@ -19,7 +18,7 @@ const lowerRightPosition = grid[1][1]; // 'Z'
 const makeDeck = (cardAmount) => {
   // create the empty deck at the beginning
   const newDeck = [];
-  const suits = ['❤', '♦', '♣', '♠'];
+  const suits = ["❤", "♦", "♣", "♠"];
 
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
     // make a variable of the current suit
@@ -33,19 +32,19 @@ const makeDeck = (cardAmount) => {
       let cardName = `${rankCounter}`;
 
       // 1, 11, 12 ,13
-      if (cardName === '1') {
-        cardName = 'A';
-      } else if (cardName === '11') {
-        cardName = 'J';
-      } else if (cardName === '12') {
-        cardName = 'Q';
-      } else if (cardName === '13') {
-        cardName = 'K';
+      if (cardName === "1") {
+        cardName = "A";
+      } else if (cardName === "11") {
+        cardName = "J";
+      } else if (cardName === "12") {
+        cardName = "Q";
+      } else if (cardName === "13") {
+        cardName = "K";
       }
-      if (currentSuit === '❤' || currentSuit ==='♦'){
-        var color = 'red';
-      } else if (currentSuit === '♣' || currentSuit === '♠'){
-        var color = 'black'
+      if (currentSuit === "❤" || currentSuit === "♦") {
+        var color = "red";
+      } else if (currentSuit === "♣" || currentSuit === "♠") {
+        var color = "black";
       }
 
       // make a single card object variable
@@ -53,21 +52,21 @@ const makeDeck = (cardAmount) => {
         name: cardName,
         suit: currentSuit,
         rank: rankCounter,
-        cardColor: color
+        cardColor: color,
       };
-/* 
+      /* 
       console.log(`rank: ${rankCounter}`); */
 
       // add the card to the deck
       newDeck.push(card); // add double the cards to the deck
-     /*  newDeck.push(card); */
+      /*  newDeck.push(card); */
     }
   }
-let shuffledCards = shuffleCards(newDeck);
-let zeroToEight = shuffledCards.slice(0,8)
-let zeroToEight2 = shuffledCards.slice(0,8)
-Array.prototype.push.apply(zeroToEight,zeroToEight2); 
-console.log(zeroToEight)
+  let shuffledCards = shuffleCards(newDeck);
+  let zeroToEight = shuffledCards.slice(0, 8);
+  let zeroToEight2 = shuffledCards.slice(0, 8);
+  Array.prototype.push.apply(zeroToEight, zeroToEight2);
+  console.log(zeroToEight);
   return zeroToEight;
 };
 
@@ -91,82 +90,64 @@ const shuffleCards = (cards) => {
 };
 
 const squareClick = (cardElement, column, row) => {
-/* console.log(cardElement);
+  /* console.log(cardElement);
   onsole.log('FIRST CARD DOM ELEMENT', firstCard);
   console.log('BOARD CLICKED CARD', board[column][row]); */
-    
-    const clickedCard = board[column][row]; 
-    
-    // the user already clicked on this square
-    if( cardElement.innerText !== '' ){
-        return;
-    }
 
-    // first turn
-    if (firstCard === null) {
-      console.log('first turn');
-      firstCard = clickedCard;
-      
-      // turn this card over
-      cardElement.innerText = firstCard.name;  
-      cardElement.innerText += firstCard.suit;  
+  const clickedCard = board[column][row];
 
-      // hold onto this for later when it may not match
-      firstCardElement = cardElement;
+  // the user already clicked on this square
+  if (cardElement.innerText !== "") {
+    return;
+  }
+
+  // first turn
+  if (firstCard === null) {
+    console.log("first turn");
+    firstCard = clickedCard;
+
+    // turn this card over
+    cardElement.innerText = firstCard.name;
+    cardElement.innerText += firstCard.suit;
+
+    // hold onto this for later when it may not match
+    firstCardElement = cardElement;
     // second turn
+  } else {
+    console.log("second turn");
+    if (
+      clickedCard.name === firstCard.name &&
+      clickedCard.suit === firstCard.suit
+    ) {
+      console.log("match");
+
+      // turn this card over
+      cardElement.innerText = clickedCard.name;
+      cardElement.innerText += clickedCard.suit;
     } else {
-    
-      console.log('second turn');
-      if (
-        clickedCard.name === firstCard.name &&
-        clickedCard.suit === firstCard.suit
-      ) {
-        console.log('match');
-    
-        // turn this card over
-        cardElement.innerText = clickedCard.name;
-        cardElement.innerText += clickedCard.suit;
+      cardElement.innerText = clickedCard.name;
+      cardElement.innerText += clickedCard.suit;
 
-      } else {
-        cardElement.innerText = clickedCard.name;
-        cardElement.innerText += clickedCard.suit;
-
-        setTimeout(() => {
-          cardElement.innerText = '';
-          // turn this card back over
-          firstCardElement.innerText = '';
-         
-        }, 500);
-        console.log('NOT a match');
-      }
-       // reset the first card
-      firstCard = null;
+      setTimeout(() => {
+        cardElement.innerText = "";
+        // turn this card back over
+        firstCardElement.innerText = "";
+      }, 500);
+      console.log("NOT a match");
     }
+    // reset the first card
+    firstCard = null;
+  }
 };
-
-/* const createCard = (cardInfo) => {
-  const suit = document.createElement('div');
-  suit.classList.add('suit',cardInfo.cardColor);
-  suit.innerText = cardInfo.suit;
-  const name = document.createElement('div');
-  name.classList.add('name');
-  name.innerText = cardInfo.name;
-  const card = document.createElement('div');
-  card.classList.add('card');
-  card.appendChild(name);
-  card.appendChild(suit);
-  return card;
-}; */
 
 // create all the board elements that will go on the screen
 // return the built board
 const buildBoardElements = (board) => {
-
   // create the element that everything will go inside of
-  const boardElement = document.createElement('div');
+  const boardElement = document.createElement("div");
 
   // give it a class for CSS purposes
-  boardElement.classList.add('board');
+  boardElement.classList.add("board");
 
   // use the board data structure we passed in to create the correct size board
   for (let i = 0; i < board.length; i += 1) {
@@ -174,20 +155,20 @@ const buildBoardElements = (board) => {
     const row = board[i];
 
     // make an element for this row of cards
-    const rowElement = document.createElement('div');
-    rowElement.classList.add('row');
+    const rowElement = document.createElement("div");
+    rowElement.classList.add("row");
 
     // make all the squares for this row
     for (let j = 0; j < row.length; j += 1) {
       // create the square element
-      const square = document.createElement('div');
+      const square = document.createElement("div");
 
       // set a class for CSS purposes
-      square.classList.add('square');
+      square.classList.add("square");
 
       // set the click event
       // eslint-disable-next-line
-      square.addEventListener('click', (event) => {
+      square.addEventListener("click", (event) => {
         // we will want to pass in the card element so
         // that we can change how it looks on screen, i.e.,
         // "turn the card over"
@@ -197,49 +178,52 @@ const buildBoardElements = (board) => {
       rowElement.appendChild(square);
     }
     boardElement.appendChild(rowElement);
-    boardElement.style.display = "none"
-    
+    boardElement.style.display = "none";
   }
 
   // using DOM to create start button
-const startButton= document.createElement('button')
-startButton.setAttribute("class","start-button")
-startButton.innerText = "CLICK TO START";
-document.body.appendChild(startButton)
+  const startButton = document.createElement("button");
+  startButton.setAttribute("class", "start-button");
+  startButton.innerText = "CLICK TO START";
+  document.body.appendChild(startButton);
 
-// creating H2 to display game message
-const gameMessage = document.createElement('h2')
-gameMessage.setAttribute('class', 'game-message')
-document.body.appendChild(gameMessage)
+  // creating H2 to display game message
+  const gameMessage = document.createElement("h2");
+  gameMessage.setAttribute("class", "game-message");
+  document.body.appendChild(gameMessage);
 
+  // once start button clicked
+  startButton.addEventListener("click", () => {
+    // once button click, the button will disappear
+    startButton.style.display = "none";
+    // this resets the gamemessage at the start of the round
+    gameMessage.innerText = "";
+    // setting timer for the game
+    let seconds = 10;
+    const delayInseconds = 1;
+    const gameTimer = document.createElement("div");
+    gameTimer.setAttribute("class", "timer");
+    // shows the timer counting down
+    gameTimer.innerText = seconds;
+    document.body.appendChild(gameTimer);
+    // setting timer to 20s (20000)
+    const timer = setInterval(() => {
+      boardElement.style.display = "";
+      gameTimer.innerText = seconds.toFixed(1);
+      if (seconds <= 0) {
+        clearInterval(timer);
+        // displays this message when timer reaches zero
+        gameMessage.innerText = "You ran out of time!";
+        // it will disappear once reaches zero or else it will show the timer being zero
+        gameTimer.innerText = "";
+        // start button will reappear after timer reaches zero
+        startButton.style.display = "";
+        boardElement.style.display = "none";
+      }
+      seconds -= 0.01;
+    }, delayInseconds);
+  });
 
-// once start button clicked
-startButton.addEventListener("click", () => {
-  // once button click, the button will disappear
-startButton.style.display ="none"
-// this resets the gamemessage at the start of the round
-gameMessage.innerText = ''
-let seconds = 10
-const delayInseconds =1;
-const output = document.createElement('div')
-output.setAttribute("class","timer")
-output.innerText = seconds
-document.body.appendChild(output)
-// setting timer to 20s (20000)
-const timer = setInterval(() => {
-  boardElement.style.display = ""
-  output.innerText = seconds.toFixed(1)
-if(seconds <= 0){
-  clearInterval(timer)
-  gameMessage.innerText = 'You ran out of time!'
-  output.innerText=""
-  startButton.style.display =""
-  boardElement.style.display = "none"
-}
-seconds -= 0.01;  
-}, delayInseconds);
-})
-  
   return boardElement;
 };
 
@@ -247,9 +231,7 @@ const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
-  /* let deckSubset = doubleDeck.slice(0, boardSize * boardSize); */
   deck = shuffleCards(doubleDeck);
-  
 
   // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
@@ -258,12 +240,9 @@ const initGame = () => {
       board[i].push(deck.pop());
     }
   }
-console.log(board)
+  console.log(board);
   const boardEl = buildBoardElements(board);
   document.body.appendChild(boardEl);
-  
 };
 
-initGame()
-
-
+initGame();
