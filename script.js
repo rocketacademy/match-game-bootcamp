@@ -5,6 +5,7 @@ let firstCard = null;
 let firstCardElement;
 let deck;
 
+
 const grid = [
   ['A', 'B'],
   ['Y', 'Z'],
@@ -134,8 +135,6 @@ const squareClick = (cardElement, column, row) => {
           cardElement.innerText = '';
           // turn this card back over
           firstCardElement.innerText = '';
-          /* // turn this card over
-          cardElement.innerText = ''; */
          
         }, 500);
         console.log('NOT a match');
@@ -145,7 +144,7 @@ const squareClick = (cardElement, column, row) => {
     }
 };
 
-const createCard = (cardInfo) => {
+/* const createCard = (cardInfo) => {
   const suit = document.createElement('div');
   suit.classList.add('suit',cardInfo.cardColor);
   suit.innerText = cardInfo.suit;
@@ -157,11 +156,12 @@ const createCard = (cardInfo) => {
   card.appendChild(name);
   card.appendChild(suit);
   return card;
-};
+}; */
 
 // create all the board elements that will go on the screen
 // return the built board
 const buildBoardElements = (board) => {
+
   // create the element that everything will go inside of
   const boardElement = document.createElement('div');
 
@@ -197,8 +197,44 @@ const buildBoardElements = (board) => {
       rowElement.appendChild(square);
     }
     boardElement.appendChild(rowElement);
+    boardElement.style.display = "none"
+    
   }
+  
+const startButton= document.createElement('button')
+startButton.setAttribute("class","start-button")
+startButton.innerText = "CLICK TO BEGIN";
+document.body.appendChild(startButton)
+const gameMessage = document.createElement('h2')
+gameMessage.setAttribute('class', 'game-message')
+document.body.appendChild(gameMessage)
 
+
+
+startButton.addEventListener("click", () => {
+startButton.style.display ="none"
+gameMessage.innerText = ''
+let seconds = 10
+const delayInseconds =1;
+const output = document.createElement('div')
+output.setAttribute("class","timer")
+output.innerText = seconds
+document.body.appendChild(output)
+// setting timer to 20s (20000)
+const timer = setInterval(() => {
+  boardElement.style.display = ""
+  output.innerText = seconds.toFixed(1)
+if(seconds <= 0){
+  clearInterval(timer)
+  gameMessage.innerText = 'You ran out of time!'
+  output.innerText=""
+  startButton.style.display =""
+  boardElement.style.display = "none"
+}
+seconds -= 0.01;  
+}, delayInseconds);
+})
+  
   return boardElement;
 };
 
@@ -226,29 +262,3 @@ console.log(board)
 initGame()
 
 
-const startButton= document.createElement('button')
-startButton.setAttribute("class","start-button")
-startButton.innerText = "CLICK TO BEGIN";
-document.body.appendChild(startButton)
-startButton.addEventListener("click", () => {
-startButton.style.display ="none"
-let seconds = 60
-const delayInseconds =1;
-const output = document.createElement('div')
-output.setAttribute("class","timer")
-output.innerText = seconds
-document.body.appendChild(output)
-// setting timer to 20s (20000)
-const timer = setInterval(() => {
-output.innerText = seconds.toFixed(1)
-if(seconds <= 0){
-  clearInterval(timer)
-  output.innerText=""
-  startButton.style.display =""
-}
-seconds -= 0.01;
-  
-}, delayInseconds);
-}
-
-)
