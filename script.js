@@ -256,7 +256,7 @@ const getPlayerName = () => {
         }
       }
       seconds -= 1;
-    }, 10);
+    }, 1000);
   }
 };
 
