@@ -200,19 +200,24 @@ const buildBoardElements = (board) => {
     boardElement.style.display = "none"
     
   }
-  
+
+  // using DOM to create start button
 const startButton= document.createElement('button')
 startButton.setAttribute("class","start-button")
-startButton.innerText = "CLICK TO BEGIN";
+startButton.innerText = "CLICK TO START";
 document.body.appendChild(startButton)
+
+// creating H2 to display game message
 const gameMessage = document.createElement('h2')
 gameMessage.setAttribute('class', 'game-message')
 document.body.appendChild(gameMessage)
 
 
-
+// once start button clicked
 startButton.addEventListener("click", () => {
+  // once button click, the button will disappear
 startButton.style.display ="none"
+// this resets the gamemessage at the start of the round
 gameMessage.innerText = ''
 let seconds = 10
 const delayInseconds =1;
