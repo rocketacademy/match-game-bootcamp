@@ -234,8 +234,17 @@ const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
-  let randomIndex = getRandomIndex(104)
+  let randomIndex = getRandomIndex(104);
+  console.log(`generated index`, randomIndex);
+  if (randomIndex % 2 === 0) {
+    randomIndex = randomIndex;
+    console.log(`even index without fix`, randomIndex);
+  } else {
+    randomIndex = randomIndex + 1;
+    console.log(`convert to even index`, randomIndex);
+  }
   let lastCardIndex = randomIndex + boardSize * boardSize;
+  console.log('lastCardIndex', lastCardIndex);
   let deckSubset = doubleDeck.slice(randomIndex, lastCardIndex);
   deck = shuffleCards(deckSubset);
 
