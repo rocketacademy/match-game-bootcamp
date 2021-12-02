@@ -6,7 +6,10 @@ let firstCard = null;
 let firstCardElement;
 let playerName;
 let deck;
-const newGame = true;
+let newGame = true;
+// Keep track of scores
+let currentScore = 0;
+const maxScore = ((boardSize * boardSize) / 2);
 
 // DOM for input, nameDiv and submit button
 const input = document.createElement('input');
@@ -36,6 +39,16 @@ const gameResult = document.createElement('div');
 // Helper function to display win/lose message
 const updateResult = (gameOutput) => {
   gameResult.innerText = gameOutput;
+};
+
+// Div to show timer
+const timer = document.createElement('div');
+
+// Function to show timer in minutes and seconds
+const millisToMinutesAndSeconds = (millis) => {
+  const minutes = Math.floor(millis / 60000);
+  const seconds = ((millis % 60000) / 1000).toFixed(0);
+  return `${minutes}:${(seconds < 10 ? '0' : '')}${seconds}`;
 };
 
 // Make card deck
@@ -106,7 +119,21 @@ const shuffleCards = (cards) => {
 
 // Gameplay logic
 const squareClick = (cardElement, column, row) => {
-  // If new game, start a timer to refresh page after 3 minutes to restart game
+  // Set a timer during first click
+  if (newGame === true) {
+    newGame = false;
+    let milliseconds = 180000;
+    document.body.appendChild(timer);
+
+    // Count down from 180000
+    const ref = setInterval(() => {
+      timer.innerText = millisToMinutesAndSeconds(milliseconds);
+      if (milliseconds <= 0) {
+        clearInterval(ref);
+      }
+      milliseconds -= 1;
+    }, 0);
+  }
   console.log(cardElement);
 
   console.log('FIRST CARD DOM ELEMENT', firstCard);
@@ -138,10 +165,14 @@ const squareClick = (cardElement, column, row) => {
         && clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
-
+      // Update current score
+      currentScore += 1;
       // turn this card over
       cardElement.innerText = clickedCard.name;
       updateResult('Its a match!');
+      if (currentScore == maxScore) {
+        updateResult('You won the game!');
+      }
     } else {
       console.log('NOT a match');
       // Turn card over
@@ -149,8 +180,8 @@ const squareClick = (cardElement, column, row) => {
       setTimeout(() => { cardElement.innerText = ''; }, 1000);
       // turn this card back over
       firstCardElement.innerText = '';
+      updateResult('Its not a match :(');
     }
-
     // reset the first card
     firstCard = null;
   }
