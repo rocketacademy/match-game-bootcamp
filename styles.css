@@ -1,3 +1,63 @@
 body {
   background-color: pink;
 }
+.square {
+  padding: 10px;
+  margin: 8px;
+  background-color: white;
+  display: inline-block;
+  height: 50px;
+  width: 50px;
+  vertical-align: top;
+  border-radius: 10px;
+  border: 1px solid black;
+}
+.suit {
+  margin: 5px;
+  font-size: 20px;
+}
+
+.name {
+  margin: 5px;
+  font-size: 24px;
+  font-weight: bold;
+  font-family: sans-serif;
+}
+
+.red {
+  color: red;
+}
+.black {
+  color: black;
+}
+.cardStyle {
+  font-size: 23px;
+  text-align: center;
+}
+.outputBox {
+  font-size: 30px;
+  color: red;
+  font-weight: bold;
+  background-color: rgb(202, 202, 202);
+  margin: 10px;
+  padding: 10px;
+  height: 80px;
+  width: 50%;
+}
+.timeBox {
+  font-size: 30px;
+  font-weight: bold;
+  color: black;
+}
+#header {
+  margin-left: 10px;
+}
+div {
+  margin-left: 10px;
+  font-size: 18px;
+}
+#resetButton {
+  margin-left: 10px;
+  margin-top: 20px;
+  font-size: 18px;
+}
