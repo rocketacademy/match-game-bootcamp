@@ -29,7 +29,7 @@ let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
-let wins = 0
+// let wins = 0
 // create the element that everything will go inside of
 const boardElement = document.createElement('div');
 // delay or sleep function
@@ -115,7 +115,7 @@ const squareClick = async (cardElement, column, row) => {
       // create card visually to show at clicked box
       cardDisplay = createCard(clickedCard);
       cardElement.appendChild(cardDisplay);
-      wins += 1
+      // wins += 1
     } else {
       console.log('NOT a match');
 
