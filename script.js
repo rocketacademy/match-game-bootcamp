@@ -4,9 +4,39 @@ const boardSize = 4;
 const board = [];
 let firstCard = null;
 let firstCardElement;
-let secondCardElement;
-const secondCard = null;
+let playerName;
 let deck;
+const newGame = true;
+
+// DOM for input, nameDiv and submit button
+const input = document.createElement('input');
+const nameDiv = document.createElement('div');
+const submitButton = document.createElement('button');
+const instructions = document.createElement('div');
+submitButton.setAttribute('id', 'submit-button');
+// input.setAttribute('id', 'input-field');
+submitButton.innerText = 'Submit';
+instructions.innerHTML = 'Please input name to play:';
+
+// Append onto nameDiv
+nameDiv.appendChild(instructions);
+nameDiv.appendChild(input);
+nameDiv.appendChild(submitButton);
+
+// Create nameDiv div to display message
+const message = document.createElement('div');
+document.body.appendChild(message);
+// Helper function to display message
+const updateOutput = (output) => {
+  message.innerText = output;
+};
+
+// Create gameResults div to display match/non-match message
+const gameResult = document.createElement('div');
+// Helper function to display win/lose message
+const updateResult = (gameOutput) => {
+  gameResult.innerText = gameOutput;
+};
 
 // Make card deck
 const makeDeck = () => {
@@ -76,6 +106,7 @@ const shuffleCards = (cards) => {
 
 // Gameplay logic
 const squareClick = (cardElement, column, row) => {
+  // If new game, start a timer to refresh page after 3 minutes to restart game
   console.log(cardElement);
 
   console.log('FIRST CARD DOM ELEMENT', firstCard);
@@ -110,11 +141,12 @@ const squareClick = (cardElement, column, row) => {
 
       // turn this card over
       cardElement.innerText = clickedCard.name;
+      updateResult('Its a match!');
     } else {
       console.log('NOT a match');
       // Turn card over
       cardElement.innerText = clickedCard.name;
-      setTimeout(() => { cardElement.innerText = ''; }, 3000);
+      setTimeout(() => { cardElement.innerText = ''; }, 1000);
       // turn this card back over
       firstCardElement.innerText = '';
     }
@@ -182,10 +214,34 @@ const initGame = () => {
       board[i].push(deck.pop());
     }
   }
-
+  updateOutput(`Hello ${playerName}, welcome to match game!`);
   const boardEl = buildBoardElements(board);
-
   document.body.appendChild(boardEl);
 };
 
-initGame();
+// Function to ask for playerName
+const getName = () => {
+  playerName = input.value;
+  if (playerName === '') {
+    updateOutput('You did not input a name');
+  }
+  else {
+    message.innerText = '';
+    playerName = input.value;
+    startGame();
+  }
+  document.body.appendChild(gameResult);
+};
+
+// Function to display nameDiv div
+const startGame = () => {
+  if (playerName == null) { document.body.appendChild(nameDiv); }
+  else {
+    nameDiv.remove();
+    initGame();
+  }
+};
+
+// When submit button clicked, change input field value to playerName;
+submitButton.addEventListener('click', getName);
+startGame();
