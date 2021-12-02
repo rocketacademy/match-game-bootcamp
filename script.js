@@ -1,4 +1,5 @@
 // Notes:
+// !!! reference from peers'code
 // ### to indicate for Comfortable exercise
 // ##### to indicate for Comfortable exercise
 
@@ -6,7 +7,7 @@
 // the user turns cards over one at a time to find the matching pair of cards
 
 // ===================================================
-//           ### Global Variables ###
+//  Global Variables
 // ===================================================
 
 // boardSize has to be an even number
@@ -18,9 +19,11 @@ let firstCardElement;
 let deck;
 let secondCard;
 let secondCardElement;
+let userName = '';
+const boardElement = document.createElement('div');
 
 // ===================================================
-//             ### Gameplay Logic ###
+//  Gameplay Logic
 // ===================================================
 
 const squareClick = (messageBoard, cardElement, column, row) => {
@@ -36,6 +39,7 @@ const squareClick = (messageBoard, cardElement, column, row) => {
   console.log(row);
 
   const clickedCard = board[column][row];
+  console.log(userName);
 
   // create default messages for messageBoard when its a match
   // messageBoard.innerText = 'Its a match!';
@@ -50,11 +54,17 @@ const squareClick = (messageBoard, cardElement, column, row) => {
   if (firstCard === null) {
     console.log('first turn');
     firstCard = clickedCard;
+
     // turn this card over
-    cardElement.innerText = firstCard.name;
+    // !!! reference codes to add both suitSymbol and displayName details
+    cardElement.classList.add('card');
+    cardElement.innerHTML = `${firstCard.suitSymbol}<br>${firstCard.displayName}`;
+    // cardElement.innerText = firstCard.name;
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
+    // !!! display message when user open the first card
+    messageBoard.innerText = `You opened ${firstCard.displayName} of ${firstCard.suitSymbol}. Click on another card and see if it matches!`;
 
     // second turn
   } else {
@@ -67,6 +77,11 @@ const squareClick = (messageBoard, cardElement, column, row) => {
       console.log('match');
       console.log(clickedCard);
       console.log(firstCard);
+
+      // !!! reference codes to add cardDisplay details
+      cardElement.innerHTML = `${clickedCard.suitSymbol}<BR>${clickedCard.displayName}`;
+      // !!! display message when user open the second card
+      messageBoard.innerText = `You opened ${clickedCard.displayName} of ${clickedCard.suitSymbol}. Click on another card and see if it matches!`;
 
       // ### display match meesage
       messageBoard.innerText = 'Congrats! Its a match!';
@@ -83,9 +98,9 @@ const squareClick = (messageBoard, cardElement, column, row) => {
       cardElement.innerText = secondCard.name;
       secondCardElement = cardElement;
       console.log('NOT a match');
-      // console.log(firstCard);
-      // console.log(clickedCard);
 
+      // !!! reference codes to add cardDisplay details
+      cardElement.innerHTML = `${clickedCard.suitSymbol}<BR>${clickedCard.displayName}`;
       // ### display not-match meesage
       messageBoard.innerText = 'Sorry! Its not a match!';
 
@@ -104,7 +119,7 @@ const squareClick = (messageBoard, cardElement, column, row) => {
 };
 
 // ===================================================
-//           ### Helper Functions ###
+//  Helper Functions
 // ===================================================
 
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
@@ -128,13 +143,19 @@ const shuffleCards = (cards) => {
   return cards;
 };
 
+// const getInputFromTextBox = () => {
+//   let input = document.getElementById('input').value;
+//   alert(input);
+// };
+
 // ===================================================
-//            ### New Make Deck ###
+//  New Make Deck
 // ===================================================
 
-const makeDeck = (cardAmount) => {
+const makeDeck = () => {
   // create the empty deck at the beginning
   const newDeck = [];
+  // Initialise an array of the 4 suits in our deck. We will loop over this array.
   const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
   const suitSymbols = ['♥', '♦️', '♣', '♠'];
   const suitColours = ['red', 'red', 'black', 'black'];
@@ -146,12 +167,15 @@ const makeDeck = (cardAmount) => {
     const currentSuitSymbol = suitSymbols[suitIndex];
     const currentColour = suitColours[suitIndex];
 
-    // loop to create all cards in this suit
-    // rank 1-13
+    // Loop from 1 to 13 to create all cards for a given suit
+    // Notice rankCounter starts at 1 and not 0, and ends at 13 and not 12.
+    // This is an example of a loop without an array.
     for (let rankCounter = 1; rankCounter <= 13; rankCounter += 1) {
       // Convert rankCounter to string
       let cardName = `${rankCounter}`;
       let displayName = `${rankCounter}`;
+      // following code will keep display heart suits
+      // let suitSymbol = `${currentSuitSymbol}`;
 
       // 1, 11, 12 ,13
       if (cardName === '1') {
@@ -186,7 +210,7 @@ const makeDeck = (cardAmount) => {
 };
 
 // ===================================================
-// ### Game Initialisation Logic ###
+//  Game Initialisation Logic
 // ===================================================
 
 // create all the board elements that will go on the screen
@@ -194,16 +218,34 @@ const makeDeck = (cardAmount) => {
 // ### for comfortable qns > create a messageboard element
 const buildBoardElements = (board) => {
   // create the element that everything will go inside of
-  const boardElement = document.createElement('div');
+  // const boardElement = document.createElement('div');
 
   // give it a class for CSS purposes
   boardElement.classList.add('board');
+
+  // #### create a element for player to enter the name
+  const inputMessage = document.createElement('box');
+  inputMessage.classList.add('input');
+  inputMessage.innerText = 'Please enter your name: ';
+  boardElement.appendChild(inputMessage);
+
+  // #### create an input box for userName
+  const userName = document.createElement('input');
+  userName.classList.add('name');
+  boardElement.appendChild(userName);
+
+  // ### create a button to store the userName
+  // user input the name and press the button to store the name into the userName global variable
+  const storeNameBtn = document.createElement('button');
+  storeNameBtn.innerText = 'Submit';
+  boardElement.appendChild(storeNameBtn);
+  // add eventListener to store the name when button is clicked
 
   // ### create a messageboard element
   const messageBoard = document.createElement('div');
   messageBoard.classList.add('messageBoard');
   messageBoard.innerText =
-    'Please click on the boxes. You have 3 minutes for the game!';
+    'Click on the boxes to play the game. You have 3 minutes for the game!';
   boardElement.appendChild(messageBoard);
 
   // ##### create a 3 minutes timer element
@@ -217,7 +259,9 @@ const buildBoardElements = (board) => {
   const ref = setInterval(() => {
     output.innerText = milliseconds;
 
-    if (milliseconds <= 0) {
+    if (milliseconds === 0) {
+      // remove all the boxes when time is up
+      boardElement.innerText = '';
       clearInterval(ref);
       output.innerText = 'Time is Up!';
     }
@@ -261,7 +305,7 @@ const buildBoardElements = (board) => {
 };
 
 // ===================================================
-//           ### Initiate the game ###
+//  Initiate the game
 // ===================================================
 const initGame = () => {
   // create this special deck by getting the doubled cards and
