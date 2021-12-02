@@ -24,7 +24,7 @@ document.body.appendChild(gamerName);
 // boardSize.setAttribute('boardSize', 'size');
 // boardSize.setAttribute('placeholder', "Put in Board Size");
 // document.body.appendChild(boardSize);
-const boardSize = 2;
+const boardSize = 4;
 let board = [];
 let firstCard = null;
 let firstCardElement;
@@ -122,13 +122,14 @@ const squareClick = async (cardElement, column, row) => {
       cardDisplay = createCard(clickedCard);
       cardElement.appendChild(cardDisplay);
       wins += 1
-      if (wins === boardSize) {
+      if (wins === (boardSize*boardSize)/2) {
         congrats.innerText = "Congratulations " + gamerName.value
         counter = '';
         clockWords.innerText = ""
-        
- 
-      }
+      } 
+      // else if () {
+      //   congrats.innerText = 'Sorry ' + gamerName.value + " Game over";
+      // }
     } else {
       console.log('NOT a match');
 
@@ -160,7 +161,7 @@ const squareClick = async (cardElement, column, row) => {
 
 console.log('starting...');
 
-const delayInMilliseconds = 18000; // 3 mins to complete
+const delayInMilliseconds = 180000; // 3 mins to complete
 let counter = delayInMilliseconds;
 
 const ref = setInterval(() => {
