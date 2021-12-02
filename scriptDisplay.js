@@ -29,7 +29,7 @@ let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
-// let wins = 0
+let wins = 0
 // create the element that everything will go inside of
 const boardElement = document.createElement('div');
 // delay or sleep function
@@ -44,14 +44,17 @@ document.body.appendChild(announcement);
 // const clockTimer = document.createElement('label');
 // clockTimer.innerHTML = "CountDown "
 // clockSpace.appendChild(clockTimer);
-const clockWords = document.createTextNode(' CountDown : ');
+// const clockWords = document.createTextNode(' CountDown : ');
+const clockWords = document.createElement('div')
+clockWords.innerText = "CountDown"
 document.body.appendChild(clockWords);
 const clock = document.createElement('h3');
 document.body.appendChild(clock);
 // clockTimer.clockSpace.insertBefore(clock, clockTimer.nextSibling);
-
 clock.innerText = '';
 
+const congrats = document.createElement('h2');
+document.body.appendChild(congrats)
 
 // Reset Game Button
 const resetbutton = document.createElement('button');
@@ -61,8 +64,11 @@ resetbutton.onclick = function () {
   // existingBoard.innerHTML = '';
   // existingBoard = null;
   // board = [];
-  gamerName.name = ""
+  gamerName.value = ""
+  congrats.innerText = ""
+  
   initGame();
+  // return counter
 };
 document.body.appendChild(resetbutton);
 
@@ -115,7 +121,14 @@ const squareClick = async (cardElement, column, row) => {
       // create card visually to show at clicked box
       cardDisplay = createCard(clickedCard);
       cardElement.appendChild(cardDisplay);
-      // wins += 1
+      wins += 1
+      if (wins === boardSize) {
+        congrats.innerText = "Congratulations " + gamerName.value
+        counter = '';
+        clockWords.innerText = ""
+        
+ 
+      }
     } else {
       console.log('NOT a match');
 
@@ -131,7 +144,7 @@ const squareClick = async (cardElement, column, row) => {
         // turn this card back over
         firstCardElement.innerText = '';
         cardElement.innerText = '';
-      }, 1000);
+      }, 800);
 
       // await sleep(1000);
 
@@ -147,14 +160,14 @@ const squareClick = async (cardElement, column, row) => {
 
 console.log('starting...');
 
-const delayInMilliseconds = 200000; // 3 mins to complete
+const delayInMilliseconds = 18000; // 3 mins to complete
 let counter = delayInMilliseconds;
 
 const ref = setInterval(() => {
   clock.innerText = counter;
   counter -= 1;
 
-  if (counter === 0) {
+  if (counter === -1) {
     clearInterval(ref);
     announcement.innerText = 'stop playing. game over';
     boardElement.innerText = '';
