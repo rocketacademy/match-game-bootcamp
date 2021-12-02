@@ -1,3 +1,206 @@
+@import url("https://fonts.googleapis.com/css2?family=Odibee+Sans&family=Poppins&display=swap");
 body {
-  background-color: pink;
+  background-image: url("https://i.pinimg.com/564x/9a/b9/d2/9ab9d210c745e2a3d588a29c10fa440f.jpg");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  align-items: center;
+  height: 97.8vh;
+  font-family: "Poppins";
+}
+
+.hide {
+  height: 0;
+  display: none;
+}
+
+#header {
+  margin-top: -4px;
+  color: #f5f5f5;
+}
+
+.modal {
+  margin-top: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.1rem;
+}
+.modal .modal-container {
+  width: 500px;
+  padding: 15px 10px;
+  margin-top: 80px;
+  background-color: #a2a2a1;
+  background-image: url("https://media.istockphoto.com/photos/green-casino-background-picture-id842444492?k=20&m=842444492&s=170667a&w=0&h=D88I7VvqcL_SyCn_lPRUSJo5L-izvzQYaCJqpSzHZ_g=");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  border: 3px solid #b60014;
+}
+.modal .modal-container .modal-title {
+  font-size: 1.65rem;
+  text-align: center;
+  padding: 0 10px 20px 10px;
+  font-family: "Odibee Sans";
+  color: #fcf6f5;
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 0.5rem;
+  vertical-align: text-bottom;
+}
+.modal .modal-container .form-container {
+  display: flex;
+  flex-direction: column;
+  padding: 0 5%;
+}
+.modal .modal-container .form-container .form-item {
+  width: 100%;
+  display: flex;
+  margin-right: -5px;
+  margin-bottom: 5px;
+}
+.modal .modal-container .form-container .form-item .label {
+  display: inline-block;
+  width: 50%;
+  vertical-align: bottom;
+  font-family: "Poppins";
+  color: #f5f5f5;
+}
+.modal .modal-container .form-container .form-item #form-player-name,
+.modal .modal-container .form-container .form-item #form-time-selection,
+.modal .modal-container .form-container .form-item #form-board-size {
+  font-size: 1.3rem;
+  width: 50%;
+  border: 2px solid black;
+  font-family: "Poppins";
+  margin: 2px 0;
+  background-color: #a2a2a1;
+  border: 2px solid #b60014;
+}
+.modal .modal-container .form-container .form-submit {
+  font-size: 1rem;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  padding: 12px;
+  align-self: center;
+  border-radius: 10px;
+  display: inline-block;
+  border-color: #7c7c7c;
+
+  background-image: linear-gradient(
+    180deg,
+    #c7c7c7 0%,
+    #e6e6e6 47%,
+    #c7c7c7 53%,
+    #b3b3b3 100%
+  );
+}
+.modal .modal-container .form-container .form-submit:hover {
+  transform: scale(0.98);
+  color: #b60014;
+  text-shadow: rgba(211, 62, 79, 0.701) 0 -1px 0, #f0d1d1 0 2px 1px,
+    #99ddff 0 0 5px, rgba(0, 128, 255, 0.6) 0 0 20px;
+  box-shadow: inset #c72929 0 0px 0px 4px,
+    inset rgba(193, 10, 10, 0.816) 0 -1px 5px 4px,
+    inset rgba(23, 27, 28, 0.7) 0 -1px 0px 7px,
+    inset rgba(255, 255, 255, 0.7) 0 2px 1px 7px,
+    rgba(243, 30, 30, 0.8) 0 0px 3px 2px;
+}
+.container {
+  font-size: 18px;
+  margin-top: -80px;
+}
+#game-title {
+  text-transform: capitalize;
+}
+
+.center-middle {
+  color: mintcream;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px;
+}
+
+.content-top,
+.content-bottom {
+  color: mintcream;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  margin: 5px 10px;
+  padding: 5px;
+  width: 35px;
+  height: 50px;
+  text-align: center;
+  border: solid 2px;
+  border-radius: 8px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.face-down {
+  background: repeating-linear-gradient(
+    135deg,
+    LightGoldenRodYellow 0px,
+    LightGoldenRodYellow 15px,
+    black 30px,
+    red 60px
+  );
+}
+
+.face-up {
+  background: white;
+}
+
+.suit {
+  margin: 3px;
+  font-size: 14px;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: bold;
+  font-family: sans-serif;
+}
+
+.red {
+  color: red;
+  font-size: 24px;
+  margin: -2px;
+}
+
+.black {
+  color: black;
+  font-size: 24px;
+  margin: 0;
+}
+
+#board {
+  margin-top: 10px;
+}
+
+.match {
+  border: solid 2px gold;
+}
+
+.no-match {
+  border: solid 2px red;
+}
+
+button {
+  font-family: "Poppins";
+  border-radius: 10px;
+}
+button:hover {
+  transform: scale(0.98);
+  background-color: red;
+  color: whitesmoke;
 }
