@@ -139,13 +139,18 @@ const resetGame = () => {
   const messageDiv = document.getElementById("message-div");
   messageDiv.remove();
 
-  // recreate board
+  // reset vars
   board = [];
   canClick = true;
+  // recreate board
   const m = createMessageDiv();
   const b = createBoard();
   document.body.appendChild(b);
   document.body.appendChild(m);
+
+  // reset timer
+  const timerDiv = document.getElementById("timer-div");
+  timerDiv.innerHTML = `Time Left: ${formatTimer(3, 0)}`;
 };
 
 const createResetBtn = () => {
