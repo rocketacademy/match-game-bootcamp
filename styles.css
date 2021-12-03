@@ -6,16 +6,28 @@ body {
 .square {
   padding: 10px;
   margin: 10px;
-  background-color: white;
+  background-color: grey;
   display: inline-block;
-  height: 30px;
-  width: 30px;
+  height: 70px;
+  width: 50px;
   border-radius: 5px;
   vertical-align: top;
   text-align: center;
+  border-color: black;
+  border-width: 5px;
 }
 
-#message-block {
-  font-size: 32px;
-  padding: 16px 0px 0px 16px;
+#message-div {
+  font-size: 24px;
+  padding: 16px 0px 0px 10px;
+}
+
+#top-div {
+  display: flex;
+}
+
+#timer-div {
+  margin-top: 3px;
+  margin-left: 10px;
+  width: 125px;
 }

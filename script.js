@@ -1,8 +1,8 @@
 import { shuffleCards, makeDeck } from "./deck.js";
+// import { userName, clearUserInput } from "./user.js";
 
-// boardSize has to be an even number
-const boardSize = 4;
-const board = [];
+const boardSize = 2;
+let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
@@ -12,104 +12,95 @@ let interval;
 let gameStarted = false;
 let pairs = 0;
 let sucessfulPairs = (boardSize * boardSize) / 2;
+let canClick = true;
+const white = "#FFFFFF";
+const grey = "#808080";
+
+const formatTimer = (m, s) => {
+  // format time to mm:ss
+  let minStr = m.toString();
+  let secStr = s.toString();
+  secStr = secStr.length > 1 ? secStr : "0" + secStr;
+  minStr = minStr.length > 2 ? minStr : "0" + minStr;
+  return `${minStr}:${secStr}`;
+};
 
 const squareClick = (cardElement, column, row) => {
-  console.log(cardElement);
-
-  console.log("FIRST CARD DOM ELEMENT", firstCard);
-
-  console.log("BOARD CLICKED CARD", board[column][row]);
-
   const clickedCard = board[column][row];
 
-  // the user already clicked on this square
   if (cardElement.innerText !== "") {
     return;
   }
 
-  // first turn
-  if (firstCard === null) {
-    console.log("first turn");
-
-    if (!gameStarted) {
-      startTimer();
-    }
-    firstCard = clickedCard;
-    // turn this card over
-    cardElement.innerText = firstCard.displayName;
-
-    // hold onto this for later when it may not match
-    firstCardElement = cardElement;
-
-    // second turn
-  } else {
-    console.log("second turn");
-    console.log("SECOND CARD Clicked", clickedCard);
-
-    if (
-      clickedCard.name === firstCard.name &&
-      clickedCard.suit === firstCard.suit
-    ) {
-      console.log("match");
-      cardElement.innerText = clickedCard.displayName;
-      const messageDiv = document.getElementById("message-block");
-      messageDiv.innerHTML = "MATCH";
-      setTimeout(() => (messageDiv.innerHTML = ""), 3000);
-
-      pairs += 1;
-      if (pairs === sucessfulPairs) {
-        messageDiv.innerHTML = "MATCHED ALL CONGRATS!";
-        clearInterval(interval);
+  if (canClick) {
+    if (firstCard === null) {
+      if (!gameStarted) {
+        startTimer();
       }
-    } else {
-      console.log("NOT a match");
-      // show second clicked card and then flip over after 2s
-      cardElement.innerText = clickedCard.displayName;
-      setTimeout(() => {
-        firstCardElement.innerText = "";
-        cardElement.innerText = "";
-      }, 2000);
-    }
 
-    // reset the first card
-    firstCard = null;
+      firstCard = clickedCard;
+      cardElement.innerHTML =
+        clickedCard.displayName + "<br />" + clickedCard.suitSymbol;
+      cardElement.style.background = white;
+      firstCardElement = cardElement;
+    } else {
+      if (
+        clickedCard.name === firstCard.name &&
+        clickedCard.suit === firstCard.suit
+      ) {
+        console.log("match");
+        canClick = false;
+        cardElement.innerHTML =
+          clickedCard.displayName + "<br />" + clickedCard.suitSymbol;
+        cardElement.style.background = white;
+        const messageDiv = document.getElementById("message-div");
+        messageDiv.innerHTML = "MATCH";
+
+        pairs += 1;
+        if (pairs === sucessfulPairs) {
+          clearInterval(interval);
+          messageDiv.innerHTML = "MATCHED ALL CONGRATS!";
+        } else {
+          setTimeout(() => {
+            messageDiv.innerHTML = "";
+            canClick = true;
+          }, 3000);
+        }
+      } else {
+        console.log("NOT a match");
+        // show second clicked card and then flip over after 2s
+        canClick = false;
+        cardElement.innerHTML =
+          clickedCard.displayName + "<br />" + clickedCard.suitSymbol;
+        cardElement.style.background = white;
+        setTimeout(() => {
+          firstCardElement.innerText = "";
+          cardElement.innerText = "";
+          firstCardElement.style.background = grey;
+          cardElement.style.background = grey;
+          canClick = true;
+        }, 2000);
+      }
+
+      firstCard = null;
+    }
   }
 };
 
-// create all the board elements that will go on the screen
 const buildBoardElements = (board) => {
-  // create the element that everything will go inside of
   const boardElement = document.createElement("div");
-
-  // give it a class for CSS purposes
   boardElement.classList.add("board");
 
-  // use the board data structure we passed in to create the correct size board
   for (let i = 0; i < board.length; i += 1) {
-    // make a var for just this row of cards
     const row = board[i];
-
-    // make an element for this row of cards
     const rowElement = document.createElement("div");
     rowElement.classList.add("row");
-
-    // make all the squares for this row
     for (let j = 0; j < row.length; j += 1) {
-      // create the square element
       const square = document.createElement("div");
-
-      // set a class for CSS purposes
       square.classList.add("square");
-
-      // set the click event
-      // eslint-disable-next-line
       square.addEventListener("click", (event) => {
-        // we will want to pass in the card element so
-        // that we can change how it looks on screen, i.e.,
-        // "turn the card over"
         squareClick(event.currentTarget, i, j);
       });
-
       rowElement.appendChild(square);
     }
     boardElement.appendChild(rowElement);
@@ -119,9 +110,10 @@ const buildBoardElements = (board) => {
 };
 
 const startTimer = () => {
-  const timer = document.getElementById("timer-div");
+  const timerDiv = document.getElementById("timer-div");
+  const messageDiv = document.getElementById("message-div");
   interval = setInterval(() => {
-    timer.innerHTML = `TIME LEFT: ${min} min , ${sec} seconds`; // count down from 2:59
+    timerDiv.innerHTML = `Time Left: ${formatTimer(min, sec)}`;
     sec--;
     if (sec == 0) {
       min--;
@@ -129,27 +121,64 @@ const startTimer = () => {
     }
     if (min < 0) {
       clearInterval(interval);
+      timerDiv.innerHTML = `Time Left: ${formatTimer(0, 0)}`;
+      messageDiv.innerHTML = "TIMES UP";
     }
   }, 1000);
   gameStarted = true;
 };
 
-const initGame = () => {
-  // for timer div
+const resetGame = () => {
+  // destroy board elements in dom
+  console.log("reset");
+  const boardElements = document.querySelectorAll(".board");
+  boardElements.forEach((e) => e.remove());
+  const squares = document.querySelectorAll(".square");
+  squares.forEach((e) => e.remove());
+
+  const messageDiv = document.getElementById("message-div");
+  messageDiv.remove();
+
+  // recreate board
+  board = [];
+  canClick = true;
+  const m = createMessageDiv();
+  const b = createBoard();
+  document.body.appendChild(b);
+  document.body.appendChild(m);
+};
+
+const createResetBtn = () => {
+  const resetBtn = document.createElement("BUTTON");
+  resetBtn.id = "reset-btn";
+  resetBtn.className = "resetBtn";
+  resetBtn.innerHTML = "RESET";
+
+  resetBtn.addEventListener("click", () => resetGame());
+
+  return resetBtn;
+};
+
+const createTimerDiv = () => {
   const timerDiv = document.createElement("div");
   timerDiv.id = "timer-div";
-  document.body.appendChild(timerDiv);
+  timerDiv.innerHTML = `Time Left: ${formatTimer(3, 0)}`;
+  // document.body.appendChild(timerDiv);
+  return timerDiv;
+};
 
-  // for board creation
-  // create this special deck by getting the doubled cards and
-  // making a smaller array that is ( boardSize squared ) number of cards
+const createMessageDiv = () => {
+  const messageDiv = document.createElement("div");
+  messageDiv.id = "message-div";
+  // document.body.appendChild(messageDiv);
+  return messageDiv;
+};
 
-  // TODO: deck subset doesnt guarantee matching pairs
+const createBoard = () => {
   let doubleDeck = makeDeck();
-  let deckSubset = doubleDeck.slice(0, boardSize * boardSize); // 16 cards
+  let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
   deck = shuffleCards(deckSubset);
 
-  // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
     board.push([]);
     for (let j = 0; j < boardSize; j += 1) {
@@ -158,12 +187,31 @@ const initGame = () => {
   }
 
   const boardEl = buildBoardElements(board);
-  document.body.appendChild(boardEl);
 
-  // message div
-  const messageDiv = document.createElement("div");
-  messageDiv.id = "message-block";
-  document.body.appendChild(messageDiv);
+  return boardEl;
+};
+
+const createTimerButtonDiv = () => {
+  const top = document.createElement("div");
+  top.id = "top-div";
+  top.className = "topDiv";
+  return top;
+};
+
+const initGame = () => {
+  const topDiv = createTimerButtonDiv();
+
+  const t = createTimerDiv();
+  const r = createResetBtn();
+  const m = createMessageDiv();
+  const b = createBoard();
+
+  topDiv.appendChild(t);
+  topDiv.appendChild(r);
+
+  document.body.appendChild(topDiv);
+  document.body.appendChild(b);
+  document.body.appendChild(m);
 };
 
 initGame();
