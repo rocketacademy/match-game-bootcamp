@@ -9,6 +9,9 @@ let clickCount = 0;
 let playerTurn = 1;
 let player1Score = 0;
 let player2Score = 0; 
+let playerName = "";
+let timer = 180;
+let timeStart = false;
 
 const gameInfo = document.createElement('h2');
 gameInfo.classList.add('game-message')
@@ -23,7 +26,8 @@ const output =(message) => {
 }
 
 //Actual parameters: event.currentTarget, i, j
-//cardElement that was in the output was the div container: e.g., <div class= "square">7</div> In other words, cardElement is basically a HTML container. 
+//cardElement that was in the output was the div container: e.g., <div class= "square">7</div> In other words, cardElement is basically a HTML container.
+//NEEDS TO BE FIXEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD 
 const squareClick = (cardElement, column, row, playerXScore) => {
 
     console.log(cardElement);
@@ -66,7 +70,9 @@ const squareClick = (cardElement, column, row, playerXScore) => {
       ) {
         output("CONGRATS ITS A MATCH")
         console.log('match');
-        playerXScore += 1;
+        if (playerTurn == 1) {
+          player1Score += 1;
+        } else player2Score += 1;
         // turn this card over
         cardElement.innerText = clickedCard.name;
         cardElement.innerText += clickedCard.suitSymbol;
@@ -122,6 +128,14 @@ const buildBoardElements = (board) => {
 
       // set the click event
       // eslint-disable-next-line
+    
+        square.addEventListener('click', () => {
+        if (timeStart === false) {
+          test = setInterval(countDown, 1000);
+          timeStart = true;
+        };
+      })
+    
       square.addEventListener('click', (event) => {
         // we will want to pass in the card element so
         // that we can change how it looks on screen, i.e.,
@@ -309,9 +323,9 @@ const createInput = () => {
   })
 }
 
-  const divCreatePlayerTurn = document.createElement("div");
-  divCreatePlayerTurn.className = "playerTurn";
-  document.body.appendChild(divCreatePlayerTurn)
+const divCreatePlayerTurn = document.createElement("div");
+divCreatePlayerTurn.className = "playerTurn";
+document.body.appendChild(divCreatePlayerTurn)
 
 const playerTurnMsg = () => {
 
@@ -323,5 +337,130 @@ const playerTurnMsg = () => {
   }
 }
 
+const createNameInput = () => {
+  const divCreateNameInput = document.createElement("h3")
+  divCreateNameInput.innerHTML = "Enter your name here! "
+  
+  const inputName = document.createElement("INPUT");
+  inputName.id = "myName"
+  inputName.setAttribute("type", "text")
+  divCreateNameInput.appendChild(inputName)
+
+  const submitButton = document.createElement("button");
+  submitButton.id = "myNameButton"
+  submitButton.innerHTML = "submit"
+  divCreateNameInput.appendChild(submitButton)
+
+  document.body.appendChild(divCreateNameInput)
+
+  submitButton.addEventListener("click", ()=> {
+  playerName = inputName.value;
+
+  divCreateNameInput.innerHTML += `<br> HI ${playerName}!`
+  })
+}
+
+displayTime = document.createElement("p");
+displayTime.id = "Timer";
+displayTime.innerHTML = `Time left ${timer}`;
+document.body.appendChild(displayTime);
+
+const countDown = () => {
+  timer--;
+  displayTime.innerHTML = timer;
+}
+
+let seconds = 0;
+let minutes = 0;
+let hours = 0;
+let appendHours = document.getElementById("hours");
+let appendMinutes = document.getElementById("minutes");
+let appendSeconds = document.getElementById("seconds");
+let buttonStart = document.getElementById("start");
+let buttonStop = document.getElementById("stop");
+let buttonReset = document.getElementById("reset");
+let buttonLap = document.getElementById("lapbutton");
+let buttonClear = document.getElementById("lap-clear-button")
+let lapCont = document.getElementsByClassName("laps")[0];
+let interval;
+
+buttonStart.addEventListener("click", ()=> {
+  interval = setInterval(startTimer);
+});
+
+buttonStop.addEventListener("click", ()=> {
+  clearInterval(interval)
+});
+
+buttonReset.addEventListener("click", ()=> {
+  clearInterval(interval)
+  seconds = "00";
+  minutes = "00";
+  hours = "00";
+  appendSeconds.innerHTML = seconds;
+  appendMinutes.innerHTML = minutes;
+  appendHours.innerHTML = hours;
+});
+
+
+const lap = () => {
+  const createLi = document.createElement("li")
+  const number = document.createElement("span")
+  const timeStamp = document.createElement("span")
+  createLi.setAttribute("class", "lap-item");
+  number.setAttribute("class", "number");
+  timeStamp.setAttribute("class", "time-stamp");
+  // timeStamp.innerHTML = `${hours} : ${minutes} : ${seconds}`
+  timeStamp.innerHTML = "HI";
+  number.innerHTML = `${hours} : ${minutes} : ${seconds}`
+  createLi.appendChild(number, timeStamp);
+  lapCont.appendChild(createLi);
+}
+
+buttonLap.addEventListener("click", ()=>{
+  lapItem = lap();
+});
+
+buttonClear.addEventListener("click", ()=>{
+  lapCont.innerHTML = "";
+});
+
+
+
+const startTimer = () => {
+  seconds ++;
+  if (seconds < 9) {
+    appendSeconds.innerHTML = "0" + seconds;
+  }
+  if (seconds > 9) {
+    appendSeconds.innerHTML = seconds;
+  }
+  if (seconds > 60) {
+    seconds = 0;
+    minutes ++;
+    appendSeconds.innterHTML = "00";
+    appendMinutes.innterHTML = "0" + minutes;
+  }
+  if (minutes < 9) {
+    appendMinutes.innerHTML = "0" + minutes;
+  }
+  if (minutes > 9) {
+    appendMinutes.innerHTML = minutes;
+  }
+  if (minutes > 60) {
+    minutes = 0;
+    hours ++;
+    appendMinutes.innterHTML = "00";
+    appendHours.innterHTML = "0" + hours;
+  }
+  if (hours < 9) {
+    appendHours.innerHTML = "0" + hours;
+  }
+  if (hours > 9) {
+    appendHours.innerHTML = hours;
+  }
+}
+
+createNameInput();
 createInput();
 initGame();
