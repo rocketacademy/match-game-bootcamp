@@ -4,6 +4,7 @@ const boardSize = 4;
 const board = [];
 let firstCard = null;
 let firstCardElement;
+let boardElement;
 let playerName;
 let deck;
 let newGame = true;
@@ -20,6 +21,10 @@ submitButton.setAttribute('id', 'submit-button');
 // input.setAttribute('id', 'input-field');
 submitButton.innerText = 'Submit';
 instructions.innerHTML = 'Please input name to play:';
+
+// DOM for reset button
+// const resetButton = document.createElement('button');
+// resetButton.innerHTML = 'Reset Game';
 
 // Append onto nameDiv
 nameDiv.appendChild(instructions);
@@ -45,10 +50,13 @@ const updateResult = (gameOutput) => {
 const timer = document.createElement('div');
 
 // Function to show timer in minutes and seconds
-const millisToMinutesAndSeconds = (millis) => {
-  const minutes = Math.floor(millis / 60000);
-  const seconds = ((millis % 60000) / 1000).toFixed(0);
-  return `${minutes}:${(seconds < 10 ? '0' : '')}${seconds}`;
+const convertMinutesAndSeconds = (value) => {
+  const sec = parseInt(value, 10); // convert value to number if it's string
+  let minutes = Math.floor(sec / 60); // get minutes
+  let seconds = sec - (minutes * 60); //  get seconds
+  if (minutes < 10) { minutes = `0${minutes}`; }
+  if (seconds < 10) { seconds = `0${seconds}`; }
+  return `${minutes}:${seconds}`; // Return is HH : MM : SS
 };
 
 // Make card deck
@@ -122,17 +130,23 @@ const squareClick = (cardElement, column, row) => {
   // Set a timer during first click
   if (newGame === true) {
     newGame = false;
-    let milliseconds = 180000;
+    let seconds = 2;
+    // Append timer
     document.body.appendChild(timer);
-
-    // Count down from 180000
+    // Count down from 3 minutes
     const ref = setInterval(() => {
-      timer.innerText = millisToMinutesAndSeconds(milliseconds);
-      if (milliseconds <= 0) {
+      timer.innerText = convertMinutesAndSeconds(seconds);
+      if (seconds <= 0) {
+        updateResult('Times up!');
         clearInterval(ref);
+        if (currentScore < maxScore) {
+          setTimeout(() => {
+            updateResult('You lose!');
+          }, 1000);
+        }
       }
-      milliseconds -= 1;
-    }, 0);
+      seconds -= 1;
+    }, 1000);
   }
   console.log(cardElement);
 
@@ -192,7 +206,7 @@ const squareClick = (cardElement, column, row) => {
 // return the built board
 const buildBoardElements = (board) => {
   // create the element that everything will go inside of
-  const boardElement = document.createElement('div');
+  boardElement = document.createElement('div');
 
   // give it a class for CSS purposes
   boardElement.classList.add('board');
@@ -250,6 +264,16 @@ const initGame = () => {
   document.body.appendChild(boardEl);
 };
 
+// const resetGame = (ref) => {
+//   newGame = true;
+//   // Clear timer
+//   currentScore = 0;
+//   board = [];
+//   boardElement.remove();
+//   // init game again
+//   initGame();
+// };
+
 // Function to ask for playerName
 const getName = () => {
   playerName = input.value;
@@ -262,6 +286,8 @@ const getName = () => {
     startGame();
   }
   document.body.appendChild(gameResult);
+  // document.body.appendChild(resetButton);
+  // resetButton.addEventListener('click', resetGame);
 };
 
 // Function to display nameDiv div
