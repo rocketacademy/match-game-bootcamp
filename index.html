@@ -1,13 +1,37 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>SWE101</title>
+    <title>Match Game</title>
     <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
   </head>
 
   <body>
-    <h1 id="header">SWE101! 🚀</h1>
+    <h1 id="header">♣️ Match Game ♣️</h1>
+    <div id="win-tracker"></div>
     <!-- Import program logic -->
+    <div id="stop-watch">
+      <div id="lap-data">Lap Data</div>
+      <div id="right-watch">
+        <div id="elapsed-time">
+          Elapsed Time
+          <p id="timing"></p>
+        </div>
+        <div>
+          <button class="button" id="start-button">Start</button>
+          <button class="button" id="stop-button">Stop</button>
+        </div>
+        <div>
+          <button class="button" id="lap-button">Lap</button>
+          <button class="button" id="reset-button">Reset</button>
+          <button class="button" id="reset-game-button">Reset Game</button>
+        </div>
+      </div>
+    </div>
+
     <script src="script.js"></script>
   </body>
 </html>
