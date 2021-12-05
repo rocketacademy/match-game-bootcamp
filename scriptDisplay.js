@@ -24,7 +24,7 @@ document.body.appendChild(gamerName);
 // boardSize.setAttribute('boardSize', 'size');
 // boardSize.setAttribute('placeholder', "Put in Board Size");
 // document.body.appendChild(boardSize);
-const boardSize = 4;
+const boardSize = 2;
 let board = [];
 let firstCard = null;
 let firstCardElement;
@@ -64,15 +64,6 @@ resetbutton.onclick = function () {
   // existingBoard.innerHTML = '';
   // existingBoard = null;
   // board = [];
-
-  clearInterval(ref);
-  // clock.innerText = delayInMilliseconds;
-  // counter -= 1;
-
-  setInterval(() => {
-    clock.innerText = delayInMilliseconds;
-    delayInMilliseconds -= 1;
-  });
 
   gamerName.value = '';
   congrats.innerText = '';
@@ -132,6 +123,7 @@ const squareClick = async (cardElement, column, row) => {
       cardDisplay = createCard(clickedCard);
       cardElement.appendChild(cardDisplay);
       wins += 1;
+      console.log('boardSize', boardSize, wins);
       if (wins === (boardSize * boardSize) / 2) {
         congrats.innerText = 'Congratulations ' + gamerName.value;
         clearInterval(ref);
@@ -172,19 +164,10 @@ const squareClick = async (cardElement, column, row) => {
 
 console.log('starting...');
 
-let delayInMilliseconds = 180000; // 3 mins to complete
-let counter = delayInMilliseconds;
-
-let ref = setInterval(() => {
-  clock.innerText = counter;
-  counter -= 1;
-
-  if (counter === -1) {
-    clearInterval(ref);
-    announcement.innerText = 'stop playing. game over';
-    boardElement.innerText = '';
-  }
-}, 1);
+let delayInMilliseconds = 1000; // 3 mins to complete
+let delayInSeconds = 10; // 3 mins to complete
+let counter;
+let ref;
 
 // Create a visual card from sample card
 const createCard = (cardInfo) => {
@@ -362,6 +345,26 @@ const initGame = () => {
   boardEl.id = 'game-board';
 
   document.body.appendChild(boardEl);
+
+  // INIT
+  wins = 0;
+  counter = delayInSeconds; // delayInMilliseconds;
+  if (ref) {
+    clearInterval(ref);
+    ref = null;
+  }
+
+  // initialie a timeout case
+  ref = setInterval(() => {
+    clock.innerText = counter;
+    counter -= 1;
+    if (counter < 0) {
+      clearInterval(ref);
+      ref = null;
+      announcement.innerText = 'stop playing. game over';
+      boardElement.innerText = '';
+    }
+  }, 1000);
 };
 
 const getRandomIndex = function (max) {
