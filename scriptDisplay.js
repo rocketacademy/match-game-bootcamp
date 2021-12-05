@@ -68,17 +68,18 @@ resetbutton.onclick = function () {
   clearInterval(ref);
   // clock.innerText = delayInMilliseconds;
   // counter -= 1;
-  
+
   setInterval(() => {
-  clock.innerText = delayInMilliseconds;
-  delayInMilliseconds -= 1;})
-  
+    clock.innerText = delayInMilliseconds;
+    delayInMilliseconds -= 1;
+  });
+
   gamerName.value = '';
   congrats.innerText = '';
 
   initGame();
   // return counter
-  }
+};
 document.body.appendChild(resetbutton);
 
 // Gameplay Logic
@@ -133,6 +134,7 @@ const squareClick = async (cardElement, column, row) => {
       wins += 1;
       if (wins === (boardSize * boardSize) / 2) {
         congrats.innerText = 'Congratulations ' + gamerName.value;
+        clearInterval(ref);
         counter = '';
         clockWords.innerText = '';
       }
