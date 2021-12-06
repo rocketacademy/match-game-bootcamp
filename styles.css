@@ -1,3 +1,44 @@
 body {
-  background-color: pink;
+  background-color: lightgrey;
+}
+
+.square {
+  padding: 50px;
+  margin: 10px;
+  background-color: white;
+  display: inline-block;
+  border-radius: 8px;
+  height: 50px;
+  width: 10px;
+  vertical-align: top;
+}
+
+.input {
+  padding: auto;
+  margin: auto;
+}
+
+.card {
+  padding: 50px;
+  margin: 10px;
+  background-color: white;
+  width: 10px;
+  height: 50px;
+  text-align: center;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+​ .suit {
+  margin: 5px;
+  font-size: 20px;
+}
+
+​ .messageBoard {
+  background-color: white;
+  padding: 10px;
+  margin: 10px;
+  width: 480px;
+  border-radius: 5px;
+  text-align: center;
 }
