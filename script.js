@@ -160,22 +160,26 @@ const makeDeck = () => {
   const suitSymbols = ['♥', '♦️', '♣', '♠'];
   const suitColours = ['red', 'red', 'black', 'black'];
 
-  for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
-    // make a variable of the current suit
-    const currentSuit = suits[suitIndex];
-    console.log(`current suit: ${currentSuit}`);
-    const currentSuitSymbol = suitSymbols[suitIndex];
-    const currentColour = suitColours[suitIndex];
+  // #### reverse the for loop for rankCounter and for loop for suitIndex so that both cards
+  // will have different suits
+  // refer to console.log in line 317
 
-    // Loop from 1 to 13 to create all cards for a given suit
-    // Notice rankCounter starts at 1 and not 0, and ends at 13 and not 12.
-    // This is an example of a loop without an array.
-    for (let rankCounter = 1; rankCounter <= 13; rankCounter += 1) {
-      // Convert rankCounter to string
-      let cardName = `${rankCounter}`;
-      let displayName = `${rankCounter}`;
-      // following code will keep display heart suits
-      // let suitSymbol = `${currentSuitSymbol}`;
+  // Loop from 1 to 13 to create all cards for a given suit
+  // Notice rankCounter starts at 1 and not 0, and ends at 13 and not 12.
+  // This is an example of a loop without an array.
+  for (let rankCounter = 1; rankCounter <= 13; rankCounter += 1) {
+    // Convert rankCounter to string
+    let cardName = `${rankCounter}`;
+    let displayName = `${rankCounter}`;
+    // following code will keep display heart suits
+    // let suitSymbol = `${currentSuitSymbol}`;
+
+    for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
+      // make a variable of the current suit
+      const currentSuit = suits[suitIndex];
+      console.log(`current suit: ${currentSuit}`);
+      const currentSuitSymbol = suitSymbols[suitIndex];
+      const currentColour = suitColours[suitIndex];
 
       // 1, 11, 12 ,13
       if (cardName === '1') {
@@ -218,7 +222,7 @@ const makeDeck = () => {
 // ### for comfortable qns > create a messageboard element
 const buildBoardElements = (board) => {
   // create the element that everything will go inside of
-  // const boardElement = document.createElement('div');
+  const boardElement = document.createElement('div');
 
   // give it a class for CSS purposes
   boardElement.classList.add('board');
@@ -311,6 +315,7 @@ const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   const doubleDeck = makeDeck();
+  console.log(doubleDeck);
 
   // to get 16 cards (boardSize * boardSize) out of the deck
   const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
