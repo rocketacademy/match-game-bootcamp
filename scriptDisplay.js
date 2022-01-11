@@ -9,23 +9,69 @@ const upperRightPosition = grid[0][1]; // 'B'
 const lowerLeftPosition = grid[1][0]; // 'Y'
 const lowerRightPosition = grid[1][1]; // 'Z'
 
+// Header to put in Player name
+const intro = document.createTextNode(' Welcome to Match Card Game. ');
+document.body.appendChild(intro);
+const gamerName = document.createElement('input');
+gamerName.setAttribute('type', 'text');
+gamerName.setAttribute('name', 'username');
+gamerName.setAttribute('placeholder', "Put in Gamer's name");
+document.body.appendChild(gamerName);
+
 // boardSize has to be an even number
-const boardSize = 4;
+// const boardSize = document.createElement('input');
+// boardSize.setAttribute('type', 'text');
+// boardSize.setAttribute('boardSize', 'size');
+// boardSize.setAttribute('placeholder', "Put in Board Size");
+// document.body.appendChild(boardSize);
+const boardSize = 2;
 let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let wins = 0;
 // create the element that everything will go inside of
 const boardElement = document.createElement('div');
-
 // delay or sleep function
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const announcement = document.createElement('div');
+// const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const announcement = document.createElement('h2');
 document.body.appendChild(announcement);
 
-const clock = document.createElement('div');
+// Timer to count dowm
+// const clockTimer = document.createTextNode('CountDown Timer:');
+// const clockSpace = document.createElement('div')
+// document.body.appendChild(clockSpace);
+// const clockTimer = document.createElement('label');
+// clockTimer.innerHTML = "CountDown "
+// clockSpace.appendChild(clockTimer);
+// const clockWords = document.createTextNode(' CountDown : ');
+const clockWords = document.createElement('div');
+clockWords.innerText = 'CountDown';
+document.body.appendChild(clockWords);
+const clock = document.createElement('h3');
 document.body.appendChild(clock);
+// clockTimer.clockSpace.insertBefore(clock, clockTimer.nextSibling);
 clock.innerText = '';
+
+const congrats = document.createElement('h2');
+document.body.appendChild(congrats);
+
+// Reset Game Button
+const resetbutton = document.createElement('button');
+resetbutton.innerText = 'reset game';
+// resetbutton.type = "reset"
+resetbutton.onclick = function () {
+  // existingBoard.innerHTML = '';
+  // existingBoard = null;
+  // board = [];
+
+  gamerName.value = '';
+  congrats.innerText = '';
+
+  initGame();
+  // return counter
+};
+document.body.appendChild(resetbutton);
 
 // Gameplay Logic
 const squareClick = async (cardElement, column, row) => {
@@ -48,9 +94,14 @@ const squareClick = async (cardElement, column, row) => {
     firstCard = clickedCard;
     // turn this card over
     cardElement.innerText = firstCard.name;
+    // create card visually to show at clicked box
+    cardDisplay = createCard(clickedCard);
+    cardElement.appendChild(cardDisplay);
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
+
+    console.log(`firstCardElement`, firstCardElement);
 
     // second turn
   } else {
@@ -68,18 +119,36 @@ const squareClick = async (cardElement, column, row) => {
 
       // turn this card over
       cardElement.innerText = clickedCard.name;
+      // create card visually to show at clicked box
+      cardDisplay = createCard(clickedCard);
+      cardElement.appendChild(cardDisplay);
+      wins += 1;
+      console.log('boardSize', boardSize, wins);
+      if (wins === (boardSize * boardSize) / 2) {
+        congrats.innerText = 'Congratulations ' + gamerName.value;
+        clearInterval(ref);
+        counter = '';
+        clockWords.innerText = '';
+      }
+      // else if () {
+      //   congrats.innerText = 'Sorry ' + gamerName.value + " Game over";
+      // }
     } else {
       console.log('NOT a match');
 
       // turn this card over
       cardElement.innerText = clickedCard.name;
+      // create card visually to show at clicked box
+      cardDisplay = createCard(clickedCard);
+      cardElement.appendChild(cardDisplay);
+      // cardElement.innerHTML = createCard(clickedCard);
 
       // delay time to turn over the 2 exposed wrong cards
       setTimeout(() => {
         // turn this card back over
         firstCardElement.innerText = '';
         cardElement.innerText = '';
-      }, 1000);
+      }, 800);
 
       // await sleep(1000);
 
@@ -95,21 +164,29 @@ const squareClick = async (cardElement, column, row) => {
 
 console.log('starting...');
 
-const delayInMilliseconds = 180000; // 3 mins to complete
-let counter = delayInMilliseconds;
+let delayInMilliseconds = 1000; // 3 mins to complete
+let delayInSeconds = 10; // 3 mins to complete
+let counter;
+let ref;
 
-const ref = setInterval(() => {
-  clock.innerText = counter;
-  counter -= 1;
+// Create a visual card from sample card
+const createCard = (cardInfo) => {
+  const suit = document.createElement('div');
+  suit.classList.add('suit', cardInfo.colour);
+  suit.innerText = cardInfo.suitSymbol;
 
-  if (counter === 0) {
-    clearInterval(ref);
-    announcement.innerText = 'stop playing. game over';
-    boardElement.innerText = '';
-  }
-}, 1);
+  const name = document.createElement('div');
+  name.classList.add(cardInfo.displayName, cardInfo.colour);
+  name.innerText = cardInfo.displayName;
 
-console.log('bananas!');
+  const card = document.createElement('div');
+  card.classList.add('card');
+
+  card.appendChild(name);
+  card.appendChild(suit);
+
+  return card;
+};
 
 // Game Initialisation Logic
 // create all the board elements that will go on the screen
@@ -231,6 +308,13 @@ const makeDeck = () => {
 };
 
 const initGame = () => {
+  let existingBoard = document.querySelector('#game-board');
+  // to reset the board to empty
+  if (existingBoard) {
+    existingBoard.innerHTML = '';
+    existingBoard = null;
+    board = [];
+  }
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   let doubleDeck = makeDeck();
@@ -253,12 +337,34 @@ const initGame = () => {
     board.push([]);
     for (let j = 0; j < boardSize; j += 1) {
       board[i].push(deck.pop());
+      // console.log(deck.pop())
     }
   }
 
   const boardEl = buildBoardElements(board);
+  boardEl.id = 'game-board';
 
   document.body.appendChild(boardEl);
+
+  // INIT
+  wins = 0;
+  counter = delayInSeconds; // delayInMilliseconds;
+  if (ref) {
+    clearInterval(ref);
+    ref = null;
+  }
+
+  // initialie a timeout case
+  ref = setInterval(() => {
+    clock.innerText = counter;
+    counter -= 1;
+    if (counter < 0) {
+      clearInterval(ref);
+      ref = null;
+      announcement.innerText = 'stop playing. game over';
+      boardElement.innerText = '';
+    }
+  }, 1000);
 };
 
 const getRandomIndex = function (max) {
