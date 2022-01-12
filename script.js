@@ -86,14 +86,6 @@ const newCardGrid = (boardSide) => {
   return board;
 };
 
-const flipDown = (cardItem) => {
-  const { element } = cardItem;
-  while (element.firstChild) {
-    element.removeChild(myNode.lastChild);
-  }
-  cardItem.faceUp = false;
-};
-
 const newElementCardSuit = (suit) => {
   const element = document.createElement(`div`);
   element.innerText = `${suit}`;
@@ -107,13 +99,25 @@ const newElementCardName = (suit) => {
   element.className += ` ${CLASS_CARD_NAME}`;
   return element;
 };
+
+const setBackGroundColor = (element, color) =>
+  (element.style.backgroundColor = color);
+
+const flipDown = (cardItem) => {
+  const { element } = cardItem;
+  while (element.firstChild) {
+    element.removeChild(myNode.lastChild);
+  }
+  setBackGroundColor(element, ``);
+  cardItem.faceUp = false;
+};
+
 const flipUp = (cardItem) => {
   const { element, value } = cardItem;
-  console.log(cardItem);
   const { suit, name } = value;
   const elementCardSuit = newElementCardSuit(suit);
   const elementCardName = newElementCardName(name);
-
+  setBackGroundColor(element, `white`);
   element.replaceChildren(elementCardName, elementCardSuit);
   cardItem.faceUp = true;
 };
@@ -124,7 +128,6 @@ const isGameFreeze = ({ state }) => {
 
 const setGameFreeze = (game) => {
   console.log(`game freeze`);
-
   game.state.isFreeze = true;
 };
 const setGameUnFreeze = (game) => (game.state.isFreeze = false);
