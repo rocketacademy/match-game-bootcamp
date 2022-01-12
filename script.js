@@ -54,7 +54,8 @@ const makeShuffledDeck = (noOfPairs, shuffle = true) => {
       suit: currentSuit,
       rank: rankCounter,
     };
-    newDeck.push(card);
+
+    newDeck.push(card); // same obj ref
     newDeck.push(card);
 
     pairIndex += 1;
@@ -130,7 +131,50 @@ const setGameFreeze = (game) => {
   console.log(`game freeze`);
   game.state.isFreeze = true;
 };
-const setGameUnFreeze = (game) => (game.state.isFreeze = false);
+const setGameUnFreeze = (game) => {
+  console.log(`game unfreeze`);
+  game.state.isFreeze = false;
+};
+
+const getActiveCardsLength = (game) => game.state.activeCardItemsFlipped.length;
+
+const deactiveActiveCardItems = () => {};
+
+const unflipActiveCards = (cardItems) => {
+  for (const cardItem of cardItems) {
+    const { element } = cardItem;
+    flipDown(cardItem);
+  }
+};
+const isMatchingCards = (cardA, cardB) => cardA === cardB;
+const settle = (game) => {
+  console.group(`Two cards clicked`);
+  const { state } = game;
+  const { activeCardItemsFlipped } = state;
+  // activeCardItemsFlipped.length === 2;
+
+  const [cardItemA, cardItemB] = activeCardItemsFlipped;
+
+  if (isMatchingCards(cardItemA.value, cardItemB.value)) {
+    console.log(`Matching!`);
+  } else {
+    console.log(`Not Matching!`);
+    setGameFreeze(game);
+    setTimeout(() => {
+      setGameUnFreeze(game);
+      unflipActiveCards(activeCardItemsFlipped);
+    }, 1500);
+  }
+  deactiveActiveCardItems(game);
+
+  console.groupEnd();
+};
+
+const addActiveCardItem = (game, cardItem) => {
+  const { element } = cardItem;
+  element.style.border = `1px solid #9acd32`;
+  game.state.activeCardItemsFlipped.push(cardItem);
+};
 const newElementCard = (cardItem, game) => {
   const element = document.createElement(`div`);
   element.className += ` ${CLASS_CARD}`;
@@ -143,13 +187,17 @@ const newElementCard = (cardItem, game) => {
       console.log(`Game is frozen`);
       return;
     }
-
-    setGameFreeze(game);
-    setTimeout(() => {
-      setGameUnFreeze(game);
-    }, 3000);
-
     flipUp(cardItem);
+    addActiveCardItem(game, cardItem);
+
+    const activeCardsLength = getActiveCardsLength(game);
+    console.log(`active cards length ${activeCardsLength}`);
+    if (activeCardsLength === 2) {
+      settle(game);
+      return;
+    } else {
+      // activeCardsLength < 2;
+    }
   });
   cardItem.element = element;
   return element;
@@ -180,7 +228,7 @@ const main = (boardSide, elementRoot) => {
         return { value, faceUp: false };
       });
     }),
-    state: { isFreeze: false, activeCardsFlipped: [] },
+    state: { isFreeze: false, activeCardItemsFlipped: [] },
   };
 
   initGame(game, elementRoot);
