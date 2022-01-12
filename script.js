@@ -84,8 +84,7 @@ const shuffleCards = (cards) => {
 
 // What happens when user clicks on a square
 const squareClick = (cardElement, row, column) => {
-	console.log(cardElement);
-	console.log('FIRST CARD DOM ELEMENT', firstCard);
+	console.log('CURRENT FIRST CARD', firstCard);
 	console.log('BOARD CLICKED CARD', board[row][column]);
 
 	// Store the clicked card
@@ -98,11 +97,11 @@ const squareClick = (cardElement, row, column) => {
 
 	// First turn
 	if (firstCard === null) {
-		console.log('First card');
+		console.log('First card picked');
 		// Set the firstCard to the card that was clicked
 		firstCard = clickedCard;
 		// "Turn the card over" by showing the card name in the square
-		cardElement.innerText = firstCard.name;
+		cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
 
 		// Hold on to this first in case second card doesn't match
 		firstCardElement = cardElement;
@@ -110,17 +109,17 @@ const squareClick = (cardElement, row, column) => {
 
 	// Second turn
 	else {
-		console.log('Second card');
+		console.log('Second card picked...');
 
 		// If it's a match
 		if (
-			clickedCard.name === firstCard.name
-			// include suit later
+			clickedCard.name === firstCard.name &&
+			clickedCard.suit === firstCard.suit
 		) {
 			console.log('MATCH');
 
 			// "Turn the card over" by showing the card name in the square
-			cardElement.innerText = clickedCard.name;
+			cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
 		}
 
 		// If it's not a match
