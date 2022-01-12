@@ -1,10 +1,13 @@
+const CLASS_CARD_ITEMS = `match-card-items`;
+const CLASS_CARD_ROW = `match-card-row`;
 const CLASS_CARD = `match-card`;
 const CLASS_CARD_SUIT = `match-card-suit`;
 const CLASS_CARD_NAME = `match-card-name`;
 
 const CLASS_BANNER = `match-banner`;
 
-const SUITS = ["hearts", "diamonds", "clubs", "spades"];
+const SUITS = ["❤️", "💎", "♣️", "♠️"];
+
 const shuffleCards = (cards) => {
   const length = cards.length;
   for (let i = 0; i < length; i += 1) {
@@ -88,45 +91,98 @@ const flipDown = (cardItem) => {
   while (element.firstChild) {
     element.removeChild(myNode.lastChild);
   }
+  cardItem.faceUp = false;
 };
 
+const newElementCardSuit = (suit) => {
+  const element = document.createElement(`div`);
+  element.innerText = `${suit}`;
+  element.className += ` ${CLASS_CARD_SUIT}`;
+  return element;
+};
+
+const newElementCardName = (suit) => {
+  const element = document.createElement(`div`);
+  element.innerText = `${suit}`;
+  element.className += ` ${CLASS_CARD_NAME}`;
+  return element;
+};
 const flipUp = (cardItem) => {
   const { element, value } = cardItem;
-
+  console.log(cardItem);
   const { suit, name } = value;
   const elementCardSuit = newElementCardSuit(suit);
   const elementCardName = newElementCardName(name);
 
   element.replaceChildren(elementCardName, elementCardSuit);
+  cardItem.faceUp = true;
 };
 
-const newElementCard = (value, game) => {};
+const isGameFreeze = ({ state }) => {
+  return state.isFreeze;
+};
 
-const initGame = (game) => {
+const setGameFreeze = (game) => {
+  console.log(`game freeze`);
+
+  game.state.isFreeze = true;
+};
+const setGameUnFreeze = (game) => (game.state.isFreeze = false);
+const newElementCard = (cardItem, game) => {
+  const element = document.createElement(`div`);
+  element.className += ` ${CLASS_CARD}`;
+  element.addEventListener(`click`, () => {
+    if (cardItem.faceUp) {
+      console.log(`already face up.....`);
+      return;
+    }
+    if (isGameFreeze(game)) {
+      console.log(`Game is frozen`);
+      return;
+    }
+
+    setGameFreeze(game);
+    setTimeout(() => {
+      setGameUnFreeze(game);
+    }, 3000);
+
+    flipUp(cardItem);
+  });
+  cardItem.element = element;
+  return element;
+};
+
+const initGame = (game, elementRoot) => {
   const { cardItems } = game;
 
+  const elementCardItems = document.createElement(`div`);
+  elementCardItems.className += ` ${CLASS_CARD_ITEMS}`;
+
   for (const cardRow of cardItems) {
+    const elementCardRow = document.createElement(`div`);
+    elementCardRow.className += ` ${CLASS_CARD_ROW}`;
     for (const cardItem of cardRow) {
-      const { value } = cardItem;
-      const elementCard = newElementCard(value, game);
-      cardItem.value = elementCard;
+      const elementCard = newElementCard(cardItem, game);
+      elementCardRow.appendChild(elementCard);
     }
+    elementCardItems.appendChild(elementCardRow);
   }
+  elementRoot.appendChild(elementCardItems);
 };
-const main = (boardSide) => {
+const main = (boardSide, elementRoot) => {
   const cardGridValues = newCardGrid(boardSide);
   const game = {
     cardItems: cardGridValues.map((row) => {
       return row.map((value) => {
-        return { value };
+        return { value, faceUp: false };
       });
     }),
-    state: { activeCardsFlipped: [] },
+    state: { isFreeze: false, activeCardsFlipped: [] },
   };
 
-  initGame(game);
+  initGame(game, elementRoot);
 };
 
 const BOARD_SIDE = 6;
-
-main(BOARD_SIDE);
+const elementRoot = document.body;
+main(BOARD_SIDE, elementRoot);
