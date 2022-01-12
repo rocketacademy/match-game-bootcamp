@@ -75,7 +75,6 @@ const newCardGrid = (boardSide) => {
   // boardSize % 2 === 0;
   const pairs = boardSize / 2;
   const cards = makeShuffledDeck(pairs);
-  console.log(cards);
   const board = [];
   for (let i = 0; i < height; i += 1) {
     const row = [];
@@ -84,7 +83,7 @@ const newCardGrid = (boardSide) => {
     }
     board.push(row);
   }
-  return board;
+  return [board, boardSize];
 };
 
 const newElementCardSuit = (suit) => {
@@ -153,9 +152,14 @@ const unflipActiveCards = (cardItems) => {
     flipDown(cardItem);
   }
 };
+
+const isAllPairsMatch = (game) => game.state.unMatchedCardsCount === 0;
+const registerMatchingPair = (game) => {
+  game.state.unMatchedCardsCount -= 2; //
+};
 const isMatchingCards = (cardA, cardB) => cardA === cardB;
 const settle = (game) => {
-  console.group(`Two cards clicked`);
+  console.group(`[settle] Two cards clicked.`);
   const { state } = game;
   const { activeCardItemsFlipped } = state;
   // activeCardItemsFlipped.length === 2;
@@ -164,6 +168,7 @@ const settle = (game) => {
 
   if (isMatchingCards(cardItemA.value, cardItemB.value)) {
     console.log(`Matching!`);
+    registerMatchingPair(game);
     deactiveActiveCardItems(game);
   } else {
     console.log(`Not Matching!`);
@@ -173,6 +178,15 @@ const settle = (game) => {
       unflipActiveCards(activeCardItemsFlipped);
       deactiveActiveCardItems(game);
     }, 1500);
+  }
+
+  if (isAllPairsMatch(game)) {
+    console.log(`WIN`);
+
+    document.getElementById(
+      `header`
+    ).innerHTML = ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `;
+    setGameFreeze(game);
   }
 
   console.groupEnd();
@@ -201,9 +215,6 @@ const newElementCard = (cardItem, game) => {
     const activeCardsLength = getActiveCardsLength(game);
     if (activeCardsLength === 2) {
       settle(game);
-      return;
-    } else {
-      // activeCardsLength < 2;
     }
   });
   cardItem.element = element;
@@ -225,17 +236,25 @@ const initGame = (game, elementRoot) => {
     }
     elementCardItems.appendChild(elementCardRow);
   }
+
+  const elementDesc = document.createElement(`div`);
+  elementDesc.innerHTML = `Click two cards, you will have a short viewing time if cards are not matching. Game ends when all cards open. glhf!`;
   elementRoot.appendChild(elementCardItems);
+  elementRoot.appendChild(elementDesc);
 };
 const main = (boardSide, elementRoot) => {
-  const cardGridValues = newCardGrid(boardSide);
+  const [cardGridValues, cardsCount] = newCardGrid(boardSide);
   const game = {
     cardItems: cardGridValues.map((row) => {
       return row.map((value) => {
         return { value, faceUp: false };
       });
     }),
-    state: { isFreeze: false, activeCardItemsFlipped: [] },
+    state: {
+      isFreeze: false,
+      activeCardItemsFlipped: [],
+      unMatchedCardsCount: cardsCount,
+    },
   };
 
   initGame(game, elementRoot);
