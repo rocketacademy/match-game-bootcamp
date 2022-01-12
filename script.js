@@ -144,7 +144,6 @@ const deactiveActiveCardItems = (game) => {
     const { element } = cardItem;
     element.style.border = `1px solid black`;
   }
-
   game.state.activeCardItemsFlipped = [];
 };
 
@@ -200,7 +199,6 @@ const newElementCard = (cardItem, game) => {
     addActiveCardItem(game, cardItem);
 
     const activeCardsLength = getActiveCardsLength(game);
-    console.log(`active cards length ${activeCardsLength}`);
     if (activeCardsLength === 2) {
       settle(game);
       return;
