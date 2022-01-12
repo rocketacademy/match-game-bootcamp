@@ -1,5 +1,10 @@
-const SUITS = ["hearts", "diamonds", "clubs", "spades"];
+const CLASS_CARD = `match-card`;
+const CLASS_CARD_SUIT = `match-card-suit`;
+const CLASS_CARD_NAME = `match-card-name`;
 
+const CLASS_BANNER = `match-banner`;
+
+const SUITS = ["hearts", "diamonds", "clubs", "spades"];
 const shuffleCards = (cards) => {
   const length = cards.length;
   for (let i = 0; i < length; i += 1) {
@@ -59,6 +64,7 @@ const makeShuffledDeck = (noOfPairs, shuffle = true) => {
   return newDeck;
 };
 
+const FACE_DOWN_DESC = ``;
 const newCardGrid = (boardSide) => {
   const height = (width = boardSide);
   const boardSize = height * width;
@@ -76,16 +82,51 @@ const newCardGrid = (boardSide) => {
   }
   return board;
 };
-const initGame = (boardSide) => {
-  const cardGridValues = newCardGrid(boardSide);
-  const cardGrids = cardGridValues.map((value) => ({
-    value,
-    element: newElementCard,
-  }));
 
-  const game = {};
+const flipDown = (cardItem) => {
+  const { element } = cardItem;
+  while (element.firstChild) {
+    element.removeChild(myNode.lastChild);
+  }
+};
+
+const flipUp = (cardItem) => {
+  const { element, value } = cardItem;
+
+  const { suit, name } = value;
+  const elementCardSuit = newElementCardSuit(suit);
+  const elementCardName = newElementCardName(name);
+
+  element.replaceChildren(elementCardName, elementCardSuit);
+};
+
+const newElementCard = (value, game) => {};
+
+const initGame = (game) => {
+  const { cardItems } = game;
+
+  for (const cardRow of cardItems) {
+    for (const cardItem of cardRow) {
+      const { value } = cardItem;
+      const elementCard = newElementCard(value, game);
+      cardItem.value = elementCard;
+    }
+  }
+};
+const main = (boardSide) => {
+  const cardGridValues = newCardGrid(boardSide);
+  const game = {
+    cardItems: cardGridValues.map((row) => {
+      return row.map((value) => {
+        return { value };
+      });
+    }),
+    state: { activeCardsFlipped: [] },
+  };
+
+  initGame(game);
 };
 
 const BOARD_SIDE = 6;
 
-initGame(BOARD_SIDE);
+main(BOARD_SIDE);

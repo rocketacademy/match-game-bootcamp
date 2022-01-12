@@ -1,3 +1,76 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   background-color: pink;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.high-playing-area {
+  border: 1px dotted blue;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.high-mat {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 500px;
+  height: 300px;
+  padding: 30px;
+  background-color: white;
+}
+.high-seat-row {
+  display: flex;
+  width: 100%;
+  height: 80%;
+  border: 1px dotted grey;
+  justify-content: space-around;
+}
+.high-seat {
+  margin-top: 30px;
+  width: 50px;
+  height: 70px;
+  border: 1px dotted grey;
+  display: flex;
+  justify-content: center;
+}
+.match-banner {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  height: 30px;
+}
+.high-button-row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-around;
+}
+.match-card {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid black;
+}
+.match-card-suit {
+  display: flex;
+  text-align: center;
+  align-items: center;
+
+  justify-content: center;
+}
+.match-card-name {
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
 }
