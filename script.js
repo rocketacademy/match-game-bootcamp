@@ -107,7 +107,7 @@ const setBackGroundColor = (element, color) =>
 const flipDown = (cardItem) => {
   const { element } = cardItem;
   while (element.firstChild) {
-    element.removeChild(myNode.lastChild);
+    element.removeChild(element.lastChild);
   }
   setBackGroundColor(element, ``);
   cardItem.faceUp = false;
@@ -138,7 +138,15 @@ const setGameUnFreeze = (game) => {
 
 const getActiveCardsLength = (game) => game.state.activeCardItemsFlipped.length;
 
-const deactiveActiveCardItems = () => {};
+const deactiveActiveCardItems = (game) => {
+  const activeCardsItem = game.state.activeCardItemsFlipped;
+  for (const cardItem of activeCardsItem) {
+    const { element } = cardItem;
+    element.style.border = `1px solid black`;
+  }
+
+  game.state.activeCardItemsFlipped = [];
+};
 
 const unflipActiveCards = (cardItems) => {
   for (const cardItem of cardItems) {
@@ -157,15 +165,16 @@ const settle = (game) => {
 
   if (isMatchingCards(cardItemA.value, cardItemB.value)) {
     console.log(`Matching!`);
+    deactiveActiveCardItems(game);
   } else {
     console.log(`Not Matching!`);
     setGameFreeze(game);
     setTimeout(() => {
       setGameUnFreeze(game);
       unflipActiveCards(activeCardItemsFlipped);
+      deactiveActiveCardItems(game);
     }, 1500);
   }
-  deactiveActiveCardItems(game);
 
   console.groupEnd();
 };
