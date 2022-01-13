@@ -1,4 +1,7 @@
+/* <----- CSS Class Names ----> */
+
 const CLASS_CARD_ITEMS = `match-card-items`;
+
 const CLASS_CARD_ROW = `match-card-row`;
 const CLASS_CARD = `match-card`;
 const CLASS_CARD_SUIT = `match-card-suit`;
@@ -6,9 +9,12 @@ const CLASS_CARD_NAME = `match-card-name`;
 
 const CLASS_BANNER = `match-banner`;
 
-const SUITS = ["❤️", "💎", "♣️", "♠️"];
+/* <----- CONFIG ----> */
 
+const BOARD_SIDE = 6;
 const FREEZE_TIME = 3000;
+
+/* <----- CARDS ----> */
 
 const shuffleCards = (cards) => {
   const length = cards.length;
@@ -20,6 +26,7 @@ const shuffleCards = (cards) => {
 };
 
 const MAX_RANK = 13;
+const SUITS = ["❤️", "💎", "♣️", "♠️"];
 
 /**
  *
@@ -88,6 +95,11 @@ const newCardGrid = (boardSide) => {
   return [board, boardSize];
 };
 
+/* <----- UI Helpers ----> */
+
+const setBackGroundColor = (element, color) =>
+  (element.style.backgroundColor = color);
+
 const newElementCardSuit = (suit) => {
   const element = document.createElement(`div`);
   element.innerText = `${suit}`;
@@ -102,8 +114,54 @@ const newElementCardName = (suit) => {
   return element;
 };
 
-const setBackGroundColor = (element, color) =>
-  (element.style.backgroundColor = color);
+// TODO move addEventListener to new helper
+const newElementCard = (cardItem, game) => {
+  const element = document.createElement(`div`);
+  element.className += ` ${CLASS_CARD}`;
+  element.addEventListener(`click`, () => {
+    if (cardItem.faceUp) {
+      console.log(`already face up.....`);
+      return;
+    }
+    if (isGameFreeze(game)) {
+      console.log(`Game is frozen`);
+      return;
+    }
+    flipUp(cardItem);
+    addActiveCardItem(game, cardItem);
+
+    const activeCardsLength = getActiveCardsLength(game);
+    if (activeCardsLength === 2) {
+      settle(game);
+    }
+  });
+  cardItem.element = element;
+  return element;
+};
+
+/* <----- Logic Helpers ----> */
+
+const isGameFreeze = ({ state }) => state.isFreeze;
+const setGameFreeze = (game) => {
+  console.log(`game freeze`);
+  game.state.isFreeze = true;
+};
+const setGameUnFreeze = (game) => {
+  console.log(`game unfreeze`);
+  game.state.isFreeze = false;
+};
+const isAllPairsMatch = (game) => game.state.unMatchedCardsCount === 0;
+
+const getActiveCardsLength = (game) => game.state.activeCardItemsFlipped.length;
+
+const isMatchingCards = (cardA, cardB) => cardA === cardB;
+
+// Called when pair matches.
+const registerMatchingPair = (game) => {
+  game.state.unMatchedCardsCount -= 2; //
+};
+
+/* <----- UI-Logic Helpers ----> */
 
 const flipDown = (cardItem) => {
   const { element } = cardItem;
@@ -124,30 +182,6 @@ const flipUp = (cardItem) => {
   cardItem.faceUp = true;
 };
 
-const isGameFreeze = ({ state }) => {
-  return state.isFreeze;
-};
-
-const setGameFreeze = (game) => {
-  console.log(`game freeze`);
-  game.state.isFreeze = true;
-};
-const setGameUnFreeze = (game) => {
-  console.log(`game unfreeze`);
-  game.state.isFreeze = false;
-};
-
-const getActiveCardsLength = (game) => game.state.activeCardItemsFlipped.length;
-
-const deactiveActiveCardItems = (game) => {
-  const activeCardsItem = game.state.activeCardItemsFlipped;
-  for (const cardItem of activeCardsItem) {
-    const { element } = cardItem;
-    element.style.border = `1px solid black`;
-  }
-  game.state.activeCardItemsFlipped = [];
-};
-
 const unflipActiveCards = (cardItems) => {
   for (const cardItem of cardItems) {
     const { element } = cardItem;
@@ -155,11 +189,13 @@ const unflipActiveCards = (cardItems) => {
   }
 };
 
-const isAllPairsMatch = (game) => game.state.unMatchedCardsCount === 0;
-const registerMatchingPair = (game) => {
-  game.state.unMatchedCardsCount -= 2; //
+const addActiveCardItem = (game, cardItem) => {
+  const { element } = cardItem;
+  element.style.border = `1px solid #9acd32`;
+  game.state.activeCardItemsFlipped.push(cardItem);
 };
-const isMatchingCards = (cardA, cardB) => cardA === cardB;
+
+// Reconciliation after every two clicks.
 const settle = (game) => {
   console.group(`[settle] Two cards clicked.`);
   const { state } = game;
@@ -194,34 +230,17 @@ const settle = (game) => {
   console.groupEnd();
 };
 
-const addActiveCardItem = (game, cardItem) => {
-  const { element } = cardItem;
-  element.style.border = `1px solid #9acd32`;
-  game.state.activeCardItemsFlipped.push(cardItem);
+// Clean up function after every two clicks
+const deactiveActiveCardItems = (game) => {
+  const activeCardsItem = game.state.activeCardItemsFlipped;
+  for (const cardItem of activeCardsItem) {
+    const { element } = cardItem;
+    element.style.border = `1px solid black`;
+  }
+  game.state.activeCardItemsFlipped = [];
 };
-const newElementCard = (cardItem, game) => {
-  const element = document.createElement(`div`);
-  element.className += ` ${CLASS_CARD}`;
-  element.addEventListener(`click`, () => {
-    if (cardItem.faceUp) {
-      console.log(`already face up.....`);
-      return;
-    }
-    if (isGameFreeze(game)) {
-      console.log(`Game is frozen`);
-      return;
-    }
-    flipUp(cardItem);
-    addActiveCardItem(game, cardItem);
 
-    const activeCardsLength = getActiveCardsLength(game);
-    if (activeCardsLength === 2) {
-      settle(game);
-    }
-  });
-  cardItem.element = element;
-  return element;
-};
+/* <----- DRIVER ----> */
 
 const initGame = (game, elementRoot) => {
   const { cardItems } = game;
@@ -262,6 +281,5 @@ const main = (boardSide, elementRoot) => {
   initGame(game, elementRoot);
 };
 
-const BOARD_SIDE = 6;
 const elementRoot = document.body;
 main(BOARD_SIDE, elementRoot);
