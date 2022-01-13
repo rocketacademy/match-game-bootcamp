@@ -290,7 +290,6 @@ const showMatcheeMatchee = (game) => {
   const element = document.createElement(`div`);
   element.className += ` match-hit`;
   element.innerText = `HITTO`;
-  console.log(`appending ${delayOnMatched}`);
   console.log(element);
 
   elementParent.appendChild(element);
@@ -328,11 +327,15 @@ const settle = (game) => {
 
     if (isAllPairsMatch(game)) {
       console.log(`WIN`);
+      console.log(
+        `Last matching: ${cardItemA.value.rank}${cardItemA.value.suit}`
+      );
       document.getElementById(
         `header`
-      ).innerHTML = ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `;
+      ).innerHTML = ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `; // !!
       stopGameAndDisplayStopGame(game);
     } else {
+      console.log(`showing flash hit on ${cardItemA.value.rank}`);
       showMatcheeMatchee(game);
     }
   } else {
@@ -349,6 +352,12 @@ const settle = (game) => {
 };
 
 const stopGameAndDisplayStopGame = (game) => {
+  const { timerItem } = game;
+  // !!timerItem
+  const { gameDurationCountDownInterval } = timerItem;
+  // !!gameDurationCountDownInterval
+  clearInterval(gameDurationCountDownInterval);
+
   stopGame(game);
   displayStopGame(game);
 };
@@ -397,12 +406,11 @@ const startTimer = (game) => {
 
   setTimeValueLeftAndUpdateDisplay(timerItem);
 
-  const gameDurationCountDownInterval = setInterval(() => {
+  timerItem.gameDurationCountDownInterval = setInterval(() => {
     console.log(`timer started`);
     setTimeValueLeftAndUpdateDisplay(timerItem);
 
     if (exceedTime(timerItem)) {
-      clearInterval(gameDurationCountDownInterval);
       stopGameAndDisplayStopGame(game);
     }
   }, timeCheckInterval);
@@ -450,7 +458,11 @@ const main = (boardSide, elementRoot, timeSettings) => {
         return { value, faceUp: false, element: null };
       });
     }),
-    timerItem: { value: null, element: null },
+    timerItem: {
+      value: null,
+      element: null,
+      gameDurationCountDownInterval: null,
+    },
     state: {
       isPause: false,
       isStop: false,
