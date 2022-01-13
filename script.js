@@ -1,10 +1,15 @@
-// boardSize has to be an even number
 const boardSize = 4;
 const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
 let paused = false;
+
+const outputBox = document.createElement('div');
+
+const output = (message) => {
+  outputBox.innerText = message;
+};
 
 const squareClick = (cardElement, column, row) => {
   if (paused === false) {
@@ -40,7 +45,8 @@ const squareClick = (cardElement, column, row) => {
         && clickedCard.suit === firstCard.suit
       ) {
         console.log('match');
-
+        output("It's a match!");
+        setTimeout(() => output(''), 3000);
       // turn this card over
       // cardElement.innerText = clickedCard.name;
       } else {
@@ -179,6 +185,7 @@ const initGame = () => {
   const boardEl = buildBoardElements(board);
 
   document.body.appendChild(boardEl);
+  document.body.appendChild(outputBox);
 };
 
-document.addEventListener('DOMContentLoaded', initGame);
+initGame();
