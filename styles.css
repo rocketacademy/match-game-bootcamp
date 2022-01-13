@@ -47,3 +47,11 @@ body {
   align-items: center;
   justify-content: center;
 }
+.match-game-desc {
+  display: flex;
+  margin-top: 30px;
+  background-color: grey;
+  color: white;
+  padding: 3px 5px;
+  border-radius: 3px;
+}
