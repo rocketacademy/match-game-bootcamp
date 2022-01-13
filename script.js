@@ -18,6 +18,8 @@ const squareClick = (cardElement, column, row) => {
     
     console.log('BOARD CLICKED CARD', board[row][column]);
     
+    
+    
     const clickedCard = board[row][column]; 
     if(canClick === false){
       return
@@ -31,7 +33,7 @@ const squareClick = (cardElement, column, row) => {
       console.log('first turn');
       firstCard = clickedCard;
       // turn this card over
-      cardElement.innerText = firstCard.name;
+      cardElement.innerText = firstCard.name  + '\n' + firstCard.suit;
   
       // hold onto this for later when it may not match
       firstCardElement = cardElement;
@@ -41,7 +43,7 @@ const squareClick = (cardElement, column, row) => {
       {
       console.log('second turn');
       
-      cardElement.innerText = clickedCard.name
+      cardElement.innerText = clickedCard.name + '\n' + clickedCard.suit
       
       if (
         clickedCard.name === firstCard.name &&
@@ -63,7 +65,7 @@ const squareClick = (cardElement, column, row) => {
         }, 3000);
     
         // turn this card over
-        cardElement.innerText = clickedCard.name;
+        cardElement.innerText = clickedCard.name +'\n' + clickedCard.suit;
         // check that all card elements have inner text
 
         
@@ -126,6 +128,8 @@ const buildBoardElements = (board) => {
         // that we can change how it looks on screen, i.e.,
         // "turn the card over"
         squareClick(event.currentTarget, i, j);
+
+        
       });
 
       rowElement.appendChild(square);
@@ -187,7 +191,7 @@ const shuffleCards = (cards) => {
 const makeDeck = () => {
   // create the empty deck at the beginning
   const newDeck = [];
-  const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
+  const suits = ['♥', '♦', '♣', '♠'];
 
   for (let suitIndex = 0; suitIndex < suits.length; suitIndex += 1) {
     // make a variable of the current suit
