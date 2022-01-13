@@ -17,6 +17,8 @@ const BOARD_SIDE_DEFAULT = 4;
 const TIME_DEFAULT_FREEZE = 3000;
 const TIME_DEFAULT_FLASH_ON_MATCHED = 3000;
 
+const DEFAULT_CARD_COLOR = `lavender`;
+
 const SETTING_TIME_DEFAULTS = {
   freeze: TIME_DEFAULT_FREEZE,
   onMatched: TIME_DEFAULT_FLASH_ON_MATCHED,
@@ -192,7 +194,7 @@ const flipUp = (cardItem) => {
   const { suit, name } = value;
   const elementCardSuit = newElementCardSuit(suit);
   const elementCardName = newElementCardName(name);
-  setBackGroundColor(element, `white`);
+  setBackGroundColor(element, DEFAULT_CARD_COLOR);
   element.replaceChildren(elementCardName, elementCardSuit);
   cardItem.faceUp = true;
 };
