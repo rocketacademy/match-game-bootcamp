@@ -390,10 +390,11 @@ const commencePreGame = (game) => {
   elementRoot.appendChild(elementGameDesc);
   elementRoot.appendChild(elementStartGameButton);
 
-  elementStartGameButton.addEventListener(`click`, () => {
+  const onClickStartHandler = () => {
     clearGameDisplay(game);
     startGame(game);
-  });
+  };
+  elementStartGameButton.addEventListener(`click`, onClickStartHandler);
 };
 
 const startTimer = (game) => {
@@ -450,36 +451,38 @@ const startGame = (game) => {
   startTimer(game);
 };
 
-const newGame = (gameData) => {
-  const { config, elementRoot } = gameData;
-  const { boardSide, timeSettings } = config;
-
-  const [cardGridValues, cardsCount] = newCardGrid(boardSide);
+const newGame = (gameConfig) => {
+  const { boardSide, timeSettings, elementRoot } = gameConfig;
+  // Get a grid of cards
+  const [cardsIn2DArray, totalCardsCount] = newCardGrid(boardSide);
   const game = {
-    cardItems: cardGridValues.map((row) => {
+    // cardItems. Grid of cards has additional associated properties during the game
+    cardItems: cardsIn2DArray.map((row) => {
       return row.map((value) => {
         return { value, faceUp: false, element: null };
       });
     }),
+    // Timer
     timerItem: {
-      value: null,
+      value: { endTime: undefined, durationLeft: undefined },
       element: null,
       gameDurationCountDownInterval: null,
     },
+    // Game state
     state: {
       isPause: false,
       isStop: false,
-      activeCardItemsFlipped: [],
-      unMatchedCardsCount: cardsCount,
+      activeCardItemsFlipped: [], // Cards which are open temporarily.
+      unMatchedCardsCount: totalCardsCount,
     },
     // variables prefixed with __ should not change during game.
-    __startCardCount: cardsCount,
+    __startCardCount: totalCardsCount,
     __elementRoot: elementRoot,
     __timeSettings: timeSettings,
     __defaultElements: {
       elementGameDesc: newElementGameDesc(timeSettings.delayPause),
     },
-    _gameData: gameData,
+    _gameData: gameConfig,
   };
 
   return game;
@@ -496,12 +499,11 @@ const elementRoot = document.createElement(`div`);
 elementRoot.className += ` ${CLASS_ROOT}`;
 document.body.appendChild(elementRoot);
 
-const gameData = {
+const gameConfig = {
   elementRoot: elementRoot,
-
-  config: {
-    boardSide: BOARD_SIDE_DEFAULT,
-    timeSettings: TIME_DEFAULT_SETTINGS,
-  },
+  boardSide: BOARD_SIDE_DEFAULT,
+  timeSettings: TIME_DEFAULT_SETTINGS,
 };
-main(gameData);
+// <!--  START  -->
+// Flow: main -> commencePreGame -> onClickStartHandler:startGame -> (exceedTime OR isAllPairsMatch): stopGameAndDisplayStopGame
+main(gameConfig);
