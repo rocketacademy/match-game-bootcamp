@@ -26,7 +26,7 @@ const TIME_DEFAULT_GAME_DURATION = 3 * SEC_PER_MIN * MS_PER_SEC;
 const TIME_DEFAULT_TIME_CHECK_INTERVAL = 100;
 
 const TIME_DEFAULT_SETTINGS = {
-  pause: TIME_DEFAULT_DELAY_PAUSE,
+  delayPause: TIME_DEFAULT_DELAY_PAUSE,
   onMatched: TIME_DEFAULT_DELAY_FLASH_ON_MATCHED,
   gameDuration: TIME_DEFAULT_GAME_DURATION,
   timeCheckInterval: TIME_DEFAULT_TIME_CHECK_INTERVAL,
@@ -299,7 +299,7 @@ const settle = (game) => {
       unPauseGame(game);
       unflipActiveCards(activeCardItemsFlipped);
       deactiveActiveCardItems(game);
-    }, timeSettings.pause);
+    }, timeSettings.delayPause);
   }
 
   console.groupEnd();
@@ -430,7 +430,7 @@ const main = (boardSide, elementRoot, timeSettings) => {
     __elementRoot: elementRoot,
     __timeSettings: timeSettings,
     __defaultElements: {
-      elementGameDesc: newElementGameDesc(timeSettings.pause),
+      elementGameDesc: newElementGameDesc(timeSettings.delayPause),
     },
   };
   // Start Game
