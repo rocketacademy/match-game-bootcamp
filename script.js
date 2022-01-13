@@ -309,6 +309,9 @@ const startGame = (game) => {
     __defaultElements,
   } = game;
   const { elementGameDesc } = __defaultElements;
+
+  // !elementRoot.firstChild
+
   const elementCardItems = document.createElement(`div`);
   elementCardItems.className += ` ${CLASS_CARD_ITEMS}`;
 
