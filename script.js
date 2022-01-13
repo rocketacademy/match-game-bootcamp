@@ -17,7 +17,7 @@ const CLASS_ROOT = `match-root`;
 
 /*        <----- BOARD DIMENSION ----> */
 
-const BOARD_SIDE_DEFAULT = 2;
+const BOARD_SIDE_DEFAULT = 4;
 
 /*        <----- TIME ----> */
 
@@ -26,8 +26,7 @@ const TIME_DEFAULT_DELAY_FLASH_ON_MATCHED = 3000;
 
 const MS_PER_SEC = 1000;
 const SEC_PER_MIN = 60;
-// const TIME_DEFAULT_GAME_DURATION = 3 * SEC_PER_MIN * MS_PER_SEC;
-const TIME_DEFAULT_GAME_DURATION = 30000;
+const TIME_DEFAULT_GAME_DURATION = 3 * SEC_PER_MIN * MS_PER_SEC;
 
 const TIME_DEFAULT_TIME_CHECK_INTERVAL = 100;
 
