@@ -8,6 +8,8 @@ const CLASS_BANNER = `match-banner`;
 
 const SUITS = ["❤️", "💎", "♣️", "♠️"];
 
+const FREEZE_TIME = 3000;
+
 const shuffleCards = (cards) => {
   const length = cards.length;
   for (let i = 0; i < length; i += 1) {
@@ -177,7 +179,7 @@ const settle = (game) => {
       setGameUnFreeze(game);
       unflipActiveCards(activeCardItemsFlipped);
       deactiveActiveCardItems(game);
-    }, 1500);
+    }, FREEZE_TIME);
   }
 
   if (isAllPairsMatch(game)) {
