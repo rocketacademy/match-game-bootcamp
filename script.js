@@ -13,7 +13,7 @@ const CLASS_GAME_DESC = `match-game-desc`;
 
 /* <----- CONFIG ----> */
 
-const BOARD_SIDE_DEFAULT = 2;
+const BOARD_SIDE_DEFAULT = 4;
 const TIME_DEFAULT_FREEZE = 3000;
 const TIME_DEFAULT_FLASH_ON_MATCHED = 3000;
 
