@@ -225,7 +225,7 @@ const startTimer = () => {
 // Create container for timer
 const createTimerContainer = () => {
 	timerContainer.classList.add('timer-container');
-	timerContainer.innerHTML = `You have 1 minute to match all card pairs.<br>The time will start when you open your first card.`;
+	timerContainer.innerHTML = `<p>You have 3 minutes to match all card pairs, starting from when you open your first card.</p>`;
 	document.body.appendChild(timerContainer);
 
 	timer.classList.add('timer');

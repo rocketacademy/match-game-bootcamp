@@ -8,11 +8,30 @@ h1 {
 	color: darkmagenta;
 }
 
-.game-info-container {
+.timer-container {
 	color: darkmagenta;
-	font-size: 1.3em;
+	font-size: 1.2em;
 	background-color: plum;
 	border: 2px solid mediumorchid;
+	width: 50vw;
+	padding: 1em;
+	margin: 2em auto;
+}
+
+.timer-container p {
+	margin-top: 0.5em;
+}
+
+.timer {
+	font-size: 1.5em;
+}
+
+.game-info-container {
+	color: darkmagenta;
+	font-size: 1.2em;
+	background-color: plum;
+	border: 2px solid mediumorchid;
+	height: 2.5em;
 	width: 50vw;
 	padding: 1em;
 	margin: 2em auto;
@@ -25,9 +44,11 @@ h1 {
 	padding: 1em;
 	margin: 2em auto;
 }
+
 .square {
 	padding: 10px;
 	margin: 10px;
+	color: crimson;
 	background-color: darkmagenta;
 	display: inline-block;
 	height: 15px;
@@ -37,5 +58,5 @@ h1 {
 }
 
 .open-card {
-	background-color: white;
+	background-color: lavenderblush;
 }
