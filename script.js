@@ -11,18 +11,28 @@ const CLASS_BANNER = `match-banner`;
 
 const CLASS_GAME_DESC = `match-game-desc`;
 
+const CLASS_ROOT = `match-root`;
+
 /* <----- CONFIG ----> */
 
 const BOARD_SIDE_DEFAULT = 4;
-const TIME_DEFAULT_FREEZE = 3000;
-const TIME_DEFAULT_FLASH_ON_MATCHED = 3000;
+const TIME_DEFAULT_DELAY_PAUSE = 3000;
+const TIME_DEFAULT_DELAY_FLASH_ON_MATCHED = 3000;
 
-const DEFAULT_CARD_COLOR = `lavender`;
+const MS_PER_SEC = 1000;
+const SEC_PER_MIN = 60;
+// const TIME_DEFAULT_GAME_DURATION = 3 * SEC_PER_MIN * MS_PER_SEC;
+const TIME_DEFAULT_GAME_DURATION = 2000;
 
-const SETTING_TIME_DEFAULTS = {
-  freeze: TIME_DEFAULT_FREEZE,
-  onMatched: TIME_DEFAULT_FLASH_ON_MATCHED,
+const TIME_DEFAULT_TIME_CHECK_INTERVAL = 100;
+
+const TIME_DEFAULT_SETTINGS = {
+  pause: TIME_DEFAULT_DELAY_PAUSE,
+  onMatched: TIME_DEFAULT_DELAY_FLASH_ON_MATCHED,
+  gameDuration: TIME_DEFAULT_GAME_DURATION,
+  timeCheckInterval: TIME_DEFAULT_TIME_CHECK_INTERVAL,
 };
+const DEFAULT_CARD_COLOR = `lavender`;
 /* <----- CARDS ----> */
 
 const shuffleCards = (cards) => {
@@ -114,6 +124,10 @@ const detachAllChildren = (element) => {
 const setBackGroundColor = (element, color) =>
   (element.style.backgroundColor = color);
 
+const newElementDurationTime = () => {
+  const element = document.createElement(`div`);
+  return element;
+};
 const newElementCardSuit = (suit) => {
   const element = document.createElement(`div`);
   element.innerText = `${suit}`;
@@ -137,7 +151,7 @@ const newElementCardAndSetClickHandle = (cardItem, game) => {
       console.warn(`already face up.....`);
       return;
     }
-    if (isGameFreeze(game)) {
+    if (isGamePause(game)) {
       console.warn(`Game is frozen`);
       return;
     }
@@ -162,15 +176,26 @@ const newElementGameDesc = (freezeTime) => {
 
 /* <----- Logic Helpers ----> */
 
-const isGameFreeze = ({ state }) => state.isFreeze;
-const setGameFreeze = (game) => {
-  console.log(`game freeze`);
-  game.state.isFreeze = true;
+const isGamePause = (game) => game.state.isPause;
+const isGameStop = (game) => game.state.isStop;
+const pauseGame = (game) => {
+  console.log(`game pause`);
+  game.state.isPause = true;
 };
-const setGameUnFreeze = (game) => {
-  console.log(`game unfreeze`);
-  game.state.isFreeze = false;
+const unPauseGame = (game) => {
+  if (isGameStop(game)) {
+    console.log(`cannot pause`);
+    return;
+  }
+  console.log(`game unpause`);
+  game.state.isPause = false;
 };
+
+const stopGame = (game) => {
+  console.log(`💎🤲  GAMESTOP 💎🤲 `);
+  game.state.isStop = true;
+};
+
 const isAllPairsMatch = (game) => game.state.unMatchedCardsCount === 0;
 
 const getActiveCardsLength = (game) => game.state.activeCardItemsFlipped.length;
@@ -250,18 +275,18 @@ const settle = (game) => {
       document.getElementById(
         `header`
       ).innerHTML = ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `;
-      setGameFreeze(game);
+      pauseGame(game);
     } else {
       showMatcheeMatchee(game);
     }
   } else {
     console.log(`Not Matching!`);
-    setGameFreeze(game);
+    pauseGame(game);
     setTimeout(() => {
-      setGameUnFreeze(game);
+      unPauseGame(game);
       unflipActiveCards(activeCardItemsFlipped);
       deactiveActiveCardItems(game);
-    }, timeSettings.freeze);
+    }, timeSettings.pause);
   }
 
   console.groupEnd();
@@ -281,6 +306,8 @@ const deactiveActiveCardItems = (game) => {
 
 const clearGameDisplay = (game) => {
   const { __elementRoot: elementRoot } = game;
+  console.log(`detaching`);
+  console.log(elementRoot);
   detachAllChildren(elementRoot);
 };
 
@@ -301,17 +328,51 @@ const commencePreGame = (game) => {
     startGame(game);
   });
 };
+
+const getDurationLeft = (endTime) => endTime - new Date();
+
+const setTimeValueLeft = (timerItem) =>
+  (timerItem.value.durationLeft = getDurationLeft(timerItem.value.endTime));
+const setTimerElementDurationLeft = (timerItem) =>
+  (timerItem.element.innerText = `${timerItem.value.durationLeft}ms`);
+
+const exceedTime = (timerItem) => timerItem.value.durationLeft < 0;
+const startTimer = (game) => {
+  const { timerItem, __timeSettings: timeSettings } = game;
+  const { gameDuration, timeCheckInterval } = timeSettings;
+
+  const endTime = new Date();
+  endTime.setMilliseconds(endTime.getMilliseconds() + gameDuration);
+  timerItem.value = { endTime: endTime, durationLeft: null };
+
+  setTimeValueLeft(timerItem);
+  setTimerElementDurationLeft(timerItem);
+  const gameDurationCountDownInterval = setInterval(() => {
+    console.log(`timer started`);
+    setTimeValueLeft(timerItem);
+    setTimerElementDurationLeft(timerItem);
+
+    if (exceedTime(timerItem)) {
+      clearInterval(gameDurationCountDownInterval);
+      stopGame(game);
+    }
+  }, timeCheckInterval);
+};
 const startGame = (game) => {
   const {
     cardItems,
+    timerItem,
     __elementRoot: elementRoot,
-    __timeSettings: timeSettings,
     __defaultElements,
   } = game;
-  const { elementGameDesc } = __defaultElements;
 
+  const { elementGameDesc } = __defaultElements;
   // !elementRoot.firstChild
 
+  //
+  const elementDurationTime = newElementDurationTime(game);
+  timerItem.element = elementDurationTime;
+  // Create Card Elements
   const elementCardItems = document.createElement(`div`);
   elementCardItems.className += ` ${CLASS_CARD_ITEMS}`;
 
@@ -319,18 +380,17 @@ const startGame = (game) => {
     const elementCardRow = document.createElement(`div`);
     elementCardRow.className += ` ${CLASS_CARD_ROW}`;
     for (const cardItem of cardRow) {
-      const elementCard = newElementCardAndSetClickHandle(
-        cardItem,
-        game,
-        timeSettings
-      );
+      const elementCard = newElementCardAndSetClickHandle(cardItem, game);
       elementCardRow.appendChild(elementCard);
     }
     elementCardItems.appendChild(elementCardRow);
   }
 
+  elementRoot.appendChild(elementDurationTime);
   elementRoot.appendChild(elementCardItems);
   elementRoot.appendChild(elementGameDesc);
+
+  startTimer(game);
 };
 const main = (boardSide, elementRoot, timeSettings) => {
   // Initialize Game
@@ -341,9 +401,10 @@ const main = (boardSide, elementRoot, timeSettings) => {
         return { value, faceUp: false, element: null };
       });
     }),
-    timer: { value: null, element: null },
+    timerItem: { value: null, element: null },
     state: {
-      isFreeze: false,
+      isPause: false,
+      isStop: false,
       activeCardItemsFlipped: [],
       unMatchedCardsCount: cardsCount,
     },
@@ -351,7 +412,7 @@ const main = (boardSide, elementRoot, timeSettings) => {
     __elementRoot: elementRoot,
     __timeSettings: timeSettings,
     __defaultElements: {
-      elementGameDesc: newElementGameDesc(timeSettings.freeze),
+      elementGameDesc: newElementGameDesc(timeSettings.pause),
     },
   };
   // Start Game
@@ -359,5 +420,8 @@ const main = (boardSide, elementRoot, timeSettings) => {
   commencePreGame(game);
 };
 
-const elementRoot = document.body;
-main(BOARD_SIDE_DEFAULT, elementRoot, SETTING_TIME_DEFAULTS);
+const elementRoot = document.createElement(`div`);
+elementRoot.className += ` ${CLASS_ROOT}`;
+
+document.body.appendChild(elementRoot);
+main(BOARD_SIDE_DEFAULT, elementRoot, TIME_DEFAULT_SETTINGS);
