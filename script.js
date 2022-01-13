@@ -223,7 +223,7 @@ const showMatcheeMatchee = (game) => {
   elementParent.appendChild(element);
   setTimeout(() => {
     elementParent.removeChild(element);
-    console.log(`match hit desc timout`);
+    console.log(`time out match hit desc`);
   }, onMatchedTime);
 };
 
