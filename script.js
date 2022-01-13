@@ -449,8 +449,9 @@ const startGame = (game) => {
 
   startTimer(game);
 };
-const main = (boardSide, elementRoot, timeSettings) => {
-  // Initialize Game
+
+const newGame = (gameData) => {
+  const { boardSide, elementRoot, timeSettings } = gameData;
   const [cardGridValues, cardsCount] = newCardGrid(boardSide);
   const game = {
     cardItems: cardGridValues.map((row) => {
@@ -475,9 +476,16 @@ const main = (boardSide, elementRoot, timeSettings) => {
     __defaultElements: {
       elementGameDesc: newElementGameDesc(timeSettings.delayPause),
     },
+    _gameData: gameData,
   };
-  // Start Game
 
+  return game;
+};
+
+const main = (gameData) => {
+  // Initialize Game
+  const game = newGame(gameData);
+  // Commence
   commencePreGame(game);
 };
 
@@ -485,4 +493,9 @@ const elementRoot = document.createElement(`div`);
 elementRoot.className += ` ${CLASS_ROOT}`;
 
 document.body.appendChild(elementRoot);
-main(BOARD_SIDE_DEFAULT, elementRoot, TIME_DEFAULT_SETTINGS);
+const gameData = {
+  boardSide: BOARD_SIDE_DEFAULT,
+  elementRoot: elementRoot,
+  timeSettings: TIME_DEFAULT_SETTINGS,
+};
+main(gameData);
