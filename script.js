@@ -154,8 +154,6 @@ const newElementGameDesc = (freezeTime) => {
   return element;
 };
 
-const ELEMENT_DEFAULT_GAME_DESC = newElementGameDesc();
-
 /* <----- Logic Helpers ----> */
 
 const isGameFreeze = ({ state }) => state.isFreeze;
@@ -282,8 +280,9 @@ const startGame = (game) => {
     cardItems,
     __elementRoot: elementRoot,
     __settingTime: settingTime,
+    __defaultElements,
   } = game;
-
+  const { elementGameDesc } = __defaultElements;
   const elementCardItems = document.createElement(`div`);
   elementCardItems.className += ` ${CLASS_CARD_ITEMS}`;
 
@@ -301,7 +300,6 @@ const startGame = (game) => {
     elementCardItems.appendChild(elementCardRow);
   }
 
-  const elementGameDesc = newElementGameDesc(settingTime.freeze);
   elementRoot.appendChild(elementCardItems);
   elementRoot.appendChild(elementGameDesc);
 };
@@ -322,6 +320,9 @@ const main = (boardSide, elementRoot, settingTime) => {
     __startCardCount: cardsCount,
     __elementRoot: elementRoot,
     __settingTime: settingTime,
+    __defaultElements: {
+      elementGameDesc: newElementGameDesc(settingTime.freeze),
+    },
   };
   // Start Game
   startGame(game);
