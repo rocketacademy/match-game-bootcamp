@@ -451,7 +451,9 @@ const startGame = (game) => {
 };
 
 const newGame = (gameData) => {
-  const { boardSide, elementRoot, timeSettings } = gameData;
+  const { config, elementRoot } = gameData;
+  const { boardSide, timeSettings } = config;
+
   const [cardGridValues, cardsCount] = newCardGrid(boardSide);
   const game = {
     cardItems: cardGridValues.map((row) => {
@@ -470,6 +472,7 @@ const newGame = (gameData) => {
       activeCardItemsFlipped: [],
       unMatchedCardsCount: cardsCount,
     },
+    // variables prefixed with __ should not change during game.
     __startCardCount: cardsCount,
     __elementRoot: elementRoot,
     __timeSettings: timeSettings,
@@ -491,11 +494,14 @@ const main = (gameData) => {
 
 const elementRoot = document.createElement(`div`);
 elementRoot.className += ` ${CLASS_ROOT}`;
-
 document.body.appendChild(elementRoot);
+
 const gameData = {
-  boardSide: BOARD_SIDE_DEFAULT,
   elementRoot: elementRoot,
-  timeSettings: TIME_DEFAULT_SETTINGS,
+
+  config: {
+    boardSide: BOARD_SIDE_DEFAULT,
+    timeSettings: TIME_DEFAULT_SETTINGS,
+  },
 };
 main(gameData);
