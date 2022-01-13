@@ -15,23 +15,33 @@ const CLASS_ROOT = `match-root`;
 
 /* <----- CONFIG ----> */
 
+/*        <----- BOARD DIMENSION ----> */
+
 const BOARD_SIDE_DEFAULT = 4;
+
+/*        <----- TIME ----> */
+
 const TIME_DEFAULT_DELAY_PAUSE = 3000;
 const TIME_DEFAULT_DELAY_FLASH_ON_MATCHED = 3000;
 
 const MS_PER_SEC = 1000;
 const SEC_PER_MIN = 60;
-const TIME_DEFAULT_GAME_DURATION = 3 * SEC_PER_MIN * MS_PER_SEC;
+// const TIME_DEFAULT_GAME_DURATION = 3 * SEC_PER_MIN * MS_PER_SEC;
+const TIME_DEFAULT_GAME_DURATION = 3000;
 
 const TIME_DEFAULT_TIME_CHECK_INTERVAL = 100;
 
 const TIME_DEFAULT_SETTINGS = {
   delayPause: TIME_DEFAULT_DELAY_PAUSE,
-  onMatched: TIME_DEFAULT_DELAY_FLASH_ON_MATCHED,
+  delayOnMatched: TIME_DEFAULT_DELAY_FLASH_ON_MATCHED,
   gameDuration: TIME_DEFAULT_GAME_DURATION,
   timeCheckInterval: TIME_DEFAULT_TIME_CHECK_INTERVAL,
 };
+
+/*        <----- STYLE ----> */
+
 const DEFAULT_CARD_COLOR = `lavender`;
+
 /* <----- CARDS ----> */
 
 const shuffleCards = (cards) => {
@@ -114,14 +124,24 @@ const newCardGrid = (boardSide) => {
 
 /* <----- UI Helpers ----> */
 
-const detachAllChildren = (element) => {
-  while (element.lastChild) {
-    element.removeChild(element.lastChild);
-  }
-};
+/*        <----- PROPERTY CHANGE ----> */
 
 const setBackGroundColor = (element, color) =>
   (element.style.backgroundColor = color);
+const setElementBorder = (element, val) => (element.style.border = val);
+
+const setElementInnerText = (element, text) => {
+  element.innerHTML = text;
+};
+
+const displayStopGame = (game) => {
+  const {
+    __defaultElements: { elementGameDesc },
+  } = game;
+  setElementInnerText(elementGameDesc, `Game Ended`);
+};
+
+/*        <----- ELEMENT: PLAIN ----> */
 
 const newElementDurationTime = () => {
   const element = document.createElement(`div`);
@@ -141,7 +161,15 @@ const newElementCardName = (suit) => {
   return element;
 };
 
-// TODO move addEventListener to new helper
+const newElementGameDesc = (freezeTime) => {
+  const element = document.createElement(`div`);
+  element.innerHTML = `Click two cards, you will have a short viewing time of ${freezeTime}ms if cards are not matching. Game wins when all cards open. glhf!`;
+  element.className += ` ${CLASS_GAME_DESC}`;
+  return element;
+};
+
+/*        <----- ELEMENT: NOT PLAIN ----> */
+
 const newElementCardAndSetClickHandle = (cardItem, game) => {
   const element = document.createElement(`div`);
   element.className += ` ${CLASS_CARD}`;
@@ -170,28 +198,23 @@ const newElementCardAndSetClickHandle = (cardItem, game) => {
   return element;
 };
 
-const newElementGameDesc = (freezeTime) => {
-  const element = document.createElement(`div`);
-  element.innerHTML = `Click two cards, you will have a short viewing time of ${freezeTime}ms if cards are not matching. Game wins when all cards open. glhf!`;
-  element.className += ` ${CLASS_GAME_DESC}`;
-  return element;
-};
+/*        <----- POSITION ----> */
 
-const setElementGameDescText = (element, text) => {
-  element.innerHTML = text;
-};
-
-const displayStopGame = (game) => {
-  const {
-    __defaultElements: { elementGameDesc },
-  } = game;
-  setElementGameDescText(elementGameDesc, `Game Ended`);
+const detachAllChildren = (element) => {
+  while (element.lastChild) {
+    element.removeChild(element.lastChild);
+  }
 };
 
 /* <----- Logic Helpers ----> */
 
-const isGamePause = (game) => game.state.isPause;
 const isGameStop = (game) => game.state.isStop;
+const stopGame = (game) => {
+  console.log(`💎🤲  GAMESTOP 💎🤲 `);
+  game.state.isStop = true;
+};
+
+const isGamePause = (game) => game.state.isPause;
 const pauseGame = (game) => {
   console.log(`game pause`);
   game.state.isPause = true;
@@ -205,21 +228,14 @@ const unPauseGame = (game) => {
   game.state.isPause = false;
 };
 
-const stopGame = (game) => {
-  console.log(`💎🤲  GAMESTOP 💎🤲 `);
-  game.state.isStop = true;
-};
-
 const isAllPairsMatch = (game) => game.state.unMatchedCardsCount === 0;
+const registerMatchingPair = (game) => (game.state.unMatchedCardsCount -= 2);
 
 const getActiveCardsLength = (game) => game.state.activeCardItemsFlipped.length;
 
 const isMatchingCards = (cardA, cardB) => cardA === cardB;
 
-// Called when pair matches.
-const registerMatchingPair = (game) => {
-  game.state.unMatchedCardsCount -= 2; //
-};
+const getDurationLeft = (endTime) => endTime - new Date();
 
 /* <----- UI-Logic Helpers ----> */
 
@@ -228,6 +244,12 @@ const flipDown = (cardItem) => {
   detachAllChildren(element);
   setBackGroundColor(element, ``);
   cardItem.faceUp = false;
+};
+
+const flipDownCards = (cardItems) => {
+  for (const cardItem of cardItems) {
+    flipDown(cardItem);
+  }
 };
 
 const flipUp = (cardItem) => {
@@ -240,32 +262,26 @@ const flipUp = (cardItem) => {
   cardItem.faceUp = true;
 };
 
-const unflipActiveCards = (cardItems) => {
-  for (const cardItem of cardItems) {
-    flipDown(cardItem);
-  }
-};
-
 const addActiveCardItem = (game, cardItem) => {
   const { element } = cardItem;
-  element.style.border = `1px solid #9acd32`;
+  setElementBorder(element, `1px solid #9acd32`);
   game.state.activeCardItemsFlipped.push(cardItem);
 };
 
 const showMatcheeMatchee = (game) => {
   const { __elementRoot: elementParent, __timeSettings: timeSettings } = game;
-  const { onMatched: onMatchedTime } = timeSettings;
+  const { delayOnMatched } = timeSettings;
   const element = document.createElement(`div`);
   element.className += ` match-hit`;
   element.innerText = `HITTO`;
-  console.log(`appending ${onMatchedTime}`);
+  console.log(`appending ${delayOnMatched}`);
   console.log(element);
 
   elementParent.appendChild(element);
   setTimeout(() => {
     elementParent.removeChild(element);
     console.log(`time out match hit desc`);
-  }, onMatchedTime);
+  }, delayOnMatched);
 };
 
 // Reconciliation after every two clicks.
@@ -297,7 +313,7 @@ const settle = (game) => {
     pauseGame(game);
     setTimeout(() => {
       unPauseGame(game);
-      unflipActiveCards(activeCardItemsFlipped);
+      flipDownCards(activeCardItemsFlipped);
       deactiveActiveCardItems(game);
     }, timeSettings.delayPause);
   }
@@ -347,12 +363,12 @@ const commencePreGame = (game) => {
   });
 };
 
-const getDurationLeft = (endTime) => endTime - new Date();
-
 const setTimeValueLeft = (timerItem) =>
   (timerItem.value.durationLeft = getDurationLeft(timerItem.value.endTime));
-const setTimerElementDurationLeft = (timerItem) =>
-  (timerItem.element.innerText = `${timerItem.value.durationLeft}ms`);
+const setTimerElementDurationLeft = (timerItem) => {
+  const { element } = timerItem;
+  setElementInnerText(element, `${timerItem.value.durationLeft}ms`);
+};
 
 const exceedTime = (timerItem) => timerItem.value.durationLeft < 0;
 const startTimer = (game) => {
