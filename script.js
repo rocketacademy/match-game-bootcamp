@@ -120,11 +120,11 @@ const newElementCard = (cardItem, game) => {
   element.className += ` ${CLASS_CARD}`;
   element.addEventListener(`click`, () => {
     if (cardItem.faceUp) {
-      console.log(`already face up.....`);
+      console.warn(`already face up.....`);
       return;
     }
     if (isGameFreeze(game)) {
-      console.log(`Game is frozen`);
+      console.warn(`Game is frozen`);
       return;
     }
     flipUp(cardItem);
