@@ -21,8 +21,7 @@ const TIME_DEFAULT_DELAY_FLASH_ON_MATCHED = 3000;
 
 const MS_PER_SEC = 1000;
 const SEC_PER_MIN = 60;
-// const TIME_DEFAULT_GAME_DURATION = 3 * SEC_PER_MIN * MS_PER_SEC;
-const TIME_DEFAULT_GAME_DURATION = 2000;
+const TIME_DEFAULT_GAME_DURATION = 3 * SEC_PER_MIN * MS_PER_SEC;
 
 const TIME_DEFAULT_TIME_CHECK_INTERVAL = 100;
 
@@ -151,8 +150,12 @@ const newElementCardAndSetClickHandle = (cardItem, game) => {
       console.warn(`already face up.....`);
       return;
     }
+    if (isGameStop(game)) {
+      console.warn(`Game stopped.`);
+      return;
+    }
     if (isGamePause(game)) {
-      console.warn(`Game is frozen`);
+      console.warn(`Game is paused`);
       return;
     }
     flipUp(cardItem);
