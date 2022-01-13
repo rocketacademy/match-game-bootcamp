@@ -285,7 +285,17 @@ const clearGameDisplay = (game) => {
 };
 
 const commencePreGame = (game) => {
+  const { __elementRoot: elementRoot, __defaultElements } = game;
+  const { elementGameDesc } = __defaultElements;
+
   const elementStartGameButton = document.createElement(`button`);
+  const elementStartGameButtonDesc = document.createTextNode(`Start Game`);
+
+  elementStartGameButton.appendChild(elementStartGameButtonDesc);
+
+  elementRoot.appendChild(elementGameDesc);
+  elementRoot.appendChild(elementStartGameButton);
+
   elementStartGameButton.addEventListener(`click`, () => {
     clearGameDisplay(game);
     startGame(game);
