@@ -13,7 +13,7 @@ const CLASS_GAME_DESC = `match-game-desc`;
 
 const CLASS_ROOT = `match-root`;
 
-/* <----- CONFIG ----> */
+/* <----- DEFAULT CONFIG ----> */
 
 /*        <----- BOARD DIMENSION ----> */
 
@@ -40,6 +40,8 @@ const TIME_DEFAULT_SETTINGS = {
 /*        <----- STYLE ----> */
 
 const DEFAULT_CARD_COLOR = `lavender`;
+
+/* <----- END OF DEFAULT CONFIG ----> */
 
 /* <----- CARDS ----> */
 
@@ -488,6 +490,8 @@ const newGame = (gameConfig) => {
   return game;
 };
 
+// <!--  MAIN  -->
+
 const main = (gameData) => {
   // Initialize Game
   const game = newGame(gameData);
@@ -495,6 +499,7 @@ const main = (gameData) => {
   commencePreGame(game);
 };
 
+// append elementRoot of game to html body. elementRoot is root-level ancestor for all other game elements.
 const elementRoot = document.createElement(`div`);
 elementRoot.className += ` ${CLASS_ROOT}`;
 document.body.appendChild(elementRoot);
@@ -504,6 +509,5 @@ const gameConfig = {
   boardSide: BOARD_SIDE_DEFAULT,
   timeSettings: TIME_DEFAULT_SETTINGS,
 };
-// <!--  START  -->
 // Flow: main -> commencePreGame -> onClickStartHandler:startGame -> (exceedTime OR isAllPairsMatch): stopGameAndDisplayStopGame
 main(gameConfig);
