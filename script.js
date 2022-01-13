@@ -1,18 +1,42 @@
 const boardSize = 4;
 const board = [];
+const totalBoardArea = boardSize * boardSize;
 let firstCard = null;
 let firstCardElement;
 let deck;
 let paused = false;
+let gameOver = false;
+const timeGiven = 180000;
+let cardsGuessed = 0;
+let clear;
 
 const outputBox = document.createElement('div');
-
 const output = (message) => {
   outputBox.innerText = message;
 };
 
+const clearOutput = () => {
+  outputBox.innerText = '';
+};
+
+const clearFunction = () => {
+  clear = setTimeout(clearOutput, 3000);
+};
+
+const winBox = document.createElement('div');
+
+const timesUp = () => {
+  if (gameOver === false) {
+    console.log('game over!');
+    output('Your time is up! (3 minute game time)');
+    gameOver = true;
+  }
+};
+
+setTimeout(timesUp, timeGiven);
+
 const squareClick = (cardElement, column, row) => {
-  if (paused === false) {
+  if (paused === false && gameOver === false) {
     console.log(cardElement);
 
     console.log('FIRST CARD DOM ELEMENT', firstCard);
@@ -45,14 +69,23 @@ const squareClick = (cardElement, column, row) => {
         && clickedCard.suit === firstCard.suit
       ) {
         console.log('match');
-        output("It's a match!");
-        setTimeout(() => output(''), 3000);
+        if (outputBox.innerText === '') {
+          output("It's a match!");
+          clearFunction();
+        } else {
+          clearTimeout(clear);
+          clearFunction();
+        }
+        cardsGuessed += 2;
+        if (cardsGuessed === totalBoardArea) {
+          gameOver = true;
+          winBox.innerText = 'Congratulations! You won!';
+        }
       // turn this card over
       // cardElement.innerText = clickedCard.name;
       } else {
         console.log('NOT a match');
         paused = true;
-
         // turn this card back over
         setTimeout(() => { firstCardElement.innerText = '';
           cardElement.innerText = ''; paused = false; }, 3000);
@@ -186,6 +219,7 @@ const initGame = () => {
 
   document.body.appendChild(boardEl);
   document.body.appendChild(outputBox);
+  document.body.appendChild(winBox);
 };
 
 initGame();
