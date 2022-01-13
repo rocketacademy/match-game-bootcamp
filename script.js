@@ -105,6 +105,12 @@ const newCardGrid = (boardSide) => {
 
 /* <----- UI Helpers ----> */
 
+const detachAllChildren = (element) => {
+  while (element.lastChild) {
+    element.removeChild(element.lastChild);
+  }
+};
+
 const setBackGroundColor = (element, color) =>
   (element.style.backgroundColor = color);
 
@@ -180,9 +186,7 @@ const registerMatchingPair = (game) => {
 
 const flipDown = (cardItem) => {
   const { element } = cardItem;
-  while (element.firstChild) {
-    element.removeChild(element.lastChild);
-  }
+  detachAllChildren(element);
   setBackGroundColor(element, ``);
   cardItem.faceUp = false;
 };
@@ -275,6 +279,18 @@ const deactiveActiveCardItems = (game) => {
 
 /* <----- DRIVER ----> */
 
+const clearGameDisplay = (game) => {
+  const { __elementRoot: elementRoot } = game;
+  detachAllChildren(elementRoot);
+};
+
+const commencePreGame = (game) => {
+  const elementStartGameButton = document.createElement(`button`);
+  elementStartGameButton.addEventListener(`click`, () => {
+    clearGameDisplay(game);
+    startGame(game);
+  });
+};
 const startGame = (game) => {
   const {
     cardItems,
@@ -325,7 +341,8 @@ const main = (boardSide, elementRoot, timeSettings) => {
     },
   };
   // Start Game
-  startGame(game);
+
+  commencePreGame(game);
 };
 
 const elementRoot = document.body;
