@@ -1,3 +1,39 @@
+#header {
+  font-size: 50px;
+  color: slategrey;
+}
+
 body {
-  background-color: pink;
+  background-color: lightblue;
+  text-align: center;
+  font-family: "ZCOOL QingKe HuangYou", cursive;
+  color: lightskyblue;
+}
+.square {
+  padding: 10px;
+  margin: 10px;
+  background-color: slategrey;
+  display: inline-block;
+  height: 40px;
+  width: 40px;
+  vertical-align: top;
+  font-size: 30px;
+  border-radius: 10%;
+}
+
+.div {
+  /* height: 10px; */
+}
+
+.board {
+  /* margin-top: 5%; */
+}
+
+.message {
+  min-height: 50px;
+  text-align: center;
+  font-size: 30px;
+  margin-top: 5%;
+  margin-bottom: 5%;
+  color: slategrey;
 }
