@@ -13,9 +13,14 @@ const CLASS_GAME_DESC = `match-game-desc`;
 
 /* <----- CONFIG ----> */
 
-const BOARD_SIDE = 6;
-const FREEZE_TIME = 3000;
+const BOARD_SIDE_DEFAULT = 2;
+const TIME_DEFAULT_FREEZE = 3000;
+const TIME_DEFAULT_FLASH_ON_MATCHED = 3000;
 
+const SETTING_TIME_DEFAULTS = {
+  freeze: TIME_DEFAULT_FREEZE,
+  onMatched: TIME_DEFAULT_FLASH_ON_MATCHED,
+};
 /* <----- CARDS ----> */
 
 const shuffleCards = (cards) => {
@@ -116,7 +121,7 @@ const newElementCardName = (suit) => {
 };
 
 // TODO move addEventListener to new helper
-const newElementCard = (cardItem, game) => {
+const newElementCardAndSetClickHandle = (cardItem, game) => {
   const element = document.createElement(`div`);
   element.className += ` ${CLASS_CARD}`;
   element.addEventListener(`click`, () => {
@@ -139,6 +144,15 @@ const newElementCard = (cardItem, game) => {
   cardItem.element = element;
   return element;
 };
+
+const newElementGameDesc = (freezeTime) => {
+  const element = document.createElement(`div`);
+  element.innerHTML = `Click two cards, you will have a short viewing time of ${freezeTime}ms if cards are not matching. Game ends when all cards open. glhf!`;
+  element.className += ` ${CLASS_GAME_DESC}`;
+  return element;
+};
+
+const ELEMENT_DEFAULT_GAME_DESC = newElementGameDesc();
 
 /* <----- Logic Helpers ----> */
 
@@ -185,7 +199,6 @@ const flipUp = (cardItem) => {
 
 const unflipActiveCards = (cardItems) => {
   for (const cardItem of cardItems) {
-    const { element } = cardItem;
     flipDown(cardItem);
   }
 };
@@ -196,11 +209,28 @@ const addActiveCardItem = (game, cardItem) => {
   game.state.activeCardItemsFlipped.push(cardItem);
 };
 
+const showMatcheeMatchee = (game) => {
+  const { __elementRoot: elementParent, __settingTime: settingTime } = game;
+  const { onMatched: onMatchedTime } = settingTime;
+  const element = document.createElement(`div`);
+  element.className += ` match-hit`;
+  element.innerText = `HaaIT`;
+  console.log(`appending ${onMatchedTime}`);
+  console.log(element);
+
+  elementParent.appendChild(element);
+  setTimeout(() => {
+    elementParent.removeChild(element);
+    console.log(`match hit desc timout`);
+  }, onMatchedTime);
+};
+
 // Reconciliation after every two clicks.
 const settle = (game) => {
   console.group(`[settle] Two cards clicked.`);
-  const { state } = game;
+  const { state, __settingTime: settingTime } = game;
   const { activeCardItemsFlipped } = state;
+
   // activeCardItemsFlipped.length === 2;
 
   const [cardItemA, cardItemB] = activeCardItemsFlipped;
@@ -209,6 +239,17 @@ const settle = (game) => {
     console.log(`Matching!`);
     registerMatchingPair(game);
     deactiveActiveCardItems(game);
+
+    if (isAllPairsMatch(game)) {
+      console.log(`WIN`);
+
+      document.getElementById(
+        `header`
+      ).innerHTML = ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `;
+      setGameFreeze(game);
+    } else {
+      showMatcheeMatchee(game);
+    }
   } else {
     console.log(`Not Matching!`);
     setGameFreeze(game);
@@ -216,16 +257,7 @@ const settle = (game) => {
       setGameUnFreeze(game);
       unflipActiveCards(activeCardItemsFlipped);
       deactiveActiveCardItems(game);
-    }, FREEZE_TIME);
-  }
-
-  if (isAllPairsMatch(game)) {
-    console.log(`WIN`);
-
-    document.getElementById(
-      `header`
-    ).innerHTML = ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `;
-    setGameFreeze(game);
+    }, settingTime.freeze);
   }
 
   console.groupEnd();
@@ -243,8 +275,12 @@ const deactiveActiveCardItems = (game) => {
 
 /* <----- DRIVER ----> */
 
-const initGame = (game, elementRoot) => {
-  const { cardItems } = game;
+const startGame = (game) => {
+  const {
+    cardItems,
+    __elementRoot: elementRoot,
+    __settingTime: settingTime,
+  } = game;
 
   const elementCardItems = document.createElement(`div`);
   elementCardItems.className += ` ${CLASS_CARD_ITEMS}`;
@@ -253,19 +289,22 @@ const initGame = (game, elementRoot) => {
     const elementCardRow = document.createElement(`div`);
     elementCardRow.className += ` ${CLASS_CARD_ROW}`;
     for (const cardItem of cardRow) {
-      const elementCard = newElementCard(cardItem, game);
+      const elementCard = newElementCardAndSetClickHandle(
+        cardItem,
+        game,
+        settingTime
+      );
       elementCardRow.appendChild(elementCard);
     }
     elementCardItems.appendChild(elementCardRow);
   }
 
-  const elementGameDesc = document.createElement(`div`);
-  elementGameDesc.innerHTML = `Click two cards, you will have a short viewing time if cards are not matching. Game ends when all cards open. glhf!`;
-  elementGameDesc.className += ` ${CLASS_GAME_DESC}`;
+  const elementGameDesc = newElementGameDesc(settingTime.freeze);
   elementRoot.appendChild(elementCardItems);
   elementRoot.appendChild(elementGameDesc);
 };
-const main = (boardSide, elementRoot) => {
+const main = (boardSide, elementRoot, settingTime) => {
+  // Initialize Game
   const [cardGridValues, cardsCount] = newCardGrid(boardSide);
   const game = {
     cardItems: cardGridValues.map((row) => {
@@ -278,10 +317,13 @@ const main = (boardSide, elementRoot) => {
       activeCardItemsFlipped: [],
       unMatchedCardsCount: cardsCount,
     },
+    __startCardCount: cardsCount,
+    __elementRoot: elementRoot,
+    __settingTime: settingTime,
   };
-
-  initGame(game, elementRoot);
+  // Start Game
+  startGame(game);
 };
 
 const elementRoot = document.body;
-main(BOARD_SIDE, elementRoot);
+main(BOARD_SIDE_DEFAULT, elementRoot, SETTING_TIME_DEFAULTS);

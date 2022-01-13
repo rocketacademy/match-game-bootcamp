@@ -55,3 +55,25 @@ body {
   padding: 3px 5px;
   border-radius: 3px;
 }
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.match-hit {
+  display: flex;
+  margin-top: 30px;
+  background-color: grey;
+  color: white;
+  padding: 3px 5px;
+  border-radius: 3px;
+
+  animation-duration: 3s;
+  animation-name: fade-out;
+}
