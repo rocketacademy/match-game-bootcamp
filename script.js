@@ -9,6 +9,8 @@ const CLASS_CARD_NAME = `match-card-name`;
 
 const CLASS_BANNER = `match-banner`;
 
+const CLASS_GAME_DESC = `match-game-desc`;
+
 /* <----- CONFIG ----> */
 
 const BOARD_SIDE = 6;
@@ -258,10 +260,11 @@ const initGame = (game, elementRoot) => {
     elementCardItems.appendChild(elementCardRow);
   }
 
-  const elementDesc = document.createElement(`div`);
-  elementDesc.innerHTML = `Click two cards, you will have a short viewing time if cards are not matching. Game ends when all cards open. glhf!`;
+  const elementGameDesc = document.createElement(`div`);
+  elementGameDesc.innerHTML = `Click two cards, you will have a short viewing time if cards are not matching. Game ends when all cards open. glhf!`;
+  elementGameDesc.className += ` ${CLASS_GAME_DESC}`;
   elementRoot.appendChild(elementCardItems);
-  elementRoot.appendChild(elementDesc);
+  elementRoot.appendChild(elementGameDesc);
 };
 const main = (boardSide, elementRoot) => {
   const [cardGridValues, cardsCount] = newCardGrid(boardSide);
