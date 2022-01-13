@@ -214,7 +214,7 @@ const showMatcheeMatchee = (game) => {
   const { onMatched: onMatchedTime } = settingTime;
   const element = document.createElement(`div`);
   element.className += ` match-hit`;
-  element.innerText = `HaaIT`;
+  element.innerText = `HITTO`;
   console.log(`appending ${onMatchedTime}`);
   console.log(element);
 
