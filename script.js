@@ -4,6 +4,11 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let canClick = true;
+
+// For game information
+const gameInfoContainer = document.createElement('div');
+const gameInfo = document.createElement('div');
 
 // ----- HELPER FUNCTIONS -----------------------
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
@@ -83,65 +88,114 @@ const shuffleCards = (cards) => {
 // ----- GAMEPLAY LOGIC -------------------------
 
 // What happens when user clicks on a square
-const squareClick = (cardElement, row, column) => {
-	console.log('CURRENT FIRST CARD', firstCard);
-	console.log('BOARD CLICKED CARD', board[row][column]);
-
+const openCard = (cardElement, row, column) => {
 	// Store the clicked card
 	const clickedCard = board[row][column];
 
-	// If user has already clicked this square
+	// If this card is already open (user has already clicked this square)
 	if (cardElement.innerText !== '') {
 		return;
 	}
 
-	// First turn
-	if (firstCard === null) {
-		console.log('First card picked');
-		// Set the firstCard to the card that was clicked
-		firstCard = clickedCard;
-		// "Turn the card over" by showing the card name in the square
-		cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
-
-		// Hold on to this first in case second card doesn't match
-		firstCardElement = cardElement;
-	}
-
-	// Second turn
-	else {
-		console.log('Second card picked...');
-
-		// If it's a match
-		if (
-			clickedCard.name === firstCard.name &&
-			clickedCard.suit === firstCard.suit
-		) {
-			console.log('MATCH');
+	if (canClick === true) {
+		// First turn
+		if (firstCard === null) {
+			console.log('First card picked');
+			// Set the firstCard to the card that was clicked
+			firstCard = clickedCard;
+			console.log(firstCard);
 
 			// "Turn the card over" by showing the card name in the square
 			cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
+			cardElement.classList.add('open-card');
+
+			// Hold on to this first in case second card doesn't match
+			firstCardElement = cardElement;
+
+			// Update game info
+			updateGameInfo(`Great, click another card to match`);
 		}
 
-		// If it's not a match
+		// Second turn
 		else {
-			console.log('NOT A MATCH');
+			console.log('Second card picked...');
+			canClick = false;
 
-			// "Turn first card over" by removing card name in square
-			firstCardElement.innerText = ``;
+			// If it's a match
+			if (
+				clickedCard.name === firstCard.name &&
+				clickedCard.suit === firstCard.suit
+			) {
+				console.log(clickedCard);
+
+				// "Turn the card over" by showing the card name in the square
+				cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
+				cardElement.classList.add('open-card');
+
+				updateGameInfo(`It's a match!`);
+
+				// Update game info
+				setTimeout(() => {
+					updateGameInfo(`Click a card`);
+				}, 2000);
+
+				canClick = true;
+			}
+
+			// If it's not a match
+			else {
+				console.log(clickedCard);
+
+				// "Turn the card over" by showing the card name in the square
+				cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
+				cardElement.classList.add('open-card');
+
+				setTimeout(() => {
+					// "Turn cards over" by removing card name in square
+					cardElement.innerText = ``;
+					firstCardElement.innerText = ``;
+
+					cardElement.classList.remove('open-card');
+					firstCardElement.classList.remove('open-card');
+
+					updateGameInfo(`Click a card`);
+					canClick = true;
+				}, 2000);
+
+				// Update game info
+				updateGameInfo(`Sorry, try again`);
+			}
+
+			// Reset the cards
+			firstCard = null;
+			console.log(firstCard);
 		}
-
-		// Reset the first card
-		firstCard = null;
 	}
 };
 
 // ----- GAME INITIALISATION --------------------
 
+// Create container for game info
+const createGameInfoContainer = () => {
+	gameInfoContainer.classList.add('game-info-container');
+	gameInfo.classList.add('game-info');
+
+	gameInfo.innerHTML = `Click on the squares to match cards.`;
+
+	gameInfoContainer.appendChild(gameInfo);
+	document.body.appendChild(gameInfoContainer);
+};
+
+const updateGameInfo = (msgText) => {
+	gameInfo.innerHTML = msgText;
+	gameInfoContainer.appendChild(gameInfo);
+};
+
 // Create container for board elements
 const createBoardContainer = (board) => {
 	// Create main container
 	const boardContainer = document.createElement('div');
-	boardContainer.classList.add('board');
+	boardContainer.classList.add('board-container');
 
 	// Create the board grid with 2 loops ------
 	// First for row and second for column
@@ -162,7 +216,7 @@ const createBoardContainer = (board) => {
 
 			// Add event listener to the square
 			square.addEventListener('click', (e) => {
-				squareClick(e.currentTarget, i, j);
+				openCard(e.currentTarget, i, j);
 			});
 
 			// Append the square to the row
@@ -172,8 +226,7 @@ const createBoardContainer = (board) => {
 		// Append row to the board
 		boardContainer.appendChild(rowDiv);
 	}
-
-	return boardContainer;
+	document.body.appendChild(boardContainer);
 };
 
 // Game initialisation
@@ -198,9 +251,9 @@ const initGame = () => {
 			board[i].push(deck.pop());
 		}
 	}
+
+	createGameInfoContainer();
+	createBoardContainer(board);
 };
 
 initGame();
-
-const boardDiv = createBoardContainer(board);
-document.body.appendChild(boardDiv);
