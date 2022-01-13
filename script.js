@@ -210,8 +210,8 @@ const addActiveCardItem = (game, cardItem) => {
 };
 
 const showMatcheeMatchee = (game) => {
-  const { __elementRoot: elementParent, __settingTime: settingTime } = game;
-  const { onMatched: onMatchedTime } = settingTime;
+  const { __elementRoot: elementParent, __timeSettings: timeSettings } = game;
+  const { onMatched: onMatchedTime } = timeSettings;
   const element = document.createElement(`div`);
   element.className += ` match-hit`;
   element.innerText = `HITTO`;
@@ -228,7 +228,7 @@ const showMatcheeMatchee = (game) => {
 // Reconciliation after every two clicks.
 const settle = (game) => {
   console.group(`[settle] Two cards clicked.`);
-  const { state, __settingTime: settingTime } = game;
+  const { state, __timeSettings: timeSettings } = game;
   const { activeCardItemsFlipped } = state;
 
   // activeCardItemsFlipped.length === 2;
@@ -257,7 +257,7 @@ const settle = (game) => {
       setGameUnFreeze(game);
       unflipActiveCards(activeCardItemsFlipped);
       deactiveActiveCardItems(game);
-    }, settingTime.freeze);
+    }, timeSettings.freeze);
   }
 
   console.groupEnd();
@@ -279,7 +279,7 @@ const startGame = (game) => {
   const {
     cardItems,
     __elementRoot: elementRoot,
-    __settingTime: settingTime,
+    __timeSettings: timeSettings,
     __defaultElements,
   } = game;
   const { elementGameDesc } = __defaultElements;
@@ -293,7 +293,7 @@ const startGame = (game) => {
       const elementCard = newElementCardAndSetClickHandle(
         cardItem,
         game,
-        settingTime
+        timeSettings
       );
       elementCardRow.appendChild(elementCard);
     }
@@ -303,7 +303,7 @@ const startGame = (game) => {
   elementRoot.appendChild(elementCardItems);
   elementRoot.appendChild(elementGameDesc);
 };
-const main = (boardSide, elementRoot, settingTime) => {
+const main = (boardSide, elementRoot, timeSettings) => {
   // Initialize Game
   const [cardGridValues, cardsCount] = newCardGrid(boardSide);
   const game = {
@@ -319,9 +319,9 @@ const main = (boardSide, elementRoot, settingTime) => {
     },
     __startCardCount: cardsCount,
     __elementRoot: elementRoot,
-    __settingTime: settingTime,
+    __timeSettings: timeSettings,
     __defaultElements: {
-      elementGameDesc: newElementGameDesc(settingTime.freeze),
+      elementGameDesc: newElementGameDesc(timeSettings.freeze),
     },
   };
   // Start Game
