@@ -79,7 +79,6 @@ const makeShuffledDeck = (noOfPairs, shuffle = true) => {
   return newDeck;
 };
 
-const FACE_DOWN_DESC = ``;
 const newCardGrid = (boardSide) => {
   const height = (width = boardSide);
   const boardSize = height * width;
