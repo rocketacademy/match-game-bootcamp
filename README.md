@@ -4,4 +4,5 @@
 
 ## Run local
 
-Clone, then open index.html.
+1. Clone
+2. open index.html.
