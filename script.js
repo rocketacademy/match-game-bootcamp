@@ -17,7 +17,7 @@ const CLASS_ROOT = `match-root`;
 
 /*        <----- BOARD DIMENSION ----> */
 
-const BOARD_SIDE_DEFAULT = 4;
+const BOARD_SIDE_DEFAULT = 2;
 
 /*        <----- TIME ----> */
 
@@ -27,7 +27,7 @@ const TIME_DEFAULT_DELAY_FLASH_ON_MATCHED = 3000;
 const MS_PER_SEC = 1000;
 const SEC_PER_MIN = 60;
 // const TIME_DEFAULT_GAME_DURATION = 3 * SEC_PER_MIN * MS_PER_SEC;
-const TIME_DEFAULT_GAME_DURATION = 3000;
+const TIME_DEFAULT_GAME_DURATION = 30000;
 
 const TIME_DEFAULT_TIME_CHECK_INTERVAL = 100;
 
@@ -141,6 +141,10 @@ const displayStopGame = (game) => {
   setElementInnerText(elementGameDesc, `Game Ended`);
 };
 
+const setTimerElementDurationLeft = (timerItem) => {
+  const { element } = timerItem;
+  setElementInnerText(element, `${timerItem.value.durationLeft}ms`);
+};
 /*        <----- ELEMENT: PLAIN ----> */
 
 const newElementDurationTime = () => {
@@ -208,6 +212,8 @@ const detachAllChildren = (element) => {
 
 /* <----- Logic Helpers ----> */
 
+/*        <----- STAGE ----> */
+
 const isGameStop = (game) => game.state.isStop;
 const stopGame = (game) => {
   console.log(`💎🤲  GAMESTOP 💎🤲 `);
@@ -228,6 +234,8 @@ const unPauseGame = (game) => {
   game.state.isPause = false;
 };
 
+/*        <----- CARD ----> */
+
 const isAllPairsMatch = (game) => game.state.unMatchedCardsCount === 0;
 const registerMatchingPair = (game) => (game.state.unMatchedCardsCount -= 2);
 
@@ -235,9 +243,18 @@ const getActiveCardsLength = (game) => game.state.activeCardItemsFlipped.length;
 
 const isMatchingCards = (cardA, cardB) => cardA === cardB;
 
-const getDurationLeft = (endTime) => endTime - new Date();
+/*        <----- TIME ----> */
+
+const getDurationLeft = (timerItem) => timerItem.value.endTime - new Date();
+
+const setTimeValueLeft = (timerItem) =>
+  (timerItem.value.durationLeft = getDurationLeft(timerItem));
+
+const exceedTime = (timerItem) => timerItem.value.durationLeft < 0;
 
 /* <----- UI-Logic Helpers ----> */
+
+/*        <----- CARD ACTIONS ----> */
 
 const flipDown = (cardItem) => {
   const { element } = cardItem;
@@ -280,9 +297,20 @@ const showMatcheeMatchee = (game) => {
   elementParent.appendChild(element);
   setTimeout(() => {
     elementParent.removeChild(element);
-    console.log(`time out match hit desc`);
   }, delayOnMatched);
 };
+
+// Clean up function after every two clicks
+const deactiveActiveCardItems = (game) => {
+  const activeCardsItem = game.state.activeCardItemsFlipped;
+  for (const cardItem of activeCardsItem) {
+    const { element } = cardItem;
+    element.style.border = `1px solid black`;
+  }
+  game.state.activeCardItemsFlipped = [];
+};
+
+/*        <----- GAME PHASE ----> */
 
 // Reconciliation after every two clicks.
 const settle = (game) => {
@@ -321,19 +349,16 @@ const settle = (game) => {
   console.groupEnd();
 };
 
-// Clean up function after every two clicks
-const deactiveActiveCardItems = (game) => {
-  const activeCardsItem = game.state.activeCardItemsFlipped;
-  for (const cardItem of activeCardsItem) {
-    const { element } = cardItem;
-    element.style.border = `1px solid black`;
-  }
-  game.state.activeCardItemsFlipped = [];
-};
-
 const stopGameAndDisplayStopGame = (game) => {
   stopGame(game);
   displayStopGame(game);
+};
+
+const setTimeValueLeftAndUpdateDisplay = (timerItem) => {
+  // Set time left
+  setTimeValueLeft(timerItem);
+  // Displau time left
+  setTimerElementDurationLeft(timerItem);
 };
 
 /* <----- DRIVER ----> */
@@ -363,14 +388,6 @@ const commencePreGame = (game) => {
   });
 };
 
-const setTimeValueLeft = (timerItem) =>
-  (timerItem.value.durationLeft = getDurationLeft(timerItem.value.endTime));
-const setTimerElementDurationLeft = (timerItem) => {
-  const { element } = timerItem;
-  setElementInnerText(element, `${timerItem.value.durationLeft}ms`);
-};
-
-const exceedTime = (timerItem) => timerItem.value.durationLeft < 0;
 const startTimer = (game) => {
   const { timerItem, __timeSettings: timeSettings } = game;
   const { gameDuration, timeCheckInterval } = timeSettings;
@@ -379,12 +396,11 @@ const startTimer = (game) => {
   endTime.setMilliseconds(endTime.getMilliseconds() + gameDuration);
   timerItem.value = { endTime: endTime, durationLeft: null };
 
-  setTimeValueLeft(timerItem);
-  setTimerElementDurationLeft(timerItem);
+  setTimeValueLeftAndUpdateDisplay(timerItem);
+
   const gameDurationCountDownInterval = setInterval(() => {
     console.log(`timer started`);
-    setTimeValueLeft(timerItem);
-    setTimerElementDurationLeft(timerItem);
+    setTimeValueLeftAndUpdateDisplay(timerItem);
 
     if (exceedTime(timerItem)) {
       clearInterval(gameDurationCountDownInterval);
