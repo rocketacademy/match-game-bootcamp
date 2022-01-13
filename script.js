@@ -1,18 +1,20 @@
-const boardSize = 4;
-let board = [];
-const totalBoardArea = boardSize * boardSize;
-let firstCard = null;
-let firstCardElement;
-let deck;
-let paused = false;
-let gameOver = false;
-const timeGiven = 180000;
-let cardsGuessed = 0;
-let clear;
-let boardEl;
-let playerName;
-let numOfWins = 0;
+const boardSize = 4; // dictates the number of rows & columns to the grid
+let board = []; // an array of all cards used in the game
+const totalBoardArea = boardSize * boardSize; // total number of cards in the game
+let firstCard = null; // set to null to indicate that no first card has been picked yet
+let firstCardElement; // variable to hold the first card while user picks second card
+let deck; // hold all 52 cards for "popping" into the board array
+let paused = false; // pause while setTimeout runs so function variables do not get overwritten
+let gameOver = false; // to indicate when game is over (i.e. times up or won)
+const timeGiven = 180000; // time given for game 3minutes (3mins x 60seconds x 1000milliseconds)
+let cardsGuessed = 0; // variable to hold number of cards correctly matched
+let clear; // global variable to hold setTimeout function for access across functions
+let gameOverFunction; // global variable to hold setTimeout function for access across functions
+let boardEl; // global variable to hold card elements for access across functions
+let playerName; // holds player name
+let numOfWins = 0; // tracks number of wins
 
+// create nameBox (will hold nameField, nameBox, numofWinsBox and resetButton)
 const nameBox = document.createElement('div');
 const nameField = document.createElement('input');
 nameField.placeholder = 'Enter name here';
@@ -20,30 +22,44 @@ nameBox.appendChild(nameField);
 const nameSubmit = document.createElement('button');
 nameSubmit.innerText = 'Submit';
 nameBox.appendChild(nameSubmit);
-
+const numOfWinsBox = document.createElement('div');
+numOfWinsBox.setAttribute('style', 'margin-bottom: 5px');
+numOfWinsBox.innerText = 'Number of Wins: 0';
 const resetButton = document.createElement('button');
 resetButton.innerText = 'Reset current game';
 
+// create outputBox (for display of game messages)
 const outputBox = document.createElement('div');
+
+// output message function
 const output = (message) => {
   outputBox.innerText = message;
 };
 
+// clearing of temporary game messages function
 const clearOutput = () => {
   outputBox.innerText = '';
   resetButton.disabled = false;
 };
 
+// setTimeout function for clearing of outputBox
 const clearFunction = () => {
   clear = setTimeout(clearOutput, 3000);
 };
 
+// create winning message box
 const winBox = document.createElement('div');
 
-const numOfWinsBox = document.createElement('div');
-numOfWinsBox.setAttribute('style', 'margin-bottom: 5px');
-numOfWinsBox.innerText = 'Number of Wins: 0';
+// setting 3 minutes game
+const timesUp = () => {
+  if (gameOver === false) {
+    output('Your time is up! (3 minute game time)');
+    gameOver = true;
+    resetButton.disabled = false;
+  }
+};
 
+// name submit button function to trigger start of game and appending of game elements
 const captureName = () => {
   playerName = nameField.value;
   nameField.remove();
@@ -55,20 +71,11 @@ const captureName = () => {
   document.body.appendChild(boardEl);
   document.body.appendChild(outputBox);
   document.body.appendChild(winBox);
+  gameOverFunction = setTimeout(timesUp, timeGiven);
 };
-
 nameSubmit.addEventListener('click', captureName);
 
-const timesUp = () => {
-  if (gameOver === false) {
-    console.log('game over!');
-    output('Your time is up! (3 minute game time)');
-    gameOver = true;
-  }
-};
-
-setTimeout(timesUp, timeGiven);
-
+// square click function
 const squareClick = (cardElement, column, row) => {
   if (paused === false && gameOver === false) {
     resetButton.disabled = true;
@@ -91,7 +98,6 @@ const squareClick = (cardElement, column, row) => {
       firstCard = clickedCard;
       // turn this card over
       cardElement.innerText = firstCard.name;
-
       // hold onto this for later when it may not match
       firstCardElement = cardElement;
 
@@ -99,6 +105,7 @@ const squareClick = (cardElement, column, row) => {
     } else {
       console.log('second turn');
       cardElement.innerText = clickedCard.name;
+      // matched
       if (
         clickedCard.name === firstCard.name
         && clickedCard.suit === firstCard.suit
@@ -116,11 +123,13 @@ const squareClick = (cardElement, column, row) => {
           numOfWins += 1;
           gameOver = true;
           winBox.innerText = 'Congratulations! You won!';
+          setTimeout(() => { winBox.innerText = ''; }, 5000);
           numOfWinsBox.innerText = `Number of Wins: ${numOfWins}`;
+          clearTimeout(gameOverFunction);
         }
-      // turn this card over
-      // cardElement.innerText = clickedCard.name;
-      } else {
+      }
+      // did not match
+      else {
         console.log('NOT a match');
         paused = true;
         // turn this card back over
@@ -237,46 +246,46 @@ const shuffleCards = (cardDeck) => {
   return cardDeck;
 };
 
+// initialise function
 const initGame = () => {
-  // create this special deck by getting the doubled cards and
-  // making a smaller array that is ( boardSize squared ) number of cards
   const doubleDeck = makeDeck();
   const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
   deck = shuffleCards(deckSubset);
 
-  // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
     board.push([]);
     for (let j = 0; j < boardSize; j += 1) {
       board[i].push(deck.pop());
     }
   }
-
   boardEl = buildBoardElements(board);
 
   document.body.appendChild(nameBox);
 };
 
+// reset function
 const reset = () => {
-  winBox.innerText = '';
-  board = [];
-  const squaresArray = document.getElementsByClassName('square');
-  for (let i = 0; i < squaresArray.length; i += 1) {
+  outputBox.innerText = ''; // clear outputBox
+  gameOverFunction = setTimeout(timesUp, timeGiven); // reset 3-minute timer
+  firstCard = null; // reset firstCard to null
+  winBox.innerText = ''; // clear winBox
+  gameOver = false; // switch gameOver from true to false
+  board = []; // empty out previous games' cards
+  const squaresArray = document.getElementsByClassName('square'); // retrieve all squares' element addresses
+  for (let i = 0; i < squaresArray.length; i += 1) { // clear all squares' innerText
     squaresArray[i].innerText = '';
   }
 
+  // generate a new set of board elements
   const doubleDeck = makeDeck();
   const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
   deck = shuffleCards(deckSubset);
-
-  // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
     board.push([]);
     for (let j = 0; j < boardSize; j += 1) {
       board[i].push(deck.pop());
     }
   }
-
   boardEl = buildBoardElements(board);
 };
 resetButton.addEventListener('click', reset);
