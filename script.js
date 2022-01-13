@@ -5,10 +5,18 @@ let firstCard = null;
 let firstCardElement;
 let deck;
 let canClick = true;
+let timerStarted = false;
+
+// 1 min = 60 000 ms
+// 3 mins = 180 000ms
+let milliseconds = 180000; // 3 minutes
+const delayInMilliseconds = 100; // 0.1 second
 
 // For game information
 const gameInfoContainer = document.createElement('div');
 const gameInfo = document.createElement('div');
+const timerContainer = document.createElement('div');
+const timer = document.createElement('div');
 
 // ----- HELPER FUNCTIONS -----------------------
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
@@ -85,10 +93,34 @@ const shuffleCards = (cards) => {
 	return cards;
 };
 
+// Format timer
+const formatTimer = (ms) => {
+	// Show min:sec
+	// calculate minutes
+	let min = Math.floor((ms / 1000 / 60) % 60);
+	// calculate seconds
+	let sec = Math.floor((ms / 1000) % 60);
+
+	// add leading 0
+	if (min < 10) {
+		min = '0' + min;
+	}
+	if (sec < 10) {
+		sec = '0' + sec;
+	}
+	return `${min}:${sec}`;
+};
+
 // ----- GAMEPLAY LOGIC -------------------------
 
 // What happens when user clicks on a square
 const openCard = (cardElement, row, column) => {
+	// Start timer on first ever card clicked
+	if (timerStarted === false) {
+		startTimer();
+		timerStarted = true;
+	}
+
 	// Store the clicked card
 	const clickedCard = board[row][column];
 
@@ -132,11 +164,13 @@ const openCard = (cardElement, row, column) => {
 				cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
 				cardElement.classList.add('open-card');
 
-				updateGameInfo(`It's a match!`);
+				updateGameInfo(`Noice, it's a match!`);
 
 				// Update game info
 				setTimeout(() => {
-					updateGameInfo(`Click a card`);
+					updateGameInfo(
+						`Click a card to continue, or refresh the page to restart`
+					);
 				}, 2000);
 
 				canClick = true;
@@ -173,7 +207,31 @@ const openCard = (cardElement, row, column) => {
 	}
 };
 
+const startTimer = () => {
+	const ref = setInterval(() => {
+		if (milliseconds <= 0) {
+			clearInterval(ref);
+			updateGameInfo(`Time's up!`);
+			canClick = false;
+		}
+
+		timer.innerHTML = formatTimer(milliseconds);
+		milliseconds -= delayInMilliseconds;
+	}, delayInMilliseconds);
+};
+
 // ----- GAME INITIALISATION --------------------
+
+// Create container for timer
+const createTimerContainer = () => {
+	timerContainer.classList.add('timer-container');
+	timerContainer.innerHTML = `You have 1 minute to match all card pairs.<br>The time will start when you open your first card.`;
+	document.body.appendChild(timerContainer);
+
+	timer.classList.add('timer');
+	timer.innerHTML = formatTimer(milliseconds);
+	timerContainer.appendChild(timer);
+};
 
 // Create container for game info
 const createGameInfoContainer = () => {
@@ -252,6 +310,7 @@ const initGame = () => {
 		}
 	}
 
+	createTimerContainer();
 	createGameInfoContainer();
 	createBoardContainer(board);
 };
