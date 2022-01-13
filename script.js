@@ -338,9 +338,10 @@ const main = (boardSide, elementRoot, timeSettings) => {
   const game = {
     cardItems: cardGridValues.map((row) => {
       return row.map((value) => {
-        return { value, faceUp: false };
+        return { value, faceUp: false, element: null };
       });
     }),
+    timer: { value: null, element: null },
     state: {
       isFreeze: false,
       activeCardItemsFlipped: [],
