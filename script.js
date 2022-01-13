@@ -172,9 +172,20 @@ const newElementCardAndSetClickHandle = (cardItem, game) => {
 
 const newElementGameDesc = (freezeTime) => {
   const element = document.createElement(`div`);
-  element.innerHTML = `Click two cards, you will have a short viewing time of ${freezeTime}ms if cards are not matching. Game ends when all cards open. glhf!`;
+  element.innerHTML = `Click two cards, you will have a short viewing time of ${freezeTime}ms if cards are not matching. Game wins when all cards open. glhf!`;
   element.className += ` ${CLASS_GAME_DESC}`;
   return element;
+};
+
+const setElementGameDescText = (element, text) => {
+  element.innerHTML = text;
+};
+
+const displayStopGame = (game) => {
+  const {
+    __defaultElements: { elementGameDesc },
+  } = game;
+  setElementGameDescText(elementGameDesc, `Game Ended`);
 };
 
 /* <----- Logic Helpers ----> */
@@ -274,11 +285,10 @@ const settle = (game) => {
 
     if (isAllPairsMatch(game)) {
       console.log(`WIN`);
-
       document.getElementById(
         `header`
       ).innerHTML = ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `;
-      pauseGame(game);
+      stopGameAndDisplayStopGame(game);
     } else {
       showMatcheeMatchee(game);
     }
@@ -303,6 +313,11 @@ const deactiveActiveCardItems = (game) => {
     element.style.border = `1px solid black`;
   }
   game.state.activeCardItemsFlipped = [];
+};
+
+const stopGameAndDisplayStopGame = (game) => {
+  stopGame(game);
+  displayStopGame(game);
 };
 
 /* <----- DRIVER ----> */
@@ -357,7 +372,7 @@ const startTimer = (game) => {
 
     if (exceedTime(timerItem)) {
       clearInterval(gameDurationCountDownInterval);
-      stopGame(game);
+      stopGameAndDisplayStopGame(game);
     }
   }, timeCheckInterval);
 };
