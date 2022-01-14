@@ -173,6 +173,15 @@ const newElementGameDesc = (freezeTime) => {
   return element;
 };
 
+const newElementStartGameButton = () => {
+  const element = document.createElement(`button`);
+  const elementStartGameButtonDesc = document.createTextNode(`Start Game`);
+
+  element.appendChild(elementStartGameButtonDesc);
+
+  return element;
+};
+
 /*        <----- ELEMENT: NOT PLAIN ----> */
 
 const newElementCardAndSetClickHandle = (cardItem, game) => {
@@ -384,10 +393,7 @@ const commencePreGame = (game) => {
   const { __elementRoot: elementRoot, __defaultElements } = game;
   const { elementGameDesc } = __defaultElements;
 
-  const elementStartGameButton = document.createElement(`button`);
-  const elementStartGameButtonDesc = document.createTextNode(`Start Game`);
-
-  elementStartGameButton.appendChild(elementStartGameButtonDesc);
+  const elementStartGameButton = newElementStartGameButton();
 
   elementRoot.appendChild(elementGameDesc);
   elementRoot.appendChild(elementStartGameButton);
