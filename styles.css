@@ -16,7 +16,6 @@ body {
   justify-content: space-evenly;
   vertical-align: center;
   height: 100%;
-
 }
 .match-banner {
   display: flex;
@@ -91,4 +90,8 @@ body {
   border-radius: 3px;
   border: none;
   padding: 3px;
+}
+
+.match-name-input {
+  display: flex;
 }

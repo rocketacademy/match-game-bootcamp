@@ -15,6 +15,8 @@ const CLASS_ROOT = `match-root`;
 
 const CLASS_CARD_START_GAME_BUTTON = `match-start-game-button`;
 
+const CLASS_NAME_INPUT = `match-name-input`;
+
 /* <----- DEFAULT CONFIG ----> */
 
 /*        <----- BOARD DIMENSION ----> */
@@ -144,6 +146,13 @@ const displayStopGame = (game) => {
   setElementInnerText(elementGameDesc, `Game Ended`);
 };
 
+const clearGameDisplay = (game) => {
+  const { __elementRoot: elementRoot } = game;
+  console.log(`detaching`);
+  console.log(elementRoot);
+  detachAllChildren(elementRoot);
+};
+
 const setTimerElementDurationLeft = (timerItem) => {
   const { element } = timerItem;
   setElementInnerText(element, `${timerItem.value.durationLeft}ms`);
@@ -211,6 +220,13 @@ const newElementCardAndSetClickHandle = (cardItem, game) => {
     }
   });
   cardItem.element = element;
+  return element;
+};
+
+const newElementNameInputAndSetClickHandler = (game) => {
+  const element = document.createElement(`input`);
+  element.className += ` ${CLASS_NAME_INPUT}`;
+  element.setAttribute(`type`, `text`);
   return element;
 };
 
@@ -384,19 +400,15 @@ const setTimeValueLeftAndUpdateDisplay = (timerItem) => {
 
 /* <----- DRIVER ----> */
 
-const clearGameDisplay = (game) => {
-  const { __elementRoot: elementRoot } = game;
-  console.log(`detaching`);
-  console.log(elementRoot);
-  detachAllChildren(elementRoot);
-};
-
 const commencePreGame = (game) => {
   const { __elementRoot: elementRoot, __defaultElements } = game;
   const { elementGameDesc } = __defaultElements;
 
+  const elementNameInput = newElementNameInputAndSetClickHandler(game);
+
   const elementStartGameButton = newElementStartGameButton();
 
+  elementRoot.appendChild(elementNameInput);
   elementRoot.appendChild(elementStartGameButton);
   elementRoot.appendChild(elementGameDesc);
 
