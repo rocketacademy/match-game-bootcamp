@@ -62,6 +62,12 @@ let firstCard = null;
 let cardElement;
 let deck;
 
+let milliseconds = 10000;
+const delayInMilliseconds = 1;
+const output = document.createElement('div');
+output.innerText = milliseconds;
+document.body.appendChild(output);
+
 //#################### PLAYER ACTION CALLBACKS ####################//
 const squareClick = (messageBoard, cardElement, column, row) => {
     console.log(cardElement);
@@ -104,17 +110,18 @@ const squareClick = (messageBoard, cardElement, column, row) => {
         cardElement.classList.add('card');
         cardElement.innerHTML = `${clickedCard.name}<br>${clickedCard.suit}`;
     
-      // turn both cards over after 3 seconds 
+      // turn both cards over after 0.5 seconds 
       setTimeout(()=>{
         firstCardElement.innerHTML = '';
         firstCardElement.className = 'square';
         cardElement.innerHTML = '';
         cardElement.className = 'square';
         firstCard = null;
-        },3000);
+        },500);
       }
         //reset the first card
         firstCard = null;
+      //
     }
 };
 
@@ -127,6 +134,19 @@ const buildBoardElements = (board) => {
 
   // give it a class for CSS purposes
   boardElement.classList.add('board');
+  
+  //timer
+  const timer = setInterval(() => {
+  output.innerText = milliseconds;
+  if (milliseconds <= 0) {
+    clearInterval(timer);
+  }
+  milliseconds -= 1;
+}, delayInMilliseconds);
+
+setInterval(() => {
+  messageBoard.innerText = 'You have 30 sec left';
+},5000);
 
   //message board
   const messageBoard = document.createElement('div');
@@ -166,13 +186,12 @@ const buildBoardElements = (board) => {
   return boardElement;
 };
 
-
 const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
-  let doubleDeck = makeDeck();
+  let doubleDeck = shuffleCards(makeDeck());
   let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
-  deck = shuffleCards(deckSubset);
+  deck = deckSubset;
 
   // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
@@ -183,6 +202,7 @@ const initGame = () => {
   }
   const boardEl = buildBoardElements(board);
   document.body.appendChild(boardEl);
+
 };
 //#################### CALL initGame FUNCTION ####################//
 initGame();
