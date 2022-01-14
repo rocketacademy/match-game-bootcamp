@@ -13,6 +13,8 @@ const CLASS_GAME_DESC = `match-game-desc`;
 
 const CLASS_ROOT = `match-root`;
 
+const CLASS_CARD_START_GAME_BUTTON = `match-start-game-button`;
+
 /* <----- DEFAULT CONFIG ----> */
 
 /*        <----- BOARD DIMENSION ----> */
@@ -176,7 +178,7 @@ const newElementGameDesc = (freezeTime) => {
 const newElementStartGameButton = () => {
   const element = document.createElement(`button`);
   const elementStartGameButtonDesc = document.createTextNode(`Start Game`);
-
+  element.className += ` ${CLASS_CARD_START_GAME_BUTTON}`;
   element.appendChild(elementStartGameButtonDesc);
 
   return element;
@@ -395,8 +397,8 @@ const commencePreGame = (game) => {
 
   const elementStartGameButton = newElementStartGameButton();
 
-  elementRoot.appendChild(elementGameDesc);
   elementRoot.appendChild(elementStartGameButton);
+  elementRoot.appendChild(elementGameDesc);
 
   const onClickStartHandler = () => {
     clearGameDisplay(game);
