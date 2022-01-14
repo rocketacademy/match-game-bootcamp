@@ -1,3 +1,97 @@
+@import url("https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Lato:ital@1&family=Lobster&family=Roboto&display=swap");
+
 body {
-  background-color: pink;
+  background-color: #f0f2f2;
+}
+h1 {
+  width: 50%;
+  margin: auto;
+  text-align: center;
+  font-family: "Abril Fatface";
+  font-size: 4em;
+  color: #5f9595;
+}
+.square {
+  background-image: linear-gradient(#c4d7d1, #f8e7e560);
+  padding: 30px;
+  margin: 10px;
+  background-color: white;
+  display: inline-block;
+  height: 40px;
+  width: 10px;
+  vertical-align: top;
+  border: 2px solid #5f9595;
+  border-radius: 10px;
+  vertical-align: middle;
+}
+
+.flip {
+  color: #121d1d;
+  background-image: none;
+  background-color: ghostwhite;
+  font-family: "Abril Fatface";
+  border: 2px solid #f0bc68;
+  font-size: 22px;
+  overflow: hidden;
+}
+
+.timer-border {
+  color: #f0bc68;
+  background-color: #f0f2f2;
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+  border: 3px solid #f0bc68;
+  border-radius: 50%;
+  padding: 20px;
+  margin: 50px;
+  overflow-wrap: break-word;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.timer {
+  margin: auto;
+  font-family: Lato;
+  font-size: 1.5em;
+}
+
+h1 + div {
+  width: 50%;
+  margin: auto;
+  text-align: center;
+  padding: 20px;
+}
+
+button {
+  background-color: #f0f2f2;
+  padding: 10px 30px;
+  border-radius: 10px;
+  border: outset;
+  color: #5f9595;
+  font-family: "Abril Fatface";
+  font-size: 1.5em;
+}
+
+button:hover {
+  background-color: #5f9595;
+  color: #f0f2f2;
+  cursor: pointer;
+}
+button:disabled {
+  background-color: #f0f2f2;
+  border-style: solid;
+  color: dimgray;
+  cursor: auto;
+}
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-right: 15em;
+}
+
+.board {
+  flex-shrink: 0;
 }
