@@ -138,7 +138,7 @@ const setBackGroundColor = (element, color) =>
 const setElementBorder = (element, val) => (element.style.border = val);
 
 const setElementInnerText = (element, text) => {
-  element.innerHTML = text;
+  element.innerText = text;
 };
 
 const displayStopGame = (game) => {
@@ -161,6 +161,11 @@ const setTimerElementDurationLeft = (timerItem) => {
 };
 /*        <----- ELEMENT: PLAIN ----> */
 
+const newDefaultElementHeader = () => {
+  const element = document.createElement(`h1`);
+  setElementInnerText(element, `SWE101! 🚀 Matchee Mutchee`);
+  return element;
+};
 const newElementDurationTime = () => {
   const element = document.createElement(`div`);
   return element;
@@ -181,7 +186,10 @@ const newElementCardName = (suit) => {
 
 const newElementGameDesc = (freezeTime) => {
   const element = document.createElement(`div`);
-  element.innerHTML = `Click two cards, you will have a short viewing time of ${freezeTime}ms if cards are not matching. Game wins when all cards open. glhf!`;
+  setElementInnerText(
+    element,
+    `Click two cards, you will have a short viewing time of ${freezeTime}ms if cards are not matching. Game wins when all cards open. glhf!`
+  );
   element.className += ` ${CLASS_GAME_DESC}`;
   return element;
 };
@@ -380,7 +388,7 @@ const deactiveActiveCardItems = (game) => {
 // Reconciliation after every two clicks.
 const settle = (game) => {
   console.group(`[settle] Two cards clicked.`);
-  const { state, __timeSettings: timeSettings } = game;
+  const { state, __timeSettings: timeSettings, __defaultElements } = game;
   const { activeCardItemsFlipped } = state;
 
   // activeCardItemsFlipped.length === 2;
@@ -397,9 +405,8 @@ const settle = (game) => {
       console.log(
         `Last matching: ${cardItemA.value.rank}${cardItemA.value.suit}`
       );
-      document.getElementById(
-        `header`
-      ).innerHTML = ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `; // !!
+      const { elementHeader } = __defaultElements;
+      setElementInnerText(elementHeader, ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `);
       stopGameAndDisplayStopGame(game);
     } else {
       console.log(`showing flash hit on ${cardItemA.value.rank}`);
@@ -440,7 +447,7 @@ const setTimeValueLeftAndUpdateDisplay = (timerItem) => {
 
 const commencePreGame = (game) => {
   const { __elementRoot: elementRoot, __defaultElements, nameItem } = game;
-  const { elementGameDesc } = __defaultElements;
+  const { elementGameDesc, elementHeader } = __defaultElements;
 
   const elementNameWrapper = newElementNameWrapper();
   nameItem.element.wrapper = elementNameWrapper;
@@ -456,6 +463,7 @@ const commencePreGame = (game) => {
   elementNameWrapper.appendChild(elementNameInputField);
   elementNameWrapper.appendChild(elementNameDisplay);
 
+  elementRoot.appendChild(elementHeader);
   elementRoot.appendChild(elementNameWrapper);
   elementRoot.appendChild(elementStartGameButton);
   elementRoot.appendChild(elementGameDesc);
@@ -494,10 +502,9 @@ const startGame = (game) => {
     __defaultElements,
   } = game;
 
-  const { elementGameDesc } = __defaultElements;
+  const { elementGameDesc, elementHeader } = __defaultElements;
   // !elementRoot.firstChild
-
-  //
+  setElementInnerText(elementHeader, `hi`);
   const elementDurationTime = newElementDurationTime(game);
   timerItem.element = elementDurationTime;
   // Create Card Elements
@@ -514,6 +521,7 @@ const startGame = (game) => {
     elementCardItems.appendChild(elementCardRow);
   }
 
+  elementRoot.appendChild(elementHeader);
   elementRoot.appendChild(elementDurationTime);
   elementRoot.appendChild(elementCardItems);
   elementRoot.appendChild(elementGameDesc);
@@ -555,6 +563,7 @@ const newGame = (gameConfig) => {
     __timeSettings: timeSettings,
     __defaultElements: {
       elementGameDesc: newElementGameDesc(timeSettings.delayPause),
+      elementHeader: newDefaultElementHeader(),
     },
     _gameData: gameConfig,
   };
