@@ -15,7 +15,9 @@ const CLASS_ROOT = `match-root`;
 
 const CLASS_CARD_START_GAME_BUTTON = `match-start-game-button`;
 
+const CLASS_NAME_WRAPPER = `match-name-wrapper`;
 const CLASS_NAME_INPUT = `match-name-input`;
+const CLASS_NAME_DISPLAY = `match-name-display`;
 
 /* <----- DEFAULT CONFIG ----> */
 
@@ -193,6 +195,16 @@ const newElementStartGameButton = () => {
   return element;
 };
 
+const newElementNameWrapper = () => {
+  const element = document.createElement(`div`);
+  const elementStartGameButtonDesc =
+    document.createTextNode(`Input Your Name :)`);
+  element.className += ` ${CLASS_NAME_WRAPPER}`;
+  element.appendChild(elementStartGameButtonDesc);
+
+  return element;
+};
+
 /*        <----- ELEMENT: NOT PLAIN ----> */
 
 const newElementCardAndSetClickHandle = (cardItem, game) => {
@@ -227,6 +239,17 @@ const newElementNameInputAndSetClickHandler = (game) => {
   const element = document.createElement(`input`);
   element.className += ` ${CLASS_NAME_INPUT}`;
   element.setAttribute(`type`, `text`);
+
+  element.addEventListener(`input`, (event) => {
+    const value = event.target.value;
+    updateNameValueAndDisplay(game, value);
+  });
+  return element;
+};
+
+const newElementNameDisplay = () => {
+  const element = document.createElement(`div`);
+  element.className = ` ${CLASS_NAME_DISPLAY}`;
   return element;
 };
 
@@ -281,6 +304,21 @@ const setTimeValueLeft = (timerItem) =>
 const exceedTime = (timerItem) => timerItem.value.durationLeft < 0;
 
 /* <----- UI-Logic Helpers ----> */
+
+/*        <----- STATS / INFO ----> */
+
+const updateNameValueAndDisplay = (game, newValue) => {
+  const { nameItem } = game;
+  const {
+    element: { display: displayElement },
+  } = nameItem;
+
+  // update name value
+  nameItem.value = newValue;
+
+  // display
+  setElementInnerText(displayElement, newValue);
+};
 
 /*        <----- CARD ACTIONS ----> */
 
@@ -401,14 +439,24 @@ const setTimeValueLeftAndUpdateDisplay = (timerItem) => {
 /* <----- DRIVER ----> */
 
 const commencePreGame = (game) => {
-  const { __elementRoot: elementRoot, __defaultElements } = game;
+  const { __elementRoot: elementRoot, __defaultElements, nameItem } = game;
   const { elementGameDesc } = __defaultElements;
 
-  const elementNameInput = newElementNameInputAndSetClickHandler(game);
+  const elementNameWrapper = newElementNameWrapper();
+  nameItem.element.wrapper = elementNameWrapper;
+
+  const elementNameDisplay = newElementNameDisplay();
+  nameItem.element.display = elementNameDisplay;
+
+  const elementNameInputField = newElementNameInputAndSetClickHandler(game);
+  nameItem.element.field = elementNameInputField;
 
   const elementStartGameButton = newElementStartGameButton();
 
-  elementRoot.appendChild(elementNameInput);
+  elementNameWrapper.appendChild(elementNameInputField);
+  elementNameWrapper.appendChild(elementNameDisplay);
+
+  elementRoot.appendChild(elementNameWrapper);
   elementRoot.appendChild(elementStartGameButton);
   elementRoot.appendChild(elementGameDesc);
 
@@ -489,6 +537,10 @@ const newGame = (gameConfig) => {
       value: { endTime: undefined, durationLeft: undefined },
       element: null,
       gameDurationCountDownInterval: null,
+    },
+    nameItem: {
+      element: { field: null, display: null, wrapper: null }, // wrapper hugs the field and display elements.
+      value: null,
     },
     // Game state
     state: {
