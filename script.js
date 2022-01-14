@@ -19,31 +19,28 @@ let firstCardElement;
 let deck;
 let secondCard;
 let secondCardElement;
-let userName = '';
+// const userName = '';
 const boardElement = document.createElement('div');
+const gameMode = true;
+let timeInterval;
+let timeLeftInSeconds = 180; // 3mins
 
 // ===================================================
 //  Gameplay Logic
 // ===================================================
 
 const squareClick = (messageBoard, cardElement, column, row) => {
+  canClick = true;
   console.log(cardElement);
-
   console.log('FIRST CARD DOM ELEMENT', firstCard);
-
   console.log('BOARD CLICKED CARD', board[column][row]);
 
   // console.log to show the column and row
-
   console.log(column);
   console.log(row);
 
   const clickedCard = board[column][row];
-  console.log(userName);
-
-  // create default messages for messageBoard when its a match
-  // messageBoard.innerText = 'Its a match!';
-  // console.log(messageBoard.innerText);
+  // console.log(userName);
 
   // the user already clicked on this square
   if (cardElement.innerText !== '') {
@@ -59,7 +56,6 @@ const squareClick = (messageBoard, cardElement, column, row) => {
     // !!! reference codes to add both suitSymbol and displayName details
     cardElement.classList.add('card');
     cardElement.innerHTML = `${firstCard.suitSymbol}<br>${firstCard.displayName}`;
-    // cardElement.innerText = firstCard.name;
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
@@ -71,8 +67,8 @@ const squareClick = (messageBoard, cardElement, column, row) => {
     console.log('second turn');
     if (
       // clickedCard here refers to the second card clicked
-      clickedCard.name === firstCard.name &&
-      clickedCard.suit === firstCard.suit
+      clickedCard.name === firstCard.name
+      && clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
       console.log(clickedCard);
@@ -170,7 +166,7 @@ const makeDeck = () => {
   for (let rankCounter = 1; rankCounter <= 13; rankCounter += 1) {
     // Convert rankCounter to string
     let cardName = `${rankCounter}`;
-    let displayName = `${rankCounter}`;
+    const displayName = `${rankCounter}`;
     // following code will keep display heart suits
     // let suitSymbol = `${currentSuitSymbol}`;
 
@@ -198,6 +194,7 @@ const makeDeck = () => {
         suit: currentSuit,
         rank: rankCounter,
         colour: currentColour,
+        // pic: `./images/cards/${cardName}_of_${currentSuit}.png`,
         displayName,
         suitSymbol: currentSuitSymbol,
       };
@@ -213,6 +210,22 @@ const makeDeck = () => {
   return newDeck;
 };
 
+// create helper function to reset the game
+const resetGame = () => {
+  timeLeftInSeconds = 180;
+  clearInterval(timeInterval);
+  board.length = 0;
+  deck.length = 0;
+  firstCard = null;
+  console.log('reset?');
+
+  boardElement.innerHTML = '';
+  // remove the existing board
+  // document.getElementsById('row-div').remove();
+
+  initGame();
+};
+
 // ===================================================
 //  Game Initialisation Logic
 // ===================================================
@@ -221,56 +234,101 @@ const makeDeck = () => {
 // return the built board
 // ### for comfortable qns > create a messageboard element
 const buildBoardElements = (board) => {
+  // if (gameMode === true) {
   // create the element that everything will go inside of
   const boardElement = document.createElement('div');
 
   // give it a class for CSS purposes
   boardElement.classList.add('board');
+  boardElement.id = 'gameBoard';
 
-  // #### create a element for player to enter the name
-  const inputMessage = document.createElement('box');
-  inputMessage.classList.add('input');
-  inputMessage.innerText = 'Please enter your name: ';
-  boardElement.appendChild(inputMessage);
+  // // #### create a element for player to enter the name
+  // const inputMessage = document.createElement('box');
+  // inputMessage.classList.add('input');
+  // inputMessage.innerText = 'Please enter your name: ';
+  // boardElement.appendChild(inputMessage);
 
-  // #### create an input box for userName
-  const userName = document.createElement('input');
-  userName.classList.add('name');
-  boardElement.appendChild(userName);
+  // // #### create an input box for userName
+  // const userName = document.createElement('input');
+  // userName.classList.add('name');
+  // boardElement.appendChild(userName);
 
-  // ### create a button to store the userName
-  // user input the name and press the button to store the name into the userName global variable
-  const storeNameBtn = document.createElement('button');
-  storeNameBtn.innerText = 'Submit';
-  boardElement.appendChild(storeNameBtn);
-  // add eventListener to store the name when button is clicked
+  // // ### create a button to store the userName
+  // // user input the name and press the button to store the name into the userName global variable
+  // const storeNameBtn = document.createElement('button');
+  // storeNameBtn.innerText = 'Submit';
+  // boardElement.appendChild(storeNameBtn);
+  // // add eventListener to store the name when button is clicked
+
+  // create an overall game-div
+  const gameDiv = document.createElement('div');
+  // set an id to the game-div
+  gameDiv.id = 'game';
 
   // ### create a messageboard element
   const messageBoard = document.createElement('div');
+  messageBoard.id = 'message';
   messageBoard.classList.add('messageBoard');
-  messageBoard.innerText =
-    'Click on the boxes to play the game. You have 3 minutes for the game!';
-  boardElement.appendChild(messageBoard);
+  messageBoard.innerText = 'Click on the boxes to play the game. You have 3 minutes for the game!';
 
   // ##### create a 3 minutes timer element
-  let milliseconds = 18000;
+  let milliseconds = 1000;
   const delayInMilliseconds = 1;
   const output = document.createElement('div');
+  output.setAttribute('class', 'timer');
   output.innerText = milliseconds;
   boardElement.appendChild(output);
 
   // #### use the timer functions
   const ref = setInterval(() => {
-    output.innerText = milliseconds;
+    output.innerText = `Time left: ${milliseconds}`;
+    output.id = ('timer');
 
     if (milliseconds === 0) {
+      // gameMode = false;
       // remove all the boxes when time is up
       boardElement.innerText = '';
+      // do not allow user to continue when time is up
       clearInterval(ref);
+      // if (gameMode === false) {
+      //   console.log('game over');
+      //   output.innerText = 'Time is Up!';
+      //   boardElement.innerText = '';
+      // }
       output.innerText = 'Time is Up!';
     }
     milliseconds -= 1;
   }, delayInMilliseconds);
+
+  // create a div to store the buttons
+  const btnDiv = document.createElement('div');
+  btnDiv.classList.add('btn-div');
+  gameDiv.appendChild(btnDiv);
+
+  // create a stop button to stop the timer
+  const startBtn = document.createElement('button');
+  startBtn.innerHTML = 'Start';
+  startBtn.setAttribute('id', 'start-btn');
+  // startBtn.src = './images/others/start-button.png';
+  btnDiv.appendChild(startBtn);
+  // startBtn.addEventListener('click', ref.currentTarget);
+
+  // create a start button to start the timer
+  const stopBtn = document.createElement('button');
+  stopBtn.innerHTML = 'Stop';
+  stopBtn.setAttribute('id', 'stop-btn');
+  btnDiv.appendChild(stopBtn);
+  stopBtn.addEventListener('click', () => clearInterval(ref));
+
+  // create a reset button to reset the game
+  const resetBtn = document.createElement('button');
+  resetBtn.setAttribute('id', 'reset-btn');
+  resetBtn.innerHTML = 'reset game';
+  resetBtn.addEventListener('click', () => resetGame());
+  btnDiv.appendChild(resetBtn);
+
+  document.body.appendChild(gameDiv);
+  boardElement.appendChild(messageBoard);
 
   // use the board data structure we passed in to create the correct size board
   for (let i = 0; i < board.length; i += 1) {
@@ -278,10 +336,37 @@ const buildBoardElements = (board) => {
     const row = board[i];
     // make an element for this row of cards
     const rowElement = document.createElement('div');
+    rowElement.id = 'row-div';
     rowElement.classList.add('row');
 
     // make all the squares for this row
     for (let j = 0; j < row.length; j += 1) {
+      // create a card Div
+      // const card = document.createElement('div');
+      // card.classList.add('card');
+
+      // // create a card-inner Div
+      // const cardInner = document.createElement('div');
+      // cardInner.classList.add('card-inner');
+      // cardInner.id = board[i][j].id;
+
+      // // create a backCard Div
+      // const cardBack = document.createElement('div');
+      // cardBack.classList.add('card-back');
+      // cardBack.innerHTML = '<img src="./images/cards/back.png" class="card-pic" />';
+
+      // // create a frontCard Div
+      // const cardFront = document.createElement('div');
+      // cardFront.classList.add('card-front');
+      // cardFront.innerHTML = `<img src="${board[i][j].pic}" class="card-pic" />`;
+
+      // // append the cards
+
+      // cardInner.appendChild(cardBack);
+      // cardInner.appendChild(cardFront);
+
+      // card.appendChild(cardInner);
+
       // create the square element
       const square = document.createElement('div');
 
@@ -306,6 +391,7 @@ const buildBoardElements = (board) => {
   }
 
   return boardElement;
+  // }
 };
 
 // ===================================================

@@ -1,5 +1,82 @@
 body {
   background-color: lightgrey;
+  font-family: "Roboto", sans-serif;
+  margin: 5vw 20vw 0 20vw;
+  text-align: center;
+}
+
+.messageBoard {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2em;
+}
+
+.timer {
+  margin: 0 auto;
+  font-size: large;
+  width: 40vw;
+  background-color: tomato;
+}
+
+.btn-div {
+  margin-top: 2em;
+}
+
+#start-btn {
+  /* margin: 0px 20px 10px 0px;
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  width: 150px;
+  background-color: rgb(26, 199, 98);
+  border-radius: 2px;
+  border: 1px solid rgb(26, 199, 98); */
+  margin: 0px 20px 10px 10px;
+  padding: 16 px 36 px;
+  border-radius: 2 px;
+  background-color: #48d1cc;
+  color: whitesmoke;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+#stop-btn {
+  /* margin: 0px 20px 10px 0px;
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  width: 150px;
+  background-color: rgb(223, 13, 13);
+  border-radius: 2px;
+  border: 1px solid rgb(223, 13, 13); */
+  margin: 0px 20px 10px 10px;
+  padding: 16 px 36 px;
+  border-radius: 2 px;
+  background-color: #b22222;
+  color: whitesmoke;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+#reset-btn {
+  /* margin: 0px 20px 10px 0px;
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  width: 150px;
+  background-color: rgb(223, 167, 13);
+  border-radius: 2px;
+  border: 1px solid rgb(223, 167, 13); */
+  margin: 0px 20px 10px 10px;
+  padding: 16 px 36 px;
+  border-radius: 2 px;
+  background-color: #ffa07a;
+  color: whitesmoke;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .square {
@@ -18,7 +95,12 @@ body {
   margin: auto;
 }
 
+.red {
+  color: red;
+}
+
 .card {
+  font-size: large;
   padding: 50px;
   margin: 10px;
   background-color: white;
@@ -31,7 +113,7 @@ body {
 
 ​ .suit {
   margin: 5px;
-  font-size: 20px;
+  font-size: 80px;
 }
 
 ​ .messageBoard {
@@ -41,4 +123,8 @@ body {
   width: 480px;
   border-radius: 5px;
   text-align: center;
+}
+
+.timer {
+  font-size: large;
 }
