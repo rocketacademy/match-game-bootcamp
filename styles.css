@@ -95,3 +95,12 @@ button:disabled {
 .board {
   flex-shrink: 0;
 }
+
+.message {
+  font-family: lato;
+  margin: auto;
+  width: 50%;
+  color: #5f9595;
+  font-size: 2em;
+  text-align: center;
+}
