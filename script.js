@@ -62,7 +62,7 @@ let firstCard = null;
 let cardElement;
 let deck;
 
-let milliseconds = 10000;
+let milliseconds = 5000;
 const delayInMilliseconds = 1;
 const output = document.createElement('div');
 output.innerText = milliseconds;
@@ -145,8 +145,8 @@ const buildBoardElements = (board) => {
 }, delayInMilliseconds);
 
 setInterval(() => {
-  messageBoard.innerText = 'You have 30 sec left';
-},5000);
+  messageBoard.innerText = 'Time is up!';
+},milliseconds);
 
   //message board
   const messageBoard = document.createElement('div');
