@@ -6,11 +6,15 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 0;
+  height: 100vh;
 }
 .match-root {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-evenly;
+  height: 100%;
 }
 .match-banner {
   display: flex;
@@ -18,12 +22,7 @@ body {
   text-align: center;
   height: 30px;
 }
-.high-button-row {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: space-around;
-}
+
 .match-card-items {
   display: flex;
   flex-direction: row;
@@ -54,7 +53,6 @@ body {
 }
 .match-game-desc {
   display: flex;
-  margin-top: 30px;
   background-color: grey;
   color: white;
   padding: 3px 5px;
@@ -74,6 +72,8 @@ body {
 
 .match-hit {
   display: flex;
+  position: absolute;
+  bottom: 100px;
   margin-top: 30px;
   background-color: red;
   color: white;
@@ -82,4 +82,45 @@ body {
 
   animation-duration: 3s;
   animation-name: fade-out;
+}
+
+.match-start-game-button {
+  display: flex;
+  color: white;
+  background-color: #0d1749;
+  border-radius: 3px;
+  border: none;
+  padding: 5px;
+}
+
+.match-name-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: fit-content;
+  width: fit-content;
+}
+
+.match-name-input {
+  display: flex;
+  margin: 10px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.match-name-display {
+  display: flex;
+  margin: 10px;
+  height: 1.3em;
+  min-width: 100px;
+  font-style: italic;
+  font-weight: bold;
+  padding: 14px;
+  justify-content: center;
+  align-items: center;
+  background-color: #7d91f7;
+  color: #fdce6f;
+  border-radius: 10px;
 }

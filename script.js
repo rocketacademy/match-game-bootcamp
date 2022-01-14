@@ -13,7 +13,17 @@ const CLASS_GAME_DESC = `match-game-desc`;
 
 const CLASS_ROOT = `match-root`;
 
+const CLASS_CARD_START_GAME_BUTTON = `match-start-game-button`;
+
+const CLASS_NAME_WRAPPER = `match-name-wrapper`;
+const CLASS_NAME_INPUT = `match-name-input`;
+const CLASS_NAME_DISPLAY = `match-name-display`;
+
 /* <----- DEFAULT CONFIG ----> */
+
+/*        <----- PROFILE ----> */
+
+const DEFAULT_PLAYER_NAME = `PLAYER 1`;
 
 /*        <----- BOARD DIMENSION ----> */
 
@@ -132,7 +142,7 @@ const setBackGroundColor = (element, color) =>
 const setElementBorder = (element, val) => (element.style.border = val);
 
 const setElementInnerText = (element, text) => {
-  element.innerHTML = text;
+  element.innerText = text;
 };
 
 const displayStopGame = (game) => {
@@ -142,12 +152,24 @@ const displayStopGame = (game) => {
   setElementInnerText(elementGameDesc, `Game Ended`);
 };
 
+const clearGameDisplay = (game) => {
+  const { __elementRoot: elementRoot } = game;
+  console.log(`detaching`);
+  console.log(elementRoot);
+  detachAllChildren(elementRoot);
+};
+
 const setTimerElementDurationLeft = (timerItem) => {
   const { element } = timerItem;
   setElementInnerText(element, `${timerItem.value.durationLeft}ms`);
 };
 /*        <----- ELEMENT: PLAIN ----> */
 
+const newDefaultElementHeader = () => {
+  const element = document.createElement(`h1`);
+  setElementInnerText(element, `SWE101! 🚀 Matchee Mutchee`);
+  return element;
+};
 const newElementDurationTime = () => {
   const element = document.createElement(`div`);
   return element;
@@ -168,8 +190,29 @@ const newElementCardName = (suit) => {
 
 const newElementGameDesc = (freezeTime) => {
   const element = document.createElement(`div`);
-  element.innerHTML = `Click two cards, you will have a short viewing time of ${freezeTime}ms if cards are not matching. Game wins when all cards open. glhf!`;
+  setElementInnerText(
+    element,
+    `Click two cards, you will have a short viewing time of ${freezeTime}ms if cards are not matching. Game wins when all cards open. glhf!`
+  );
   element.className += ` ${CLASS_GAME_DESC}`;
+  return element;
+};
+
+const newElementButtonStart = () => {
+  const element = document.createElement(`button`);
+  const elementButtonStartDesc = document.createTextNode(`Start Game`);
+  element.className += ` ${CLASS_CARD_START_GAME_BUTTON}`;
+  element.appendChild(elementButtonStartDesc);
+
+  return element;
+};
+
+const newElementNameWrapper = () => {
+  const element = document.createElement(`div`);
+  const elementButtonStartDesc = document.createTextNode(`Input Your Name :)`);
+  element.className += ` ${CLASS_NAME_WRAPPER}`;
+  element.appendChild(elementButtonStartDesc);
+
   return element;
 };
 
@@ -200,6 +243,56 @@ const newElementCardAndSetClickHandle = (cardItem, game) => {
     }
   });
   cardItem.element = element;
+  return element;
+};
+
+const hideElement = (element) => (element.style.display = `none`);
+const hideStartButton = (game) => {
+  const { clickables } = game;
+  const { elementButtonStart } = clickables;
+  // !!elementButtonStart
+  hideElement(elementButtonStart);
+};
+
+const showElement = (element) => (element.style.display = `flex`);
+
+const showStartButton = (game) => {
+  const { clickables } = game;
+  const { elementButtonStart } = clickables;
+  // !!elementButtonStart
+  showElement(elementButtonStart);
+};
+
+const newElementNameInputAndSetClickHandler = (game) => {
+  const {
+    nameItem: { value: name },
+  } = game;
+
+  const element = document.createElement(`input`);
+  element.className += ` ${CLASS_NAME_INPUT}`;
+  element.setAttribute(`type`, `text`);
+
+  // Show placeholder name on start screen
+  let firstName = name || `-`;
+  element.setAttribute(`value`, firstName);
+  updateNameValueAndDisplay(game, firstName);
+
+  element.addEventListener(`input`, (event) => {
+    const value = event.target.value;
+    updateNameValueAndDisplay(game, value);
+    if (value === ``) {
+      hideStartButton(game);
+    } else {
+      showStartButton(game);
+    }
+  });
+
+  return element;
+};
+
+const newElementNameDisplay = () => {
+  const element = document.createElement(`div`);
+  element.className = ` ${CLASS_NAME_DISPLAY}`;
   return element;
 };
 
@@ -255,6 +348,21 @@ const exceedTime = (timerItem) => timerItem.value.durationLeft < 0;
 
 /* <----- UI-Logic Helpers ----> */
 
+/*        <----- STATS / INFO ----> */
+
+const updateNameValueAndDisplay = (game, newValue) => {
+  const { nameItem } = game;
+  const {
+    element: { display: elementNameDisplay },
+  } = nameItem;
+
+  // update name value
+  nameItem.value = newValue;
+
+  // display
+  setElementInnerText(elementNameDisplay, newValue);
+};
+
 /*        <----- CARD ACTIONS ----> */
 
 const flipDown = (cardItem) => {
@@ -288,11 +396,11 @@ const addActiveCardItem = (game, cardItem) => {
 
 const showMatcheeMatchee = (game) => {
   const { __elementRoot: elementParent, __timeSettings: timeSettings } = game;
+
   const { delayOnMatched } = timeSettings;
   const element = document.createElement(`div`);
   element.className += ` match-hit`;
   element.innerText = `HITTO`;
-  console.log(element);
 
   elementParent.appendChild(element);
   setTimeout(() => {
@@ -315,7 +423,7 @@ const deactiveActiveCardItems = (game) => {
 // Reconciliation after every two clicks.
 const settle = (game) => {
   console.group(`[settle] Two cards clicked.`);
-  const { state, __timeSettings: timeSettings } = game;
+  const { state, __timeSettings: timeSettings, __defaultElements } = game;
   const { activeCardItemsFlipped } = state;
 
   // activeCardItemsFlipped.length === 2;
@@ -332,12 +440,11 @@ const settle = (game) => {
       console.log(
         `Last matching: ${cardItemA.value.rank}${cardItemA.value.suit}`
       );
-      document.getElementById(
-        `header`
-      ).innerHTML = ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `; // !!
+      const { elementHeader } = __defaultElements;
+      setElementInnerText(elementHeader, ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `);
       stopGameAndDisplayStopGame(game);
     } else {
-      console.log(`showing flash hit on ${cardItemA.value.rank}`);
+      console.log(`Showing flash hit on ${cardItemA.value.rank}`);
       showMatcheeMatchee(game);
     }
   } else {
@@ -373,30 +480,40 @@ const setTimeValueLeftAndUpdateDisplay = (timerItem) => {
 
 /* <----- DRIVER ----> */
 
-const clearGameDisplay = (game) => {
-  const { __elementRoot: elementRoot } = game;
-  console.log(`detaching`);
-  console.log(elementRoot);
-  detachAllChildren(elementRoot);
-};
-
 const commencePreGame = (game) => {
-  const { __elementRoot: elementRoot, __defaultElements } = game;
-  const { elementGameDesc } = __defaultElements;
+  const {
+    __elementRoot: elementRoot,
+    __defaultElements,
+    nameItem,
+    clickables,
+  } = game;
+  const { elementGameDesc, elementHeader } = __defaultElements;
 
-  const elementStartGameButton = document.createElement(`button`);
-  const elementStartGameButtonDesc = document.createTextNode(`Start Game`);
+  const elementNameWrapper = newElementNameWrapper();
+  nameItem.element.wrapper = elementNameWrapper;
 
-  elementStartGameButton.appendChild(elementStartGameButtonDesc);
+  const elementNameDisplay = newElementNameDisplay();
+  nameItem.element.display = elementNameDisplay;
 
+  const elementNameInputField = newElementNameInputAndSetClickHandler(game);
+  nameItem.element.field = elementNameInputField;
+
+  const elementButtonStart = newElementButtonStart();
+  clickables.elementButtonStart = elementButtonStart;
+
+  elementNameWrapper.appendChild(elementNameInputField);
+  elementNameWrapper.appendChild(elementNameDisplay);
+
+  elementRoot.appendChild(elementHeader);
+  elementRoot.appendChild(elementNameWrapper);
+  elementRoot.appendChild(elementButtonStart);
   elementRoot.appendChild(elementGameDesc);
-  elementRoot.appendChild(elementStartGameButton);
 
   const onClickStartHandler = () => {
     clearGameDisplay(game);
     startGame(game);
   };
-  elementStartGameButton.addEventListener(`click`, onClickStartHandler);
+  elementButtonStart.addEventListener(`click`, onClickStartHandler);
 };
 
 const startTimer = (game) => {
@@ -405,7 +522,7 @@ const startTimer = (game) => {
 
   const endTime = new Date();
   endTime.setMilliseconds(endTime.getMilliseconds() + gameDuration);
-  timerItem.value = { endTime: endTime, durationLeft: null };
+  timerItem.value.endTime = endTime;
 
   setTimeValueLeftAndUpdateDisplay(timerItem);
 
@@ -422,14 +539,15 @@ const startGame = (game) => {
   const {
     cardItems,
     timerItem,
+    nameItem: { element: nameElements },
     __elementRoot: elementRoot,
     __defaultElements,
   } = game;
 
-  const { elementGameDesc } = __defaultElements;
+  const { elementGameDesc, elementHeader } = __defaultElements;
+  const { display: elementNameDisplay } = nameElements;
   // !elementRoot.firstChild
-
-  //
+  setElementInnerText(elementHeader, `hi`);
   const elementDurationTime = newElementDurationTime(game);
   timerItem.element = elementDurationTime;
   // Create Card Elements
@@ -446,6 +564,7 @@ const startGame = (game) => {
     elementCardItems.appendChild(elementCardRow);
   }
 
+  elementRoot.appendChild(elementNameDisplay);
   elementRoot.appendChild(elementDurationTime);
   elementRoot.appendChild(elementCardItems);
   elementRoot.appendChild(elementGameDesc);
@@ -470,6 +589,15 @@ const newGame = (gameConfig) => {
       element: null,
       gameDurationCountDownInterval: null,
     },
+    nameItem: {
+      element: { field: null, display: null, wrapper: null }, // wrapper hugs the field and display elements.
+      value: DEFAULT_PLAYER_NAME,
+    },
+    clickables: {
+      elementButtonStart: null,
+      elementButtonPause: null,
+      elementButtonReset: null,
+    },
     // Game state
     state: {
       isPause: false,
@@ -483,6 +611,7 @@ const newGame = (gameConfig) => {
     __timeSettings: timeSettings,
     __defaultElements: {
       elementGameDesc: newElementGameDesc(timeSettings.delayPause),
+      elementHeader: newDefaultElementHeader(),
     },
     _gameData: gameConfig,
   };
