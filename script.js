@@ -266,6 +266,7 @@ const initGame = () => {
 // reset function
 const reset = () => {
   outputBox.innerText = ''; // clear outputBox
+  clearTimeout(gameOverFunction); // clear 3-minute timer
   gameOverFunction = setTimeout(timesUp, timeGiven); // reset 3-minute timer
   firstCard = null; // reset firstCard to null
   winBox.innerText = ''; // clear winBox
