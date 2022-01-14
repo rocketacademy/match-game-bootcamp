@@ -1,16 +1,20 @@
 // ----- GLOBAL VARIABLES -----------------------
 const boardSize = 4;
 const board = [];
+
+let deck;
 let firstCard = null;
 let firstCardElement;
-let deck;
-let canClick = true;
-let timerStarted = false;
 
-// 1 min = 60 000 ms
-// 3 mins = 180 000ms
-let milliseconds = 180000; // 3 minutes
+// For gameplay
+let canClick = true;
+let gameCompleted = false;
+
+// For timer
+let milliseconds = 180000; // 3 minutes (1 min = 60 000ms)
 const delayInMilliseconds = 100; // 0.1 second
+let timerStarted = false;
+let timerRef;
 
 // For game information
 const gameInfoContainer = document.createElement('div');
@@ -93,6 +97,15 @@ const shuffleCards = (cards) => {
 	return cards;
 };
 
+// Format open cards
+const formatOpenCard = (cardDiv, card) => {
+	cardDiv.innerText = `${card.name}${card.symbol}`;
+	if (card.symbol === '♥️' || card.symbol === '♦️') {
+		cardDiv.classList.add('red');
+	}
+	cardDiv.classList.add('open-card');
+};
+
 // Format timer
 const formatTimer = (ms) => {
 	// Show min:sec
@@ -111,6 +124,35 @@ const formatTimer = (ms) => {
 	return `${min}:${sec}`;
 };
 
+const startTimer = () => {
+	timerRef = setInterval(() => {
+		if (milliseconds <= 0) {
+			clearInterval(timerRef);
+			updateGameInfo(`Time's up! You lose.`);
+			canClick = false;
+		}
+
+		timer.innerHTML = formatTimer(milliseconds);
+		milliseconds -= delayInMilliseconds;
+	}, delayInMilliseconds);
+};
+
+const stopTimer = () => {
+	clearInterval(timerRef);
+	updateGameInfo(
+		`Congrats, you matched all the cards!<br>Refresh the page to play again.`
+	);
+	canClick = false;
+};
+
+const areAllCardsOpen = () => {
+	const numOfOpenCards = document.querySelectorAll('.open-card');
+	if (numOfOpenCards.length === 16) {
+		return true;
+	}
+	return false;
+};
+
 // ----- GAMEPLAY LOGIC -------------------------
 
 // What happens when user clicks on a square
@@ -125,99 +167,84 @@ const openCard = (cardElement, row, column) => {
 	const clickedCard = board[row][column];
 
 	// If this card is already open (user has already clicked this square)
-	if (cardElement.innerText !== '') {
+	// Or setTimeout is running
+	if (cardElement.innerText !== '' || canClick === false) {
 		return;
 	}
 
-	if (canClick === true) {
-		// First turn
-		if (firstCard === null) {
-			console.log('First card picked');
-			// Set the firstCard to the card that was clicked
-			firstCard = clickedCard;
-			console.log(firstCard);
+	// First turn
+	if (firstCard === null) {
+		// Set the firstCard to the card that was clicked
+		firstCard = clickedCard;
 
+		// "Turn the card over" by showing the card name in the square
+		formatOpenCard(cardElement, clickedCard);
+
+		// Hold on to this first in case second card doesn't match
+		firstCardElement = cardElement;
+
+		// Update game info
+		updateGameInfo(`Great, now find its match!`);
+	}
+
+	// Second turn
+	else {
+		canClick = false;
+
+		// If it's a match
+		if (
+			clickedCard.name === firstCard.name &&
+			clickedCard.suit === firstCard.suit
+		) {
 			// "Turn the card over" by showing the card name in the square
-			cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
-			cardElement.classList.add('open-card');
 
-			// Hold on to this first in case second card doesn't match
-			firstCardElement = cardElement;
+			formatOpenCard(cardElement, clickedCard);
 
-			// Update game info
-			updateGameInfo(`Great, click another card to match`);
-		}
+			// Check if all cards are open
+			if (areAllCardsOpen() === true) {
+				stopTimer();
+				return;
+			}
 
-		// Second turn
-		else {
-			console.log('Second card picked...');
-			canClick = false;
-
-			// If it's a match
-			if (
-				clickedCard.name === firstCard.name &&
-				clickedCard.suit === firstCard.suit
-			) {
-				console.log(clickedCard);
-
-				// "Turn the card over" by showing the card name in the square
-				cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
-				cardElement.classList.add('open-card');
-
+			// If not all cards have been open, update game info
+			else {
 				updateGameInfo(`Noice, it's a match!`);
-
-				// Update game info
 				setTimeout(() => {
 					updateGameInfo(
-						`Click a card to continue, or refresh the page to restart`
+						`Click a card to continue, or refresh the page to restart.`
 					);
 				}, 2000);
 
 				canClick = true;
 			}
-
-			// If it's not a match
-			else {
-				console.log(clickedCard);
-
-				// "Turn the card over" by showing the card name in the square
-				cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
-				cardElement.classList.add('open-card');
-
-				setTimeout(() => {
-					// "Turn cards over" by removing card name in square
-					cardElement.innerText = ``;
-					firstCardElement.innerText = ``;
-
-					cardElement.classList.remove('open-card');
-					firstCardElement.classList.remove('open-card');
-
-					updateGameInfo(`Click a card`);
-					canClick = true;
-				}, 2000);
-
-				// Update game info
-				updateGameInfo(`Sorry, try again`);
-			}
-
-			// Reset the cards
-			firstCard = null;
-			console.log(firstCard);
 		}
+
+		// If it's not a match
+		else {
+			// "Open cards" by showing the card name in the square and adding the relevant classes
+
+			formatOpenCard(cardElement, clickedCard);
+
+			// "Turn cards over" after a set time
+			setTimeout(() => {
+				// "Turn cards over" by removing card name in square
+				cardElement.innerText = ``;
+				firstCardElement.innerText = ``;
+
+				cardElement.classList.remove('open-card', 'red', 'black');
+				firstCardElement.classList.remove('open-card', 'red', 'black');
+
+				updateGameInfo(`Click to open a card.`);
+				canClick = true;
+			}, 1500);
+
+			// Update game info
+			updateGameInfo(`Sorry, those didn't match. Try again!`);
+		}
+
+		// Reset the cards
+		firstCard = null;
 	}
-};
-
-const startTimer = () => {
-	const ref = setInterval(() => {
-		if (milliseconds <= 0) {
-			clearInterval(ref);
-			updateGameInfo(`Time's up!`);
-			canClick = false;
-		}
-
-		timer.innerHTML = formatTimer(milliseconds);
-		milliseconds -= delayInMilliseconds;
-	}, delayInMilliseconds);
 };
 
 // ----- GAME INITIALISATION --------------------
