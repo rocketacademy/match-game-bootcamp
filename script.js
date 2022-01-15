@@ -211,7 +211,7 @@ const makeDeck = () => {
   return newDeck;
 };
 
-let milliseconds = 1 * 60 * 1000;
+let milliseconds = 0.2 * 60 * 1000;
 
 // console.log(totalSeconds);
 // console.log(minutes);
@@ -236,8 +236,12 @@ const ref = setInterval(() => {
 
   if (milliseconds <= 0) {
     clearInterval(ref);
-    messageOutput.innerText = 'GAME OVER!';
+    messageOutput.innerText = 'GAME OVER! Resetting...';
     canClick = false;
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
+
     return;
   }
 
