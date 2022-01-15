@@ -211,7 +211,7 @@ const makeDeck = () => {
   return newDeck;
 };
 
-let milliseconds = 0.2 * 60 * 1000;
+let milliseconds = 3 * 60 * 1000;
 
 // console.log(totalSeconds);
 // console.log(minutes);
