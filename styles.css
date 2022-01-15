@@ -22,7 +22,6 @@ body {
 }
 
 .div {
-  /* height: 10px; */
 }
 
 .board {
@@ -34,6 +33,12 @@ body {
   text-align: center;
   font-size: 30px;
   margin-top: 5%;
-  margin-bottom: 5%;
+  /* margin-bottom: 5%; */
   color: slategrey;
+}
+
+#timer {
+  color: black;
+  font-size: 30px;
+  margin: 10px;
 }
