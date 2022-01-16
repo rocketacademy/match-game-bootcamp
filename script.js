@@ -486,13 +486,20 @@ const settle = (game) => {
   console.groupEnd();
 };
 
-const stopGameAndDisplayStopGame = (game) => {
-  const { timerItem } = game;
-  // !!timerItem
+const unsetGameCoundownInterval = (timerItem) => {
   const { gameDurationCountDownInterval } = timerItem;
   // !!gameDurationCountDownInterval
+  if (!gameDurationCountDownInterval) {
+    throw new Error(
+      `[unsetGameCoundownInterval] should be called only if there is a countdown interval`
+    );
+  }
   clearInterval(gameDurationCountDownInterval);
-
+  timerItem.gameDurationCountDownInterval = null;
+};
+const stopGameAndDisplayStopGame = (game) => {
+  const { timerItem } = game;
+  unsetGameCoundownInterval(timerItem);
   stopGame(game);
   displayStopGame(game);
 };
@@ -542,9 +549,36 @@ const commencePreGame = (game) => {
   elementButtonStart.addEventListener(`click`, onClickStartHandler);
 };
 
-const startTimer = (game) => {
+const readyTimer = (game) => {
+  const { timerItem, __timeSettings: timeSettings } = game;
+  const { gameDuration } = timeSettings;
+  // Set end time
+  const endTime = new Date();
+  endTime.setMilliseconds(endTime.getMilliseconds() + gameDuration);
+  timerItem.value.endTime = endTime;
+};
+
+const goTimer = (game) => {
   const { timerItem, __timeSettings: timeSettings, clickables } = game;
-  const { gameDuration, timeCheckInterval } = timeSettings;
+  const { timeCheckInterval } = timeSettings;
+  const { inGameElements } = clickables;
+
+  setTimeDurationLeftAndUpdateDisplay(timerItem);
+
+  if (timerItem.gameDurationCountDownInterval) {
+    throw `Should have one game countdown timer only`;
+  }
+  timerItem.gameDurationCountDownInterval = setInterval(() => {
+    console.log(`timer started`);
+    setTimeDurationLeftAndUpdateDisplay(timerItem);
+    if (exceedTime(timerItem)) {
+      stopGameAndDisplayStopGame(game);
+    }
+  }, timeCheckInterval);
+};
+
+const displayTimer = (game) => {
+  const { clickables } = game;
   const { inGameElements } = clickables;
   const { wrapper: elementButtonWrapper } = inGameElements;
 
@@ -558,25 +592,12 @@ const startTimer = (game) => {
 
   elementButtonWrapper.appendChild(elementButtonPause);
   elementButtonWrapper.appendChild(elementButtonReset);
-
-  // Set end time
-  const endTime = new Date();
-  endTime.setMilliseconds(endTime.getMilliseconds() + gameDuration);
-  timerItem.value.endTime = endTime;
-
-  //
+};
+const startTimer = (game) => {
+  displayTimer(game);
+  readyTimer(game);
   enableCardClickable(game);
-
-  // CountUp commences
-  setTimeDurationLeftAndUpdateDisplay(timerItem);
-  timerItem.gameDurationCountDownInterval = setInterval(() => {
-    console.log(`timer started`);
-    setTimeDurationLeftAndUpdateDisplay(timerItem);
-
-    if (exceedTime(timerItem)) {
-      stopGameAndDisplayStopGame(game);
-    }
-  }, timeCheckInterval);
+  goTimer(game);
 };
 
 const newElementCardItemsWrapper = () => {
@@ -659,6 +680,7 @@ const newGame = (gameConfig) => {
     // Game state
     state: {
       isClickable: false,
+      isPause: false,
       isStop: false,
       activeCardItemsFlipped: [], // Cards which are open temporarily.
       unMatchedCardsCount: totalCardsCount,
