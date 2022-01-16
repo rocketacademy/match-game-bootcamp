@@ -25,6 +25,8 @@ const CLASS_NAME_DISPLAY = `match-name-display`;
 
 const CLASS_MATCH_HIT = `match-hit`;
 
+const CLASS_TABLE_TD = `match-table-td`;
+
 /* <----- DEFAULT CONFIG ----> */
 
 /*        <----- PROFILE ----> */
@@ -588,6 +590,15 @@ const onClickRestartHandler = (prevGame) => {
   clearDisplayAndStartGame(game);
 };
 
+const newElementTableData = (desc) => {
+  const element = document.createElement(`td`);
+
+  element.className += ` ${CLASS_TABLE_TD}`;
+
+  element.innerText = `${desc}`;
+  return element;
+};
+
 const displayGameStatistics = (gameConfig) => {
   const {
     statistics: { tally },
@@ -606,8 +617,7 @@ const displayGameStatistics = (gameConfig) => {
   const th = document.createElement(`th`);
 
   for (const { desc: prop } of properties) {
-    const td = document.createElement(`td`);
-    td.innerText = `${prop}`;
+    const td = newElementTableData(prop);
     th.appendChild(td);
     elementTableHead.appendChild(td);
   }
@@ -615,8 +625,7 @@ const displayGameStatistics = (gameConfig) => {
   for (const stat of tally) {
     const tr = document.createElement(`tr`);
     for (const { value: prop } of properties) {
-      const td = document.createElement(`td`);
-      td.innerText = `${stat[prop]}`;
+      const td = newElementTableData(stat[prop]);
       tr.appendChild(td);
     }
     elementTableBody.appendChild(tr);
