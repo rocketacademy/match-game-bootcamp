@@ -149,11 +149,20 @@ const setElementInnerText = (element, text) => {
   element.innerText = text;
 };
 
-const displayStopGameMessage = (game) => {
+const updateDisplayGameDescGameEnds = (game) => {
   const {
     __defaultElements: { elementGameDesc },
   } = game;
   setElementInnerText(elementGameDesc, `Game Ended`);
+};
+const displayStopGameElements = (game) => {
+  const isCompleted = isGameCompleted(game);
+  undisplayTimeBanner(game);
+  // show grid only if completed
+  if (!isCompleted) {
+  }
+
+  updateDisplayGameDescGameEnds(game);
 };
 
 const undisplayTimeBanner = (game) => {
@@ -172,7 +181,7 @@ const clearGameDisplay = (game) => {
   detachAllChildren(elementRoot);
 };
 
-const setTimerElementDurationLeft = (timerItem) => {
+const updateDisplayDurationLeft = (timerItem) => {
   const {
     elements: { durationLeft: elementDurationLeft },
   } = timerItem;
@@ -453,8 +462,12 @@ const isMatchingCards = (cardA, cardB) => cardA === cardB;
 /*                                                        <----- LH:TIME ----> */
 
 const getDurationLeft = (timerItem) => timerItem.value.endTime - new Date();
-const setTimerValueLeft = (timerItem) =>
-  (timerItem.value.durationLeft = getDurationLeft(timerItem));
+const setTimerValueLeft = (timerItem) => {
+  const prevDurationLeft = timerItem.value.durationLeft;
+  const currentDurationLeft = getDurationLeft(timerItem);
+  timerItem.value.durationLeft = currentDurationLeft;
+  timerItem.value.durationElapsed += prevDurationLeft - currentDurationLeft;
+};
 const exceedTime = (timerItem) => timerItem.value.durationLeft < 0;
 
 /* <----- UI-Logic Helpers (a mix of ui and logic in the function body) ----> */
@@ -585,11 +598,50 @@ const setGameCountdownInterval = (game) => {
   }, timeCheckInterval);
 };
 
+const setGameCompleted = (game) => {
+  game.state.isCompleted = true;
+};
+
+const isGameCompleted = (game) => game.state.isCompleted;
+
+const getGameStatistics = (game) => {
+  const isCompleted = isGameCompleted(game);
+  const {
+    _gameData: { boardSide, gameDuration },
+    timerItem: {
+      value: { durationElapsed, durationLeft },
+    },
+  } = game;
+
+  const startTime = getStartTime(game);
+
+  // sanity check on time logging
+  if (!(durationElapsed + durationLeft !== gameDuration)) {
+    console.warn(
+      `[getGameStatistics] durationElapsed (${durationElapsed}) durationLeft (${durationLeft}) !== ${gameDuration}`
+    );
+  }
+  return {
+    isCompleted,
+    boardSide,
+    durationElapsed,
+    startTime,
+  };
+};
+
+const runGameReport = (game) => {
+  const gameStatistics = getGameStatistics(game);
+  console.log(` [ current game stats ]`);
+  console.log(gameStatistics);
+
+  const { _gameData } = game;
+  _gameData.mostRecentGame = gameStatistics;
+};
+// end of game clear up function
 const stopGameAndDisplayStopGame = (game) => {
   unsetGameCountdownInterval(game);
   flagGameStop(game);
-  undisplayTimeBanner(game);
-  displayStopGameMessage(game);
+  displayStopGameElements(game);
 };
 
 const pauseTimer = (game) => {
@@ -602,7 +654,7 @@ const setTimeDurationLeftAndUpdateDisplay = (timerItem) => {
   // Set time left
   setTimerValueLeft(timerItem);
   // Displau time left
-  setTimerElementDurationLeft(timerItem);
+  updateDisplayDurationLeft(timerItem);
 };
 
 const goTimer = (game) => {
@@ -623,13 +675,18 @@ const goTimer = (game) => {
   setGameCountdownInterval(game);
 };
 
+const setStartTime = (game, time) => (game.state.startTime = time);
+const getStartTime = () => game.state.startTime;
 const readyTimer = (game) => {
   const { timerItem, __timeSettings: timeSettings } = game;
   const { gameDuration } = timeSettings;
   // Set end time as offset of now
-  const endTime = new Date();
+  const now = new Date();
+  setStartTime(game);
+  const endTime = now;
   endTime.setMilliseconds(endTime.getMilliseconds() + gameDuration);
   timerItem.value.endTime = endTime;
+  timerItem.value.durationLeft = gameDuration;
 };
 
 const playTimer = (game) => {
@@ -661,6 +718,8 @@ const settle = (game) => {
       );
       const { elementHeader } = __defaultElements;
       setElementInnerText(elementHeader, ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `);
+
+      setGameCompleted(game);
       stopGameAndDisplayStopGame(game);
     } else {
       console.log(`Showing flash hit on ${cardItemA.value.rank}`);
@@ -805,7 +864,11 @@ const newGame = (gameConfig) => {
     },
     // Timer
     timerItem: {
-      value: { endTime: undefined, durationLeft: undefined },
+      value: {
+        endTime: undefined,
+        durationLeft: undefined,
+        durationElapsed: 0,
+      },
       elements: { durationLeft: null, banner: null }, // banner will contain timer descriptions and controls
       gameDurationCountDownInterval: null,
     },
@@ -826,6 +889,8 @@ const newGame = (gameConfig) => {
       isCardOnCoolDown: false,
       isPause: undefined,
       isStop: undefined,
+      isCompleted: false,
+      startTime: undefined,
       activeCardItemsFlipped: [], // Cards which are open temporarily.
       unMatchedCardsCount: totalCardsCount,
     },
@@ -842,15 +907,14 @@ const newGame = (gameConfig) => {
 
   return game;
 };
-
-// <!--  MAIN  -->
-
 const main = (gameData) => {
   // Initialize Game
   const game = newGame(gameData);
   // Commence
   commencePreGame(game);
 };
+
+// <!-- EXECUTION -->
 
 // append elementRoot of game to html body. elementRoot is root-level ancestor for all other game elements.
 const elementRoot = document.createElement(`div`);
@@ -861,6 +925,8 @@ const gameConfig = {
   elementRoot: elementRoot,
   boardSide: BOARD_SIDE_DEFAULT,
   timeSettings: TIME_DEFAULT_SETTINGS,
+  stats: { mostRecentGame: null, tally: [] },
 };
+
 // Flow: main -> commencePreGame -> onClickStartHandler:startGame -> (exceedTime OR isAllPairsMatch): stopGameAndDisplayStopGame
 main(gameConfig);
