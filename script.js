@@ -251,13 +251,21 @@ const newElementInGameButtonsWrapper = () => {
 const newElementButtonPlay = () => {
   const element = document.createElement(`button`);
   element.className += ` ${CLASS_BUTTON_PLAY}`;
-  element.innerHTML = ` |>`;
+  element.innerHTML = `▶`;
   return element;
 };
 const newElementButtonPause = () => {
   const element = document.createElement(`button`);
   element.className += ` ${CLASS_BUTTON_PAUSE}`;
-  element.innerText = `||`;
+  element.innerText = `⏸`;
+
+  return element;
+};
+
+const newElementButtonStop = () => {
+  const element = document.createElement(`button`);
+  element.className += ` ${CLASS_BUTTON_PAUSE}`;
+  element.innerText = `⏹`;
 
   return element;
 };
@@ -329,7 +337,6 @@ const newElementNameInputAndSetClickHandler = (game) => {
 
   // !!playerName
 
-  console.warn(`playerName should have a value ${playerName}`);
   element.setAttribute(`value`, playerName);
   updateAndDisplayPlayerName(game, playerName);
 
@@ -599,12 +606,20 @@ const newElementTableData = (desc) => {
   return element;
 };
 
-const displayGameStatistics = (gameConfig) => {
+const displayGameStatistics = (game) => {
+  const {
+    clickables: {
+      preCommenceElements: { buttonStart: elementButtonStart },
+    },
+    nameItem: {
+      element: { display: elementNameDisplay },
+    },
+    _gameData: gameConfig,
+  } = game;
   const {
     statistics: { tally },
     elementRoot,
   } = gameConfig;
-
   const elementTable = document.createElement(`table`);
 
   const elementTableHead = document.createElement(`thead`);
@@ -621,7 +636,13 @@ const displayGameStatistics = (gameConfig) => {
     format: (is) => (is === true ? `T` : is === false ? `F` : `?`),
   };
 
-  const properties = [propCompleted, propDurationElapsed];
+  const propTimeStarted = {
+    value: `startTime`,
+    colName: `Start Time`,
+    format: (d) => d,
+  };
+
+  const properties = [propTimeStarted, propCompleted, propDurationElapsed];
   const th = document.createElement(`th`);
 
   for (const { colName } of properties) {
@@ -638,16 +659,19 @@ const displayGameStatistics = (gameConfig) => {
     }
     elementTableBody.appendChild(tr);
   }
+  elementRoot.appendChild(elementNameDisplay);
 
   elementTable.appendChild(elementTableHead);
   elementTable.appendChild(elementTableBody);
 
   elementRoot.appendChild(elementTable);
+  elementRoot.appendChild(elementButtonStart);
 };
 const clearDisplayAndViewStatistics = (game) => {
   clearGameDisplay(game);
   const gameConfig = getGameConfig(game);
-  displayGameStatistics(gameConfig);
+  const thisNewGame = newGame(gameConfig);
+  displayGameStatistics(thisNewGame);
 };
 const onClickStatisticsHandler = (prevGame) => {
   clearDisplayAndViewStatistics(prevGame);
@@ -661,14 +685,21 @@ const updateDisplayTimerControl = (game) => {
     wrapper: elementButtonTimeControlWrapper,
     buttonPause: elementButtonPause,
     buttonPlay: elementButtonPlay,
+    buttonStop: elementButtonStop,
   } = inGameTimeControlElements;
 
   // !!elementButtonTimeControlWrapper
   const isGamePausing = isGamePause(game);
   if (isGamePausing === true) {
-    elementButtonTimeControlWrapper.replaceChildren(elementButtonPlay);
+    elementButtonTimeControlWrapper.replaceChildren(
+      elementButtonPlay,
+      elementButtonStop
+    );
   } else if (isGamePausing === false) {
-    elementButtonTimeControlWrapper.replaceChildren(elementButtonPause);
+    elementButtonTimeControlWrapper.replaceChildren(
+      elementButtonPause,
+      elementButtonStop
+    );
   } else {
     console.warn(
       `[updateTimerControl] isGamePausing undefined or null or not a boolean`
@@ -682,9 +713,10 @@ const unsetGameCountdownInterval = (game) => {
   const { gameDurationCountDownInterval } = timerItem;
   // !!gameDurationCountDownInterval
   if (!gameDurationCountDownInterval) {
-    throw new Error(
-      `[unsetGameCoundownInterval] should be called only if there is a countdown interval`
+    console.warn(
+      `[unsetGameCoundownInterval]  called without a countdown interval`
     );
+    return;
   }
   clearInterval(gameDurationCountDownInterval);
   timerItem.gameDurationCountDownInterval = null;
@@ -701,7 +733,7 @@ const setGameCountdownInterval = (game) => {
   timerItem.gameDurationCountDownInterval = setInterval(() => {
     setTimeDurationLeftAndUpdateDisplay(timerItem);
     if (exceedTime(timerItem)) {
-      stopGameAndDisplayStopGame(game);
+      stopGameDueToTimeExceed(game);
     }
   }, timeCheckInterval);
 };
@@ -729,12 +761,14 @@ const getGameStatistics = (game) => {
       `[getGameStatistics] durationElapsed (${durationElapsed}) durationLeft (${durationLeft}) !== ${gameDuration}`
     );
   }
-  return {
+
+  const gameStatistics = {
     isCompleted,
     boardSide,
     durationElapsed,
     startTime,
   };
+  return gameStatistics;
 };
 
 const runGameReport = (game) => {
@@ -750,10 +784,14 @@ const runGameReport = (game) => {
 
 // end of game clear up function
 const stopGameAndDisplayStopGame = (game) => {
-  unsetGameCountdownInterval(game);
   flagGameStop(game);
   runGameReport(game);
   displayGameStop(game);
+};
+
+const stopGameDueToTimeExceed = (game) => {
+  unsetGameCountdownInterval(game);
+  stopGameAndDisplayStopGame(game);
 };
 
 const pauseTimer = (game) => {
@@ -796,7 +834,7 @@ const readyTimer = (game) => {
   const { gameDuration } = timeSettings;
   // Set end time as offset of now
   const now = new Date();
-  setStartTime(game);
+  setStartTime(game, now);
   const endTime = now;
   endTime.setMilliseconds(endTime.getMilliseconds() + gameDuration);
   timerItem.value.endTime = endTime;
@@ -902,16 +940,18 @@ const startGame = (game) => {
   elementButtonPause.addEventListener(`click`, () => {
     pauseTimer(game);
   });
-  elementInGameTimeControlWrapper.appendChild(elementButtonPause);
 
   const elementButtonPlay = newElementButtonPlay();
   inGameTimeControlElements.buttonPlay = elementButtonPlay;
   elementButtonPlay.addEventListener(`click`, () => {
     playTimer(game);
   });
-  elementInGameTimeControlWrapper.appendChild(elementButtonPlay);
   elementTimeBanner.appendChild(elementInGameTimeControlWrapper);
-
+  const elementButtonStop = newElementButtonStop();
+  inGameTimeControlElements.buttonStop = elementButtonStop;
+  elementButtonStop.addEventListener(`click`, () => {
+    stopGameAndDisplayStopGame(game);
+  });
   // Append to Screen
   elementRoot.appendChild(elementNameDisplay);
   elementRoot.appendChild(elementTimeBanner);
@@ -954,6 +994,8 @@ const displayGameStop = (game) => {
   let desc = ``;
   if (mostRecentGameStatistics.isCompleted === true) {
     desc = `You've completed in ${mostRecentGameStatistics.durationElapsed}ms`;
+  } else {
+    desc = `Try again! Duration elapsed: ${mostRecentGameStatistics.durationElapsed}ms`;
   }
   elementDesc.innerText = desc;
 
@@ -1024,15 +1066,16 @@ const newGame = (gameConfig) => {
         wrapper: null,
         buttonPause: null,
         buttonPlay: null,
+        buttonStop: null,
       },
     },
     // Game state
     state: {
       isCardOnCoolDown: false,
-      isPause: undefined,
-      isStop: undefined,
+      isPause: false,
+      isStop: false,
       isCompleted: false,
-      startTime: undefined,
+      startTime: false,
       activeCardItemsFlipped: [], // Cards which are open temporarily.
       unMatchedCardsCount: totalCardsCount,
     },
