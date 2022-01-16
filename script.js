@@ -254,8 +254,8 @@ const newElementCardAndSetClickHandle = (cardItem, game) => {
       console.warn(`Game stopped.`);
       return;
     }
-    if (isGamePause(game)) {
-      console.warn(`Game is paused`);
+    if (!isCardClickable(game)) {
+      console.warn(`Card click callback disabled`);
       return;
     }
     flipUp(cardItem);
@@ -340,18 +340,18 @@ const stopGame = (game) => {
   game.state.isStop = true;
 };
 
-const isGamePause = (game) => game.state.isPause;
-const pauseGame = (game) => {
-  console.log(`game pause`);
-  game.state.isPause = true;
+const isCardClickable = (game) => game.state.isClickable;
+const disableCardClickable = (game) => {
+  console.log(`card click disabled`);
+  game.state.isClickable = false;
 };
-const unPauseGame = (game) => {
+const enableCardClickable = (game) => {
   if (isGameStop(game)) {
-    console.log(`cannot pause`);
+    console.log(`cannot enable click. game has stopped`);
     return;
   }
-  console.log(`game unpause`);
-  game.state.isPause = false;
+  console.log(`card click enabled`);
+  game.state.isClickable = true;
 };
 
 /*        <----- CARD ----> */
@@ -475,9 +475,9 @@ const settle = (game) => {
     }
   } else {
     console.log(`Not Matching!`);
-    pauseGame(game);
+    disableCardClickable(game);
     setTimeout(() => {
-      unPauseGame(game);
+      enableCardClickable(game);
       flipDownCards(activeCardItemsFlipped);
       deactiveActiveCardItems(game);
     }, timeSettings.delayPause);
@@ -563,6 +563,9 @@ const startTimer = (game) => {
   const endTime = new Date();
   endTime.setMilliseconds(endTime.getMilliseconds() + gameDuration);
   timerItem.value.endTime = endTime;
+
+  //
+  enableCardClickable(game);
 
   // CountUp commences
   setTimeDurationLeftAndUpdateDisplay(timerItem);
@@ -655,7 +658,7 @@ const newGame = (gameConfig) => {
     },
     // Game state
     state: {
-      isPause: false,
+      isClickable: false,
       isStop: false,
       activeCardItemsFlipped: [], // Cards which are open temporarily.
       unMatchedCardsCount: totalCardsCount,
