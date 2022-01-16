@@ -13,7 +13,11 @@ const CLASS_GAME_DESC = `match-game-desc`;
 
 const CLASS_ROOT = `match-root`;
 
-const CLASS_CARD_START_GAME_BUTTON = `match-start-game-button`;
+const CLASS_BUTTON_START = `match-button-start-game`;
+const CLASS_BUTTON_PAUSE = `match-button-pause-game`;
+const CLASS_BUTTON_RESET = `match-button-reset-game`;
+const CLASS_IMG_BUTTON_IN_GAME = `match-img-button-in-game`;
+const CLASS_WRAPPER_BUTTON_IN_GAMES = `match-wrapper-buttons-in-game`;
 
 const CLASS_NAME_WRAPPER = `match-name-wrapper`;
 const CLASS_NAME_INPUT = `match-name-input`;
@@ -201,7 +205,7 @@ const newElementGameDesc = (freezeTime) => {
 const newElementButtonStart = () => {
   const element = document.createElement(`button`);
   const elementButtonStartDesc = document.createTextNode(`Start Game`);
-  element.className += ` ${CLASS_CARD_START_GAME_BUTTON}`;
+  element.className += ` ${CLASS_BUTTON_START}`;
   element.appendChild(elementButtonStartDesc);
 
   return element;
@@ -216,6 +220,26 @@ const newElementNameWrapper = () => {
   return element;
 };
 
+const newElementInGameButtonsWrapper = () => {
+  const element = document.createElement(`button`);
+  element.className += ` ${CLASS_WRAPPER_BUTTON_IN_GAMES}`;
+
+  return element;
+};
+
+const newElementButtonReset = () => {
+  const element = document.createElement(`button`);
+  element.className += ` ${CLASS_BUTTON_RESET}`;
+  element.innerHTML = ` |>`;
+  return element;
+};
+const newElementButtonPause = () => {
+  const element = document.createElement(`button`);
+  element.className += ` ${CLASS_BUTTON_PAUSE}`;
+  element.innerText = `||`;
+
+  return element;
+};
 /*        <----- ELEMENT: NOT PLAIN ----> */
 
 const newElementCardAndSetClickHandle = (cardItem, game) => {
@@ -249,7 +273,8 @@ const newElementCardAndSetClickHandle = (cardItem, game) => {
 const hideElement = (element) => (element.style.display = `none`);
 const hideStartButton = (game) => {
   const { clickables } = game;
-  const { elementButtonStart } = clickables;
+  const { startElements } = clickables;
+  const { elementButtonStart } = startElements;
   // !!elementButtonStart
   hideElement(elementButtonStart);
 };
@@ -258,7 +283,8 @@ const showElement = (element) => (element.style.display = `flex`);
 
 const showStartButton = (game) => {
   const { clickables } = game;
-  const { elementButtonStart } = clickables;
+  const { startElements } = clickables;
+  const { elementButtonStart } = startElements;
   // !!elementButtonStart
   showElement(elementButtonStart);
 };
@@ -341,7 +367,7 @@ const isMatchingCards = (cardA, cardB) => cardA === cardB;
 
 const getDurationLeft = (timerItem) => timerItem.value.endTime - new Date();
 
-const setTimeValueLeft = (timerItem) =>
+const setTimerValueLeft = (timerItem) =>
   (timerItem.value.durationLeft = getDurationLeft(timerItem));
 
 const exceedTime = (timerItem) => timerItem.value.durationLeft < 0;
@@ -471,9 +497,9 @@ const stopGameAndDisplayStopGame = (game) => {
   displayStopGame(game);
 };
 
-const setTimeValueLeftAndUpdateDisplay = (timerItem) => {
+const setTimeDurationLeftAndUpdateDisplay = (timerItem) => {
   // Set time left
-  setTimeValueLeft(timerItem);
+  setTimerValueLeft(timerItem);
   // Displau time left
   setTimerElementDurationLeft(timerItem);
 };
@@ -499,7 +525,7 @@ const commencePreGame = (game) => {
   nameItem.element.field = elementNameInputField;
 
   const elementButtonStart = newElementButtonStart();
-  clickables.elementButtonStart = elementButtonStart;
+  clickables.preCommenceElements.buttonStart = elementButtonStart;
 
   elementNameWrapper.appendChild(elementNameInputField);
   elementNameWrapper.appendChild(elementNameDisplay);
@@ -517,42 +543,64 @@ const commencePreGame = (game) => {
 };
 
 const startTimer = (game) => {
-  const { timerItem, __timeSettings: timeSettings } = game;
+  const { timerItem, __timeSettings: timeSettings, clickables } = game;
   const { gameDuration, timeCheckInterval } = timeSettings;
+  const { inGameElements } = clickables;
+  const { wrapper: elementButtonWrapper } = inGameElements;
 
+  // !!elementButtonWrapper
+
+  const elementButtonPause = newElementButtonPause();
+  inGameElements.buttonPause = elementButtonPause;
+
+  const elementButtonReset = newElementButtonReset();
+  inGameElements.buttonReset = elementButtonReset;
+
+  elementButtonWrapper.appendChild(elementButtonPause);
+  elementButtonWrapper.appendChild(elementButtonReset);
+
+  // Set end time
   const endTime = new Date();
   endTime.setMilliseconds(endTime.getMilliseconds() + gameDuration);
   timerItem.value.endTime = endTime;
 
-  setTimeValueLeftAndUpdateDisplay(timerItem);
-
+  // CountUp commences
+  setTimeDurationLeftAndUpdateDisplay(timerItem);
   timerItem.gameDurationCountDownInterval = setInterval(() => {
     console.log(`timer started`);
-    setTimeValueLeftAndUpdateDisplay(timerItem);
+    setTimeDurationLeftAndUpdateDisplay(timerItem);
 
     if (exceedTime(timerItem)) {
       stopGameAndDisplayStopGame(game);
     }
   }, timeCheckInterval);
 };
+
+const newElementCardItemsWrapper = () => {
+  const element = document.createElement(`div`);
+  element.className += ` ${CLASS_CARD_ITEMS}`;
+  return element;
+};
 const startGame = (game) => {
   const {
     cardItems,
     timerItem,
     nameItem: { element: nameElements },
+    clickables,
     __elementRoot: elementRoot,
     __defaultElements,
   } = game;
 
-  const { elementGameDesc, elementHeader } = __defaultElements;
+  const { elementGameDesc } = __defaultElements;
   const { display: elementNameDisplay } = nameElements;
+  const { inGameElements } = clickables;
+
   // !elementRoot.firstChild
-  setElementInnerText(elementHeader, `hi`);
-  const elementDurationTime = newElementDurationTime(game);
-  timerItem.element = elementDurationTime;
+  const elementDurationTimeLeft = newElementDurationTime(game);
+  timerItem.element = elementDurationTimeLeft;
+
   // Create Card Elements
-  const elementCardItems = document.createElement(`div`);
-  elementCardItems.className += ` ${CLASS_CARD_ITEMS}`;
+  const elementCardItemsWrapper = newElementCardItemsWrapper();
 
   for (const cardRow of cardItems) {
     const elementCardRow = document.createElement(`div`);
@@ -561,12 +609,16 @@ const startGame = (game) => {
       const elementCard = newElementCardAndSetClickHandle(cardItem, game);
       elementCardRow.appendChild(elementCard);
     }
-    elementCardItems.appendChild(elementCardRow);
+    elementCardItemsWrapper.appendChild(elementCardRow);
   }
 
+  const elementInGameButtonWrapper = newElementInGameButtonsWrapper();
+  inGameElements.wrapper = elementInGameButtonWrapper;
+
   elementRoot.appendChild(elementNameDisplay);
-  elementRoot.appendChild(elementDurationTime);
-  elementRoot.appendChild(elementCardItems);
+  elementRoot.appendChild(elementDurationTimeLeft);
+  elementRoot.appendChild(elementInGameButtonWrapper);
+  elementRoot.appendChild(elementCardItemsWrapper);
   elementRoot.appendChild(elementGameDesc);
 
   startTimer(game);
@@ -594,9 +646,12 @@ const newGame = (gameConfig) => {
       value: DEFAULT_PLAYER_NAME,
     },
     clickables: {
-      elementButtonStart: null,
-      elementButtonPause: null,
-      elementButtonReset: null,
+      preCommenceElements: { buttonStart: null },
+      inGameElements: {
+        wrapper: null,
+        buttonPause: null,
+        buttonReset: null,
+      },
     },
     // Game state
     state: {
