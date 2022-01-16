@@ -149,11 +149,20 @@ const setElementInnerText = (element, text) => {
   element.innerText = text;
 };
 
-const displayStopGame = (game) => {
+const displayStopGameMessage = (game) => {
   const {
     __defaultElements: { elementGameDesc },
   } = game;
   setElementInnerText(elementGameDesc, `Game Ended`);
+};
+
+const undisplayTimeBanner = (game) => {
+  const {
+    timerItem: {
+      elements: { banner },
+    },
+  } = game;
+  banner.parentNode.removeChild(banner);
 };
 
 const clearGameDisplay = (game) => {
@@ -164,8 +173,10 @@ const clearGameDisplay = (game) => {
 };
 
 const setTimerElementDurationLeft = (timerItem) => {
-  const { element } = timerItem;
-  setElementInnerText(element, `${timerItem.value.durationLeft}ms`);
+  const {
+    elements: { durationLeft: elementDurationLeft },
+  } = timerItem;
+  setElementInnerText(elementDurationLeft, `${timerItem.value.durationLeft}ms`);
 };
 /*        <----- ELEMENT: PLAIN ----> */
 
@@ -577,7 +588,8 @@ const setGameCountdownInterval = (game) => {
 const stopGameAndDisplayStopGame = (game) => {
   unsetGameCountdownInterval(game);
   flagGameStop(game);
-  displayStopGame(game);
+  undisplayTimeBanner(game);
+  displayStopGameMessage(game);
 };
 
 const pauseTimer = (game) => {
@@ -706,8 +718,9 @@ const startGame = (game) => {
 
   const elementTimeBanner = document.createElement(`div`);
   elementTimeBanner.className += ` ${CLASS_TIME_BANNER}`;
+  game.timerItem.elements.banner = elementTimeBanner;
   const elementDurationTimeLeft = newElementDurationTime(game);
-  timerItem.element = elementDurationTimeLeft;
+  timerItem.elements.durationLeft = elementDurationTimeLeft;
   elementTimeBanner.appendChild(elementDurationTimeLeft);
 
   const elementInGameTimeControlWrapper = newElementInGameButtonsWrapper();
@@ -793,7 +806,7 @@ const newGame = (gameConfig) => {
     // Timer
     timerItem: {
       value: { endTime: undefined, durationLeft: undefined },
-      element: null,
+      elements: { durationLeft: null, banner: null }, // banner will contain timer descriptions and controls
       gameDurationCountDownInterval: null,
     },
     nameItem: {
