@@ -19,31 +19,83 @@ let firstCardElement;
 let deck;
 let secondCard;
 let secondCardElement;
+let canClick = true;
 // const userName = '';
 const boardElement = document.createElement('div');
-const gameMode = true;
-let timeInterval;
-let timeLeftInSeconds = 180; // 3mins
+
+// ADDED-v1: add a gameStart to change the t/f mode of game
+let gameStart = false;
+// let timeInterval;
+// const timeLeftInSeconds = 180; // 3mins
+
+// ===================================================
+//  DOM elements creation
+// ===================================================
+
+// CHANGED-v2: shifted DOM elements creation to the global scope
+
+// ##### create a 3 minutes timer element
+let milliseconds = 18000;
+const delayInMilliseconds = 1;
+const timerDiv = document.createElement('div');
+timerDiv.setAttribute('class', 'timer');
+timerDiv.innerText = '00:00';
+document.body.appendChild(timerDiv);
+
+// create an overall game-div
+const gameDiv = document.createElement('div');
+// set an id to the game-div
+gameDiv.id = 'game';
+
+// create a div to store the buttons
+const btnDiv = document.createElement('div');
+btnDiv.classList.add('btn-div');
+gameDiv.appendChild(btnDiv);
+
+// create a stop button to stop the timer
+const startBtn = document.createElement('button');
+startBtn.innerHTML = 'Start';
+startBtn.setAttribute('id', 'start-btn');
+// startBtn.src = './images/others/start-button.png';
+btnDiv.appendChild(startBtn);
+startBtn.addEventListener('click', () => startGame());
+
+// create a start button to start the timer
+const stopBtn = document.createElement('button');
+stopBtn.innerHTML = 'Stop';
+stopBtn.setAttribute('id', 'stop-btn');
+btnDiv.appendChild(stopBtn);
+stopBtn.addEventListener('click', () => clearInterval(startTimer));
+
+// create a reset button to reset the game
+const resetBtn = document.createElement('button');
+resetBtn.setAttribute('id', 'reset-btn');
+resetBtn.innerHTML = 'reset game';
+resetBtn.addEventListener('click', () => resetGame());
+btnDiv.appendChild(resetBtn);
+
+document.body.appendChild(gameDiv);
 
 // ===================================================
 //  Gameplay Logic
 // ===================================================
 
 const squareClick = (messageBoard, cardElement, column, row) => {
-  canClick = true;
-  console.log(cardElement);
-  console.log('FIRST CARD DOM ELEMENT', firstCard);
-  console.log('BOARD CLICKED CARD', board[column][row]);
+  // console.log(cardElement);
+  // console.log('FIRST CARD DOM ELEMENT', firstCard);
+  // console.log('BOARD CLICKED CARD', board[column][row]);
 
-  // console.log to show the column and row
-  console.log(column);
-  console.log(row);
+  // // console.log to show the column and row
+  // console.log(column);
+  // console.log(row);
 
   const clickedCard = board[column][row];
   // console.log(userName);
 
-  // the user already clicked on this square
-  if (cardElement.innerText !== '') {
+  // the user already clicked on this square or game has not started
+  // ADDED-v1: check the condition of canClick here;
+  // ADDED-v1: include the gameStart here
+  if (cardElement.innerText !== '' || canClick !== true || gameStart !== true) {
     return;
   }
 
@@ -51,7 +103,6 @@ const squareClick = (messageBoard, cardElement, column, row) => {
   if (firstCard === null) {
     console.log('first turn');
     firstCard = clickedCard;
-
     // turn this card over
     // !!! reference codes to add both suitSymbol and displayName details
     cardElement.classList.add('card');
@@ -76,11 +127,15 @@ const squareClick = (messageBoard, cardElement, column, row) => {
 
       // !!! reference codes to add cardDisplay details
       cardElement.innerHTML = `${clickedCard.suitSymbol}<BR>${clickedCard.displayName}`;
+
       // !!! display message when user open the second card
       messageBoard.innerText = `You opened ${clickedCard.displayName} of ${clickedCard.suitSymbol}. Click on another card and see if it matches!`;
 
       // ### display match meesage
       messageBoard.innerText = 'Congrats! Its a match!';
+
+      // ADDED-v2: enable the startBtn again
+      startBtn.disabled = false;
 
       // ### add setTimeout to display the match message and disappear after 3s
       setTimeout(() => {
@@ -88,7 +143,7 @@ const squareClick = (messageBoard, cardElement, column, row) => {
       }, 3000);
 
       // turn this card over
-      cardElement.innerText = clickedCard.name;
+      // cardElement.innerText = clickedCard.name;
     } else {
       secondCard = clickedCard;
       cardElement.innerText = secondCard.name;
@@ -100,6 +155,9 @@ const squareClick = (messageBoard, cardElement, column, row) => {
       // ### display not-match meesage
       messageBoard.innerText = 'Sorry! Its not a match!';
 
+      // ADDED-v1 user cannot click while waiting for card to close
+      canClick = false;
+
       // add setTimeout function to turn both cards over when they are not a match
       setTimeout(() => {
         // both functions inside setTimeout are to turn the cards back over
@@ -107,6 +165,8 @@ const squareClick = (messageBoard, cardElement, column, row) => {
         secondCardElement.innerText = '';
         // ### no-match message to disappear after 3s
         messageBoard.innerText = '';
+        // ADDED-v1 change the canClick state to allow user to click again
+        canClick = true;
       }, 3000);
       // reset the first card
       firstCard = null;
@@ -210,20 +270,83 @@ const makeDeck = () => {
   return newDeck;
 };
 
-// create helper function to reset the game
+// ===================================================
+//  callBack functions for eventListeners
+// ===================================================
+
+// ADDED-v2: create a startTimer function in the global scope;
+// #### use the timer functions
+const startTimer = setInterval(() => {
+  startBtn.disabled = true;
+  gameStart = false;
+  // timerDiv.innerText = `Time left: ${Math.round(milliseconds / 1000)} seconds remaining`;
+  timerDiv.innerText = `Time left: ${milliseconds} milliseconds remaining`;
+  console.log('start timer');
+
+  if (milliseconds === 0) {
+    // gameMode = false;
+    // remove all the boxes when time is up
+    boardElement.innerText = '';
+    // do not allow user to continue when time is up
+    clearInterval(startTimer);
+    // if (gameMode === false) {
+    //   console.log('game over');
+    //   output.innerText = 'Time is Up!';
+    //   boardElement.innerText = '';
+    // }
+    timerDiv.innerText = 'Time is Up!';
+    // ADDED-v2: enable the startBtn again
+    startBtn.disabled = false;
+  }
+  milliseconds -= 1;
+}, delayInMilliseconds);
+
+// ADDED-v1: create a startGame function to start the game
+// currently start button does not work!
+const startGame = () => {
+  startTimer;
+  console.log('start game?');
+
+  // // #### use the timer functions
+  // const startTimer = setInterval(() => {
+  //   // timerDiv.innerText = `Time left: ${Math.round(milliseconds / 1000)} seconds remaining`;
+  //   timerDiv.innerText = `Time left: ${milliseconds} milliseconds remaining`;
+  //   console.log('start timer');
+
+  //   if (milliseconds === 0) {
+  //     // gameMode = false;
+  //     // remove all the boxes when time is up
+  //     boardElement.innerText = '';
+  //     // do not allow user to continue when time is up
+  //     clearInterval(startTimer);
+  //     // if (gameMode === false) {
+  //     //   console.log('game over');
+  //     //   output.innerText = 'Time is Up!';
+  //     //   boardElement.innerText = '';
+  //     // }
+  //     timerDiv.innerText = 'Time is Up!';
+  //   }
+  //   milliseconds -= 1;
+  // }, delayInMilliseconds);
+
+  // change the gameStart mode
+  console.log('start');
+  gameStart = true;
+};
+
+// create resetGame function to reset the game
 const resetGame = () => {
-  timeLeftInSeconds = 180;
-  clearInterval(timeInterval);
-  board.length = 0;
-  deck.length = 0;
-  firstCard = null;
-  console.log('reset?');
+  // timeLeftInSeconds = 180;
+  // clearInterval(timeInterval);
+  // board.length = 0;
+  // deck.length = 0;
+  // firstCard = null;
+  // console.log('reset?');
 
-  boardElement.innerHTML = '';
-  // remove the existing board
-  // document.getElementsById('row-div').remove();
+  // reload the whole page
+  location.reload();
 
-  initGame();
+  // initGame();
 };
 
 // ===================================================
@@ -260,10 +383,10 @@ const buildBoardElements = (board) => {
   // boardElement.appendChild(storeNameBtn);
   // // add eventListener to store the name when button is clicked
 
-  // create an overall game-div
-  const gameDiv = document.createElement('div');
-  // set an id to the game-div
-  gameDiv.id = 'game';
+  // // create an overall game-div
+  // const gameDiv = document.createElement('div');
+  // // set an id to the game-div
+  // gameDiv.id = 'game';
 
   // ### create a messageboard element
   const messageBoard = document.createElement('div');
@@ -271,63 +394,64 @@ const buildBoardElements = (board) => {
   messageBoard.classList.add('messageBoard');
   messageBoard.innerText = 'Click on the boxes to play the game. You have 3 minutes for the game!';
 
-  // ##### create a 3 minutes timer element
-  let milliseconds = 1000;
-  const delayInMilliseconds = 1;
-  const output = document.createElement('div');
-  output.setAttribute('class', 'timer');
-  output.innerText = milliseconds;
-  boardElement.appendChild(output);
+  // CHANGED-v1: moved the timer elements to the global setting
+  // // ##### create a 3 minutes timer element
+  // let milliseconds = 18000;
+  // const delayInMilliseconds = 1;
+  // const timerDiv = document.createElement('div');
+  // timerDiv.setAttribute('class', 'timer');
+  // timerDiv.innerText = milliseconds;
+  // boardElement.appendChild(timerDiv);
 
-  // #### use the timer functions
-  const ref = setInterval(() => {
-    output.innerText = `Time left: ${milliseconds}`;
-    output.id = ('timer');
+  // // #### use the timer functions
+  // const ref = setInterval(() => {
+  //   timerDiv.innerText = `Time left: ${milliseconds}`;
+  //   timerDiv.id = ('timer');
 
-    if (milliseconds === 0) {
-      // gameMode = false;
-      // remove all the boxes when time is up
-      boardElement.innerText = '';
-      // do not allow user to continue when time is up
-      clearInterval(ref);
-      // if (gameMode === false) {
-      //   console.log('game over');
-      //   output.innerText = 'Time is Up!';
-      //   boardElement.innerText = '';
-      // }
-      output.innerText = 'Time is Up!';
-    }
-    milliseconds -= 1;
-  }, delayInMilliseconds);
+  //   if (milliseconds === 0) {
+  //     // gameMode = false;
+  //     // remove all the boxes when time is up
+  //     boardElement.innerText = '';
+  //     // do not allow user to continue when time is up
+  //     clearInterval(ref);
+  //     // if (gameMode === false) {
+  //     //   console.log('game over');
+  //     //   output.innerText = 'Time is Up!';
+  //     //   boardElement.innerText = '';
+  //     // }
+  //     timerDiv.innerText = 'Time is Up!';
+  //   }
+  //   milliseconds -= 1;
+  // }, delayInMilliseconds);
 
-  // create a div to store the buttons
-  const btnDiv = document.createElement('div');
-  btnDiv.classList.add('btn-div');
-  gameDiv.appendChild(btnDiv);
+  // // create a div to store the buttons
+  // const btnDiv = document.createElement('div');
+  // btnDiv.classList.add('btn-div');
+  // gameDiv.appendChild(btnDiv);
 
-  // create a stop button to stop the timer
-  const startBtn = document.createElement('button');
-  startBtn.innerHTML = 'Start';
-  startBtn.setAttribute('id', 'start-btn');
-  // startBtn.src = './images/others/start-button.png';
-  btnDiv.appendChild(startBtn);
-  // startBtn.addEventListener('click', ref.currentTarget);
+  // // create a stop button to stop the timer
+  // const startBtn = document.createElement('button');
+  // startBtn.innerHTML = 'Start';
+  // startBtn.setAttribute('id', 'start-btn');
+  // // startBtn.src = './images/others/start-button.png';
+  // btnDiv.appendChild(startBtn);
+  // startBtn.addEventListener('click', () => startGame());
 
-  // create a start button to start the timer
-  const stopBtn = document.createElement('button');
-  stopBtn.innerHTML = 'Stop';
-  stopBtn.setAttribute('id', 'stop-btn');
-  btnDiv.appendChild(stopBtn);
-  stopBtn.addEventListener('click', () => clearInterval(ref));
+  // // create a start button to start the timer
+  // const stopBtn = document.createElement('button');
+  // stopBtn.innerHTML = 'Stop';
+  // stopBtn.setAttribute('id', 'stop-btn');
+  // btnDiv.appendChild(stopBtn);
+  // stopBtn.addEventListener('click', () => clearInterval(startTimer));
 
-  // create a reset button to reset the game
-  const resetBtn = document.createElement('button');
-  resetBtn.setAttribute('id', 'reset-btn');
-  resetBtn.innerHTML = 'reset game';
-  resetBtn.addEventListener('click', () => resetGame());
-  btnDiv.appendChild(resetBtn);
+  // // create a reset button to reset the game
+  // const resetBtn = document.createElement('button');
+  // resetBtn.setAttribute('id', 'reset-btn');
+  // resetBtn.innerHTML = 'reset game';
+  // resetBtn.addEventListener('click', () => resetGame());
+  // btnDiv.appendChild(resetBtn);
 
-  document.body.appendChild(gameDiv);
+  // document.body.appendChild(gameDiv);
   boardElement.appendChild(messageBoard);
 
   // use the board data structure we passed in to create the correct size board
@@ -404,8 +528,9 @@ const initGame = () => {
   console.log(doubleDeck);
 
   // to get 16 cards (boardSize * boardSize) out of the deck
-  const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  const deckSubset = doubleDeck.slice(0, (boardSize * boardSize));
   deck = shuffleCards(deckSubset);
+  console.log(deck);
 
   // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
@@ -416,7 +541,6 @@ const initGame = () => {
   }
 
   const boardEl = buildBoardElements(board);
-
   document.body.appendChild(boardEl);
 };
 
