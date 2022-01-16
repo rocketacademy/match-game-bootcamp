@@ -558,6 +558,22 @@ const unsetGameCountdownInterval = (game) => {
   timerItem.gameDurationCountDownInterval = null;
 };
 
+const setGameCountdownInterval = (game) => {
+  const { timerItem, __timeSettings: timeSettings } = game;
+  const { timeCheckInterval } = timeSettings;
+  if (!!timerItem.gameDurationCountDownInterval) {
+    console.warn(
+      `[setGameCountdownInterval] Game has an existing countdown interval.`
+    );
+  }
+  timerItem.gameDurationCountDownInterval = setInterval(() => {
+    setTimeDurationLeftAndUpdateDisplay(timerItem);
+    if (exceedTime(timerItem)) {
+      stopGameAndDisplayStopGame(game);
+    }
+  }, timeCheckInterval);
+};
+
 const stopGameAndDisplayStopGame = (game) => {
   unsetGameCountdownInterval(game);
   flagGameStop(game);
@@ -579,7 +595,6 @@ const setTimeDurationLeftAndUpdateDisplay = (timerItem) => {
 
 const goTimer = (game) => {
   const { timerItem, __timeSettings: timeSettings } = game;
-  const { timeCheckInterval } = timeSettings;
 
   if (!isGamePause(game)) {
     console.warn(`[goTimer] Game should be paused for game to go again`);
@@ -593,12 +608,7 @@ const goTimer = (game) => {
 
   setTimeDurationLeftAndUpdateDisplay(timerItem);
 
-  timerItem.gameDurationCountDownInterval = setInterval(() => {
-    setTimeDurationLeftAndUpdateDisplay(timerItem);
-    if (exceedTime(timerItem)) {
-      stopGameAndDisplayStopGame(game);
-    }
-  }, timeCheckInterval);
+  setGameCountdownInterval(game);
 };
 
 const readyTimer = (game) => {
