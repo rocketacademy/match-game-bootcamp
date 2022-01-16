@@ -1,6 +1,6 @@
 body {
   background-color: lightgrey;
-  font-family: "Roboto", sans-serif;
+  font-family: "Caveat", cursive;
   margin: 5vw 20vw 0 20vw;
   text-align: center;
 }
@@ -39,6 +39,7 @@ body {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 #stop-btn {
@@ -58,6 +59,7 @@ body {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 #reset-btn {
@@ -77,6 +79,7 @@ body {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 .square {
@@ -109,6 +112,12 @@ body {
   text-align: center;
   border-radius: 8px;
   display: inline-block;
+  cursor: pointer;
+}
+
+.card:hover {
+  background-color: #ffe4e1;
+  color: #ff4500;
 }
 
 ​ .suit {

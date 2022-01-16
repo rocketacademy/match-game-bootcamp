@@ -20,23 +20,23 @@ let deck;
 let secondCard;
 let secondCardElement;
 let canClick = true;
+let boardElement;
 // const userName = '';
-const boardElement = document.createElement('div');
+// const boardElement = document.createElement('div');
+// declared timer globally
+let timer;
 
 // ADDED-v1: add a gameStart to change the t/f mode of game
 let gameStart = false;
-// let timeInterval;
-// const timeLeftInSeconds = 180; // 3mins
 
 // ===================================================
 //  DOM elements creation
 // ===================================================
 
 // CHANGED-v2: shifted DOM elements creation to the global scope
-
 // ##### create a 3 minutes timer element
-let milliseconds = 18000;
-const delayInMilliseconds = 1;
+let seconds = 180;
+const delayInMilliseconds = 1000;
 const timerDiv = document.createElement('div');
 timerDiv.setAttribute('class', 'timer');
 timerDiv.innerText = '00:00';
@@ -55,21 +55,48 @@ gameDiv.appendChild(btnDiv);
 // create a stop button to stop the timer
 const startBtn = document.createElement('button');
 startBtn.innerHTML = 'Start';
+startBtn.classList.add('button');
 startBtn.setAttribute('id', 'start-btn');
 // startBtn.src = './images/others/start-button.png';
 btnDiv.appendChild(startBtn);
-startBtn.addEventListener('click', () => startGame());
+startBtn.addEventListener('click', () => {
+  timer = setInterval(() => {
+    startBtn.disabled = true;
+    gameStart = true;
+    timerDiv.innerText = `Time left: ${seconds}s remaining`;
+    console.log('start timer');
+
+    if (seconds === 0) {
+    // gameMode = false;
+    // remove all the boxes when time is up
+      boardElement.innerText = '';
+      // do not allow user to continue when time is up
+      clearInterval(timer);
+      // if (gameMode === false) {
+      //   console.log('game over');
+      //   output.innerText = 'Time is Up!';
+      //   boardElement.innerText = '';
+      // }
+      timerDiv.innerText = 'Time is Up!';
+      // ADDED-v2: enable the startBtn again
+      startBtn.disabled = false;
+    }
+    seconds -= 1;
+  }, delayInMilliseconds);
+});
 
 // create a start button to start the timer
 const stopBtn = document.createElement('button');
 stopBtn.innerHTML = 'Stop';
 stopBtn.setAttribute('id', 'stop-btn');
+stopBtn.classList.add('button');
 btnDiv.appendChild(stopBtn);
-stopBtn.addEventListener('click', () => clearInterval(startTimer));
+stopBtn.addEventListener('click', () => clearInterval(timer));
 
 // create a reset button to reset the game
 const resetBtn = document.createElement('button');
 resetBtn.setAttribute('id', 'reset-btn');
+resetBtn.classList.add('button');
 resetBtn.innerHTML = 'reset game';
 resetBtn.addEventListener('click', () => resetGame());
 btnDiv.appendChild(resetBtn);
@@ -199,11 +226,6 @@ const shuffleCards = (cards) => {
   return cards;
 };
 
-// const getInputFromTextBox = () => {
-//   let input = document.getElementById('input').value;
-//   alert(input);
-// };
-
 // ===================================================
 //  New Make Deck
 // ===================================================
@@ -274,66 +296,6 @@ const makeDeck = () => {
 //  callBack functions for eventListeners
 // ===================================================
 
-// ADDED-v2: create a startTimer function in the global scope;
-// #### use the timer functions
-const startTimer = setInterval(() => {
-  startBtn.disabled = true;
-  gameStart = false;
-  // timerDiv.innerText = `Time left: ${Math.round(milliseconds / 1000)} seconds remaining`;
-  timerDiv.innerText = `Time left: ${milliseconds} milliseconds remaining`;
-  console.log('start timer');
-
-  if (milliseconds === 0) {
-    // gameMode = false;
-    // remove all the boxes when time is up
-    boardElement.innerText = '';
-    // do not allow user to continue when time is up
-    clearInterval(startTimer);
-    // if (gameMode === false) {
-    //   console.log('game over');
-    //   output.innerText = 'Time is Up!';
-    //   boardElement.innerText = '';
-    // }
-    timerDiv.innerText = 'Time is Up!';
-    // ADDED-v2: enable the startBtn again
-    startBtn.disabled = false;
-  }
-  milliseconds -= 1;
-}, delayInMilliseconds);
-
-// ADDED-v1: create a startGame function to start the game
-// currently start button does not work!
-const startGame = () => {
-  startTimer;
-  console.log('start game?');
-
-  // // #### use the timer functions
-  // const startTimer = setInterval(() => {
-  //   // timerDiv.innerText = `Time left: ${Math.round(milliseconds / 1000)} seconds remaining`;
-  //   timerDiv.innerText = `Time left: ${milliseconds} milliseconds remaining`;
-  //   console.log('start timer');
-
-  //   if (milliseconds === 0) {
-  //     // gameMode = false;
-  //     // remove all the boxes when time is up
-  //     boardElement.innerText = '';
-  //     // do not allow user to continue when time is up
-  //     clearInterval(startTimer);
-  //     // if (gameMode === false) {
-  //     //   console.log('game over');
-  //     //   output.innerText = 'Time is Up!';
-  //     //   boardElement.innerText = '';
-  //     // }
-  //     timerDiv.innerText = 'Time is Up!';
-  //   }
-  //   milliseconds -= 1;
-  // }, delayInMilliseconds);
-
-  // change the gameStart mode
-  console.log('start');
-  gameStart = true;
-};
-
 // create resetGame function to reset the game
 const resetGame = () => {
   // timeLeftInSeconds = 180;
@@ -359,7 +321,7 @@ const resetGame = () => {
 const buildBoardElements = (board) => {
   // if (gameMode === true) {
   // create the element that everything will go inside of
-  const boardElement = document.createElement('div');
+  boardElement = document.createElement('div');
 
   // give it a class for CSS purposes
   boardElement.classList.add('board');
@@ -394,62 +356,7 @@ const buildBoardElements = (board) => {
   messageBoard.classList.add('messageBoard');
   messageBoard.innerText = 'Click on the boxes to play the game. You have 3 minutes for the game!';
 
-  // CHANGED-v1: moved the timer elements to the global setting
-  // // ##### create a 3 minutes timer element
-  // let milliseconds = 18000;
-  // const delayInMilliseconds = 1;
-  // const timerDiv = document.createElement('div');
-  // timerDiv.setAttribute('class', 'timer');
-  // timerDiv.innerText = milliseconds;
-  // boardElement.appendChild(timerDiv);
-
-  // // #### use the timer functions
-  // const ref = setInterval(() => {
-  //   timerDiv.innerText = `Time left: ${milliseconds}`;
-  //   timerDiv.id = ('timer');
-
-  //   if (milliseconds === 0) {
-  //     // gameMode = false;
-  //     // remove all the boxes when time is up
-  //     boardElement.innerText = '';
-  //     // do not allow user to continue when time is up
-  //     clearInterval(ref);
-  //     // if (gameMode === false) {
-  //     //   console.log('game over');
-  //     //   output.innerText = 'Time is Up!';
-  //     //   boardElement.innerText = '';
-  //     // }
-  //     timerDiv.innerText = 'Time is Up!';
-  //   }
-  //   milliseconds -= 1;
-  // }, delayInMilliseconds);
-
-  // // create a div to store the buttons
-  // const btnDiv = document.createElement('div');
-  // btnDiv.classList.add('btn-div');
-  // gameDiv.appendChild(btnDiv);
-
-  // // create a stop button to stop the timer
-  // const startBtn = document.createElement('button');
-  // startBtn.innerHTML = 'Start';
-  // startBtn.setAttribute('id', 'start-btn');
-  // // startBtn.src = './images/others/start-button.png';
-  // btnDiv.appendChild(startBtn);
-  // startBtn.addEventListener('click', () => startGame());
-
-  // // create a start button to start the timer
-  // const stopBtn = document.createElement('button');
-  // stopBtn.innerHTML = 'Stop';
-  // stopBtn.setAttribute('id', 'stop-btn');
-  // btnDiv.appendChild(stopBtn);
-  // stopBtn.addEventListener('click', () => clearInterval(startTimer));
-
-  // // create a reset button to reset the game
-  // const resetBtn = document.createElement('button');
-  // resetBtn.setAttribute('id', 'reset-btn');
-  // resetBtn.innerHTML = 'reset game';
-  // resetBtn.addEventListener('click', () => resetGame());
-  // btnDiv.appendChild(resetBtn);
+  // CHANGED-v1: moved the timer elements and btn elements to the global setting
 
   // document.body.appendChild(gameDiv);
   boardElement.appendChild(messageBoard);
@@ -488,7 +395,6 @@ const buildBoardElements = (board) => {
 
       // cardInner.appendChild(cardBack);
       // cardInner.appendChild(cardFront);
-
       // card.appendChild(cardInner);
 
       // create the square element
@@ -496,6 +402,7 @@ const buildBoardElements = (board) => {
 
       // set a class for CSS purposes
       square.classList.add('square');
+      square.innerHTML = '<img src="./images/cards/back.png" ';
 
       // set the click event
       // eslint-disable-next-line
