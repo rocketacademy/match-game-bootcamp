@@ -170,7 +170,9 @@ const undisplayTimeBanner = (game) => {
 };
 
 const clearGameDisplay = (game) => {
-  const { __elementRoot: elementRoot } = game;
+  const {
+    _gameData: { elementRoot },
+  } = game;
   console.log(`detaching`);
   console.log(elementRoot);
   detachAllChildren(elementRoot);
@@ -586,10 +588,49 @@ const onClickRestartHandler = (prevGame) => {
   clearDisplayAndStartGame(game);
 };
 
+const displayGameStatistics = (gameConfig) => {
+  const {
+    statistics: { tally },
+    elementRoot,
+  } = gameConfig;
+
+  const elementTable = document.createElement(`table`);
+
+  const elementTableHead = document.createElement(`thead`);
+  const elementTableBody = document.createElement(`tbody`);
+
+  const propCompleted = { value: `durationElapsed`, desc: `Time Taken (ms)` };
+  const propDurationElapsed = { value: `isCompleted`, desc: `Completed` };
+
+  const properties = [propCompleted, propDurationElapsed];
+  const th = document.createElement(`th`);
+
+  for (const { desc: prop } of properties) {
+    const td = document.createElement(`td`);
+    td.innerText = `${prop}`;
+    th.appendChild(td);
+    elementTableHead.appendChild(td);
+  }
+
+  for (const stat of tally) {
+    const tr = document.createElement(`tr`);
+    for (const { value: prop } of properties) {
+      const td = document.createElement(`td`);
+      td.innerText = `${stat[prop]}`;
+      tr.appendChild(td);
+    }
+    elementTableBody.appendChild(tr);
+  }
+
+  elementTable.appendChild(elementTableHead);
+  elementTable.appendChild(elementTableBody);
+
+  elementRoot.appendChild(elementTable);
+};
 const clearDisplayAndViewStatistics = (game) => {
   clearGameDisplay(game);
   const gameConfig = getGameConfig(game);
-  clearDisplayAndViewStatistics(gameConfig);
+  displayGameStatistics(gameConfig);
 };
 const onClickStatisticsHandler = (prevGame) => {
   clearDisplayAndViewStatistics(prevGame);
@@ -680,18 +721,21 @@ const getGameStatistics = (game) => {
 };
 
 const runGameReport = (game) => {
+  console.group(`[runGameReport]`);
   const gameStatistics = getGameStatistics(game);
   console.log(` [ current game stats ]`);
   console.log(gameStatistics);
 
   const { _gameData } = game;
-  _gameData.mostRecentGame = gameStatistics;
+  _gameData.statistics.tally.push(gameStatistics);
+  console.groupEnd();
 };
+
 // end of game clear up function
 const stopGameAndDisplayStopGame = (game) => {
   unsetGameCountdownInterval(game);
   flagGameStop(game);
-
+  runGameReport(game);
   displayGameStop(game);
 };
 
@@ -729,7 +773,7 @@ const goTimer = (game) => {
 };
 
 const setStartTime = (game, time) => (game.state.startTime = time);
-const getStartTime = () => game.state.startTime;
+const getStartTime = (game) => game.state.startTime;
 const readyTimer = (game) => {
   const { timerItem, __timeSettings: timeSettings } = game;
   const { gameDuration } = timeSettings;
@@ -773,7 +817,6 @@ const settle = (game) => {
       );
       const { elementHeader } = __defaultElements;
       setElementInnerText(elementHeader, ` 🔥🚀🔥🚀🔥 ON FIRE 🔥🚀🔥🚀🔥 `);
-
       setGameCompleted(game);
       stopGameAndDisplayStopGame(game);
     } else {
@@ -800,7 +843,7 @@ const startGame = (game) => {
     timerItem,
     nameItem: { element: nameElements },
     clickables,
-    __elementRoot: elementRoot,
+    _gameData: { elementRoot },
     __defaultElements,
   } = game;
 
@@ -862,11 +905,10 @@ const startGame = (game) => {
 };
 
 const displayGameStop = (game) => {
-  const isCompleted = isGameCompleted(game);
+  const {
+    _gameData: { elementRoot },
+  } = game;
   undisplayTimeBanner(game);
-  // show grid only if completed
-  if (!isCompleted) {
-  }
 
   updateDisplayGameDescGameEnds(game);
 
@@ -882,8 +924,25 @@ const displayGameStop = (game) => {
     onClickStatisticsHandler(game);
   });
 
-  game.__elementRoot.appendChild(buttonRestart);
-  game.__elementRoot.appendChild(buttonStatistics);
+  const {
+    _gameData: {
+      statistics: { tally },
+    },
+  } = game;
+
+  // tally.length > 0
+  const mostRecentGameStatistics = tally[tally.length - 1];
+  const elementDesc = document.createElement(`div`);
+
+  let desc = ``;
+  if (mostRecentGameStatistics.isCompleted === true) {
+    desc = `You've completed in ${mostRecentGameStatistics.durationElapsed}ms`;
+  }
+  elementDesc.innerText = desc;
+
+  elementRoot.appendChild(elementDesc);
+  elementRoot.appendChild(buttonRestart);
+  elementRoot.appendChild(buttonStatistics);
 };
 
 const displayGamePreGameConfig = (game) => {
@@ -999,7 +1058,7 @@ const gameConfig = {
   elementRoot: elementRoot,
   boardSide: BOARD_SIDE_DEFAULT,
   timeSettings: TIME_DEFAULT_SETTINGS,
-  stats: { mostRecentGame: null, tally: [] },
+  statistics: { tally: [] },
   playerName: DEFAULT_PLAYER_NAME,
 };
 
