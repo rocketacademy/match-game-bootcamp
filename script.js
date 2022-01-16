@@ -60,7 +60,7 @@ const squareClick = (cardElement, column, row) => {
       setTimeout(() => {
         messageOutput.innerText = '';
         canClick = true;
-      }, 3000);
+      }, 1000);
 
       // turn this card over
       cardElement.innerText = `${clickedCard.name}\n${clickedCard.suit}`;
@@ -75,7 +75,7 @@ const squareClick = (cardElement, column, row) => {
         cardElement.innerText = '';
         messageOutput.innerText = '';
         canClick = true;
-      }, 3000);
+      }, 1000);
     }
     // reset the first card
     firstCard = null;
@@ -220,7 +220,7 @@ let milliseconds = 3 * 60 * 1000;
 const delayInMilliseconds = 1000;
 const output = document.createElement('div');
 output.id = 'timer';
-output.innerText = 'Let\'s go!';
+output.innerText = 'You have 3 minutes. Let\'s go!';
 document.body.appendChild(output);
 
 const ref = setInterval(() => {
