@@ -242,29 +242,26 @@ const newElementButtonPause = () => {
 };
 /*        <----- ELEMENT: NOT PLAIN ----> */
 
+const onCardClickHandler = (cardItem, game) => {
+  const [is, msg] = isCardClickable(cardItem, game);
+
+  if (is === false) {
+    console.warn(msg);
+    return;
+  }
+  flipUp(cardItem);
+  addActiveCardItem(game, cardItem);
+
+  const activeCardsLength = getActiveCardsLength(game);
+  if (activeCardsLength === 2) {
+    settle(game);
+  }
+};
 const newElementCardAndSetClickHandle = (cardItem, game) => {
   const element = document.createElement(`div`);
   element.className += ` ${CLASS_CARD}`;
   element.addEventListener(`click`, () => {
-    if (cardItem.faceUp) {
-      console.warn(`already face up.....`);
-      return;
-    }
-    if (isGameStop(game)) {
-      console.warn(`Game stopped.`);
-      return;
-    }
-    if (!isCardClickable(game)) {
-      console.warn(`Card click callback disabled`);
-      return;
-    }
-    flipUp(cardItem);
-    addActiveCardItem(game, cardItem);
-
-    const activeCardsLength = getActiveCardsLength(game);
-    if (activeCardsLength === 2) {
-      settle(game);
-    }
+    onCardClickHandler(cardItem, game);
   });
   cardItem.element = element;
   return element;
@@ -332,47 +329,117 @@ const detachAllChildren = (element) => {
 
 /* <----- Logic Helpers ----> */
 
-/*        <----- STAGE ----> */
+/*                                <----- STATE ----> */
 
-const isGameStop = (game) => game.state.isStop;
-const flagStopGame = (game) => {
+/*                                                        <----- STATE: gamestop ----> */
+
+const isGameStop = (game) => {
+  if (game.state.isStop === undefined || game.state.isStop === null) {
+    console.warn(`A game must be started before game state can be queried.`);
+    return;
+  }
+
+  return game.state.isStop;
+};
+
+const flagGameStart = (game) => {
+  console.log(`  GAMESTART  `);
+  game.state.isStop = false;
+};
+
+const flagGameStop = (game) => {
   console.log(`💎🤲  GAMESTOP 💎🤲 `);
+  if (game.state.isStop === undefined || game.state.isStop === null) {
+    console.warn(`A game must be started before game can be stopped.`);
+    return;
+  }
   game.state.isStop = true;
 };
 
-const isCardClickable = (game) => game.state.isClickable;
-const disableCardClickable = (game) => {
-  console.log(`card click disabled`);
-  game.state.isClickable = false;
-};
-const enableCardClickable = (game) => {
-  if (isGameStop(game)) {
-    console.log(`cannot enable click. game has stopped`);
+/*                                                        <----- STATE: gamepause ----> */
+
+const isGamePause = (game) => {
+  if (game.state.isPause === undefined || game.state.isPause === null) {
+    console.warn(
+      `A game must be pause/unpaused before game state can be queried.`
+    );
     return;
   }
-  console.log(`card click enabled`);
-  game.state.isClickable = true;
+  console.log(`isGamePause ${game.state.isPause}`);
+  return game.state.isPause;
+};
+
+const flagGamePause = (game) => {
+  if (isGameStop(game)) {
+    console.warn(`[flagGamePause] behavior not executed. game has stopped`);
+    return;
+  }
+  console.log(`[flagGamePause] set.`);
+  game.state.isPause = true;
+};
+
+const deflagGamePause = (game) => {
+  if (isGameStop(game)) {
+    console.warn(`[deflagGamePause] behavior not executed. game has stopped`);
+    return;
+  }
+  game.state.isPause = false;
+};
+
+/*                                                        <----- STATE: cardcooldown ----> */
+const isCardCoolDowning = (game) => game.state.isCardOnCoolDown;
+const flagMissCoolDown = (game) => {
+  if (isGameStop(game)) {
+    console.warn(`[flagMissCoolDown] behavior not executed. game has stopped`);
+    return;
+  }
+  console.log(`[flagMissCoolDown] isCardOnCoolDown set`);
+
+  game.state.isCardOnCoolDown = true;
+};
+const deflagMissCoolDown = (game) => {
+  if (isGameStop(game)) {
+    console.warn(
+      `[deflagMissCoolDown] behavior not executed. game has stopped`
+    );
+    return;
+  }
+  console.log(`[deflagMissCoolDown] isCardOnCoolDown unset`);
+  game.state.isCardOnCoolDown = false;
+};
+
+const isCardClickable = (cardItem, game) => {
+  const functionName = `isCardClickable`;
+  if (cardItem.faceUp) {
+    return [false, `[${functionName}] already face up.....`];
+  }
+  if (isGameStop(game)) {
+    return [false, `[${functionName}] Game stopped.`];
+  }
+  if (isGamePause(game)) {
+    return [false, `[${functionName}] Game paused.`];
+  }
+  if (isCardCoolDowning(game)) {
+    return [false, `[${functionName}] Cooling Down.`];
+  }
+  return [true, ``];
 };
 
 /*        <----- CARD ----> */
 
 const isAllPairsMatch = (game) => game.state.unMatchedCardsCount === 0;
 const registerMatchingPair = (game) => (game.state.unMatchedCardsCount -= 2);
-
 const getActiveCardsLength = (game) => game.state.activeCardItemsFlipped.length;
-
 const isMatchingCards = (cardA, cardB) => cardA === cardB;
 
 /*        <----- TIME ----> */
 
 const getDurationLeft = (timerItem) => timerItem.value.endTime - new Date();
-
 const setTimerValueLeft = (timerItem) =>
   (timerItem.value.durationLeft = getDurationLeft(timerItem));
-
 const exceedTime = (timerItem) => timerItem.value.durationLeft < 0;
 
-/* <----- UI-Logic Helpers ----> */
+/* <----- UI-Logic Helpers (a mix of ui and logic in the function body) ----> */
 
 /*        <----- STATS / INFO ----> */
 
@@ -421,7 +488,10 @@ const addActiveCardItem = (game, cardItem) => {
 };
 
 const showMatcheeMatchee = (game) => {
-  const { __elementRoot: elementParent, __timeSettings: timeSettings } = game;
+  const {
+    __timeSettings: timeSettings,
+    cardGridItems: { element: elementParent },
+  } = game;
 
   const { delayOnMatched } = timeSettings;
   const element = document.createElement(`div`);
@@ -471,13 +541,14 @@ const settle = (game) => {
       stopGameAndDisplayStopGame(game);
     } else {
       console.log(`Showing flash hit on ${cardItemA.value.rank}`);
+
       showMatcheeMatchee(game);
     }
   } else {
     console.log(`Not Matching!`);
-    disableCardClickable(game);
+    flagMissCoolDown(game);
     setTimeout(() => {
-      enableCardClickable(game);
+      deflagMissCoolDown(game);
       flipDownCards(activeCardItemsFlipped);
       deactiveActiveCardItems(game);
     }, timeSettings.delayPause);
@@ -500,7 +571,7 @@ const unsetGameCoundownInterval = (game) => {
 };
 const stopGameAndDisplayStopGame = (game) => {
   unsetGameCoundownInterval(game);
-  flagStopGame(game);
+  flagGameStop(game);
   displayStopGame(game);
 };
 
@@ -561,7 +632,8 @@ const readyTimer = (game) => {
 const goTimer = (game) => {
   const { timerItem, __timeSettings: timeSettings } = game;
   const { timeCheckInterval } = timeSettings;
-  enableCardClickable(game);
+  deflagGamePause(game);
+
   setTimeDurationLeftAndUpdateDisplay(timerItem);
 
   if (timerItem.gameDurationCountDownInterval) {
@@ -576,6 +648,7 @@ const goTimer = (game) => {
 };
 
 const pauseTimer = (game) => {
+  flagGamePause(game);
   unsetGameCoundownInterval(game);
 };
 
@@ -596,12 +669,13 @@ const displayTimer = (game) => {
 
   elementButtonPause.addEventListener(`click`, () => {
     pauseTimer(game);
-    console.log(`Hello`);
   });
 
   const elementButtonPlay = newElementButtonPlay();
   inGameElements.buttonReset = elementButtonPlay;
-
+  elementButtonPlay.addEventListener(`click`, () => {
+    playTimer(game);
+  });
   elementButtonWrapper.appendChild(elementButtonPause);
   elementButtonWrapper.appendChild(elementButtonPlay);
 };
@@ -617,7 +691,7 @@ const newElementCardItemsWrapper = () => {
 };
 const startGame = (game) => {
   const {
-    cardItems,
+    cardGridItems,
     timerItem,
     nameItem: { element: nameElements },
     clickables,
@@ -628,15 +702,17 @@ const startGame = (game) => {
   const { elementGameDesc } = __defaultElements;
   const { display: elementNameDisplay } = nameElements;
   const { inGameElements } = clickables;
+  const { value: cardGrid } = cardGridItems;
 
+  flagGameStart(game);
   // !elementRoot.firstChild
   const elementDurationTimeLeft = newElementDurationTime(game);
   timerItem.element = elementDurationTimeLeft;
 
   // Create Card Elements
   const elementCardItemsWrapper = newElementCardItemsWrapper();
-
-  for (const cardRow of cardItems) {
+  cardGridItems.element = elementCardItemsWrapper;
+  for (const cardRow of cardGrid) {
     const elementCardRow = document.createElement(`div`);
     elementCardRow.className += ` ${CLASS_CARD_ROW}`;
     for (const cardItem of cardRow) {
@@ -664,11 +740,14 @@ const newGame = (gameConfig) => {
   const [cardsIn2DArray, totalCardsCount] = newCardGrid(boardSide);
   const game = {
     // cardItems. Grid of cards has additional associated properties during the game
-    cardItems: cardsIn2DArray.map((row) => {
-      return row.map((value) => {
-        return { value, faceUp: false, element: null };
-      });
-    }),
+    cardGridItems: {
+      value: cardsIn2DArray.map((row) => {
+        return row.map((value) => {
+          return { value, faceUp: false, element: null };
+        });
+      }),
+      element: null,
+    },
     // Timer
     timerItem: {
       value: { endTime: undefined, durationLeft: undefined },
@@ -689,9 +768,9 @@ const newGame = (gameConfig) => {
     },
     // Game state
     state: {
-      isClickable: false,
-      isPause: false,
-      isStop: false,
+      isCardOnCoolDown: false,
+      isPause: undefined,
+      isStop: undefined,
       activeCardItemsFlipped: [], // Cards which are open temporarily.
       unMatchedCardsCount: totalCardsCount,
     },
