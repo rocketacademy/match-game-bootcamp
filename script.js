@@ -15,7 +15,7 @@ const CLASS_ROOT = `match-root`;
 
 const CLASS_BUTTON_START = `match-button-start-game`;
 const CLASS_BUTTON_PAUSE = `match-button-pause-game`;
-const CLASS_BUTTON_RESET = `match-button-reset-game`;
+const CLASS_BUTTON_PLAY = `match-button-play-game`;
 const CLASS_IMG_BUTTON_IN_GAME = `match-img-button-in-game`;
 const CLASS_WRAPPER_BUTTON_IN_GAMES = `match-wrapper-buttons-in-game`;
 
@@ -227,9 +227,9 @@ const newElementInGameButtonsWrapper = () => {
   return element;
 };
 
-const newElementButtonReset = () => {
+const newElementButtonPlay = () => {
   const element = document.createElement(`button`);
-  element.className += ` ${CLASS_BUTTON_RESET}`;
+  element.className += ` ${CLASS_BUTTON_PLAY}`;
   element.innerHTML = ` |>`;
   return element;
 };
@@ -335,7 +335,7 @@ const detachAllChildren = (element) => {
 /*        <----- STAGE ----> */
 
 const isGameStop = (game) => game.state.isStop;
-const stopGame = (game) => {
+const flagStopGame = (game) => {
   console.log(`💎🤲  GAMESTOP 💎🤲 `);
   game.state.isStop = true;
 };
@@ -486,7 +486,8 @@ const settle = (game) => {
   console.groupEnd();
 };
 
-const unsetGameCoundownInterval = (timerItem) => {
+const unsetGameCoundownInterval = (game) => {
+  const { timerItem } = game;
   const { gameDurationCountDownInterval } = timerItem;
   // !!gameDurationCountDownInterval
   if (!gameDurationCountDownInterval) {
@@ -498,9 +499,8 @@ const unsetGameCoundownInterval = (timerItem) => {
   timerItem.gameDurationCountDownInterval = null;
 };
 const stopGameAndDisplayStopGame = (game) => {
-  const { timerItem } = game;
-  unsetGameCoundownInterval(timerItem);
-  stopGame(game);
+  unsetGameCoundownInterval(game);
+  flagStopGame(game);
   displayStopGame(game);
 };
 
@@ -559,22 +559,29 @@ const readyTimer = (game) => {
 };
 
 const goTimer = (game) => {
-  const { timerItem, __timeSettings: timeSettings, clickables } = game;
+  const { timerItem, __timeSettings: timeSettings } = game;
   const { timeCheckInterval } = timeSettings;
-  const { inGameElements } = clickables;
-
+  enableCardClickable(game);
   setTimeDurationLeftAndUpdateDisplay(timerItem);
 
   if (timerItem.gameDurationCountDownInterval) {
     throw `Should have one game countdown timer only`;
   }
   timerItem.gameDurationCountDownInterval = setInterval(() => {
-    console.log(`timer started`);
     setTimeDurationLeftAndUpdateDisplay(timerItem);
     if (exceedTime(timerItem)) {
       stopGameAndDisplayStopGame(game);
     }
   }, timeCheckInterval);
+};
+
+const pauseTimer = (game) => {
+  unsetGameCoundownInterval(game);
+};
+
+const playTimer = (game) => {
+  readyTimer(game);
+  goTimer(game);
 };
 
 const displayTimer = (game) => {
@@ -587,17 +594,20 @@ const displayTimer = (game) => {
   const elementButtonPause = newElementButtonPause();
   inGameElements.buttonPause = elementButtonPause;
 
-  const elementButtonReset = newElementButtonReset();
-  inGameElements.buttonReset = elementButtonReset;
+  elementButtonPause.addEventListener(`click`, () => {
+    pauseTimer(game);
+    console.log(`Hello`);
+  });
+
+  const elementButtonPlay = newElementButtonPlay();
+  inGameElements.buttonReset = elementButtonPlay;
 
   elementButtonWrapper.appendChild(elementButtonPause);
-  elementButtonWrapper.appendChild(elementButtonReset);
+  elementButtonWrapper.appendChild(elementButtonPlay);
 };
 const startTimer = (game) => {
   displayTimer(game);
-  readyTimer(game);
-  enableCardClickable(game);
-  goTimer(game);
+  playTimer(game);
 };
 
 const newElementCardItemsWrapper = () => {
