@@ -1,7 +1,6 @@
 /* <----- CSS Class Names ----> */
 
-const CLASS_CARD_ITEMS = `match-card-items`;
-
+const CLASS_GRID_ITEMS = `match-card-grid`;
 const CLASS_CARD_ROW = `match-card-row`;
 const CLASS_CARD = `match-card`;
 const CLASS_CARD_SUIT = `match-card-suit`;
@@ -13,11 +12,12 @@ const CLASS_GAME_DESC = `match-game-desc`;
 
 const CLASS_ROOT = `match-root`;
 
+const CLASS_TIME_BANNER = `match-time-bar`;
+const CLASS_WRAPPER_BUTTON_IN_GAMES = `match-wrapper-buttons-in-game`;
 const CLASS_BUTTON_START = `match-button-start-game`;
 const CLASS_BUTTON_PAUSE = `match-button-pause-game`;
 const CLASS_BUTTON_PLAY = `match-button-play-game`;
 const CLASS_IMG_BUTTON_IN_GAME = `match-img-button-in-game`;
-const CLASS_WRAPPER_BUTTON_IN_GAMES = `match-wrapper-buttons-in-game`;
 
 const CLASS_NAME_WRAPPER = `match-name-wrapper`;
 const CLASS_NAME_INPUT = `match-name-input`;
@@ -31,7 +31,7 @@ const DEFAULT_PLAYER_NAME = `PLAYER 1`;
 
 /*        <----- BOARD DIMENSION ----> */
 
-const BOARD_SIDE_DEFAULT = 4;
+const BOARD_SIDE_DEFAULT = 2;
 
 /*        <----- TIME ----> */
 
@@ -241,9 +241,9 @@ const newElementButtonPause = () => {
   return element;
 };
 
-const newElementCardItemsWrapper = () => {
+const newElementCardGrid = () => {
   const element = document.createElement(`div`);
-  element.className += ` ${CLASS_CARD_ITEMS}`;
+  element.className += ` ${CLASS_GRID_ITEMS}`;
   return element;
 };
 
@@ -642,7 +642,6 @@ const settle = (game) => {
       stopGameAndDisplayStopGame(game);
     } else {
       console.log(`Showing flash hit on ${cardItemA.value.rank}`);
-
       showMatcheeMatchee(game);
     }
   } else {
@@ -679,12 +678,10 @@ const startGame = (game) => {
 
   flagGameStart(game);
   // !elementRoot.firstChild
-  const elementDurationTimeLeft = newElementDurationTime(game);
-  timerItem.element = elementDurationTimeLeft;
 
   // Create Card Elements
-  const elementCardItemsWrapper = newElementCardItemsWrapper();
-  cardGridItems.element = elementCardItemsWrapper;
+  const elementCardGridWrapper = newElementCardGrid();
+  cardGridItems.element = elementCardGridWrapper;
   for (const cardRow of cardGrid) {
     const elementCardRow = document.createElement(`div`);
     elementCardRow.className += ` ${CLASS_CARD_ROW}`;
@@ -692,29 +689,39 @@ const startGame = (game) => {
       const elementCard = newElementCardAndSetClickHandle(cardItem, game);
       elementCardRow.appendChild(elementCard);
     }
-    elementCardItemsWrapper.appendChild(elementCardRow);
+    elementCardGridWrapper.appendChild(elementCardRow);
   }
 
   // Create Time Control Buttons
-  const elementInGameButtonWrapper = newElementInGameButtonsWrapper();
-  inGameTimeControlElements.wrapper = elementInGameButtonWrapper;
+
+  const elementTimeBanner = document.createElement(`div`);
+  elementTimeBanner.className += ` ${CLASS_TIME_BANNER}`;
+  const elementDurationTimeLeft = newElementDurationTime(game);
+  timerItem.element = elementDurationTimeLeft;
+  elementTimeBanner.appendChild(elementDurationTimeLeft);
+
+  const elementInGameTimeControlWrapper = newElementInGameButtonsWrapper();
+  inGameTimeControlElements.wrapper = elementInGameTimeControlWrapper;
 
   const elementButtonPause = newElementButtonPause();
   inGameTimeControlElements.buttonPause = elementButtonPause;
-
   elementButtonPause.addEventListener(`click`, () => {
     pauseTimer(game);
   });
+  elementInGameTimeControlWrapper.appendChild(elementButtonPause);
+
   const elementButtonPlay = newElementButtonPlay();
   inGameTimeControlElements.buttonPlay = elementButtonPlay;
   elementButtonPlay.addEventListener(`click`, () => {
     playTimer(game);
   });
+  elementInGameTimeControlWrapper.appendChild(elementButtonPlay);
+  elementTimeBanner.appendChild(elementInGameTimeControlWrapper);
 
+  // Append to Screen
   elementRoot.appendChild(elementNameDisplay);
-  elementRoot.appendChild(elementDurationTimeLeft);
-  elementRoot.appendChild(elementInGameButtonWrapper);
-  elementRoot.appendChild(elementCardItemsWrapper);
+  elementRoot.appendChild(elementTimeBanner);
+  elementRoot.appendChild(elementCardGridWrapper);
   elementRoot.appendChild(elementGameDesc);
 
   startTimer(game);
