@@ -240,6 +240,13 @@ const newElementButtonPause = () => {
 
   return element;
 };
+
+const newElementCardItemsWrapper = () => {
+  const element = document.createElement(`div`);
+  element.className += ` ${CLASS_CARD_ITEMS}`;
+  return element;
+};
+
 /*        <----- ELEMENT: NOT PLAIN ----> */
 
 const onCardClickHandler = (cardItem, game) => {
@@ -329,9 +336,9 @@ const detachAllChildren = (element) => {
 
 /* <----- Logic Helpers ----> */
 
-/*                                <----- STATE ----> */
+/*                                <----- LH:STATE ----> */
 
-/*                                                        <----- STATE: gamestop ----> */
+/*                                                        <----- LH:STATE: gamestop ----> */
 
 const isGameStop = (game) => {
   if (game.state.isStop === undefined || game.state.isStop === null) {
@@ -356,7 +363,7 @@ const flagGameStop = (game) => {
   game.state.isStop = true;
 };
 
-/*                                                        <----- STATE: gamepause ----> */
+/*                                                        <----- LH:STATE: gamepause ----> */
 
 const isGamePause = (game) => {
   if (game.state.isPause === undefined || game.state.isPause === null) {
@@ -386,7 +393,7 @@ const deflagGamePause = (game) => {
   game.state.isPause = false;
 };
 
-/*                                                        <----- STATE: cardcooldown ----> */
+/*                                                        <----- LH:STATE: cardcooldown ----> */
 const isCardCoolDowning = (game) => game.state.isCardOnCoolDown;
 const flagMissCoolDown = (game) => {
   if (isGameStop(game)) {
@@ -425,14 +432,14 @@ const isCardClickable = (cardItem, game) => {
   return [true, ``];
 };
 
-/*        <----- CARD ----> */
+/*                                                        <----- LH:CARD ----> */
 
 const isAllPairsMatch = (game) => game.state.unMatchedCardsCount === 0;
 const registerMatchingPair = (game) => (game.state.unMatchedCardsCount -= 2);
 const getActiveCardsLength = (game) => game.state.activeCardItemsFlipped.length;
 const isMatchingCards = (cardA, cardB) => cardA === cardB;
 
-/*        <----- TIME ----> */
+/*                                                        <----- LH:TIME ----> */
 
 const getDurationLeft = (timerItem) => timerItem.value.endTime - new Date();
 const setTimerValueLeft = (timerItem) =>
@@ -441,7 +448,7 @@ const exceedTime = (timerItem) => timerItem.value.durationLeft < 0;
 
 /* <----- UI-Logic Helpers (a mix of ui and logic in the function body) ----> */
 
-/*        <----- STATS / INFO ----> */
+/*                                                        <----- UI-LH:STATS / GENERAL INFO ----> */
 
 const updateNameValueAndDisplay = (game, newValue) => {
   const { nameItem } = game;
@@ -456,7 +463,7 @@ const updateNameValueAndDisplay = (game, newValue) => {
   setElementInnerText(elementNameDisplay, newValue);
 };
 
-/*        <----- CARD ACTIONS ----> */
+/*                                                        <----- UI-LH:CARD ACTIONS ----> */
 
 const flipDown = (cardItem) => {
   const { element } = cardItem;
@@ -514,6 +521,100 @@ const deactiveActiveCardItems = (game) => {
   game.state.activeCardItemsFlipped = [];
 };
 
+/*                                                        <----- UI-LH:TIME CONTROL ----> */
+
+const updateDisplayTimerControl = (game) => {
+  const { clickables } = game;
+  const { inGameTimeControlElements } = clickables;
+  const {
+    wrapper: elementButtonTimeControlWrapper,
+    buttonPause: elementButtonPause,
+    buttonPlay: elementButtonPlay,
+  } = inGameTimeControlElements;
+
+  // !!elementButtonTimeControlWrapper
+  const isGamePausing = isGamePause(game);
+  if (isGamePausing === true) {
+    elementButtonTimeControlWrapper.replaceChildren(elementButtonPlay);
+  } else if (isGamePausing === false) {
+    elementButtonTimeControlWrapper.replaceChildren(elementButtonPause);
+  } else {
+    console.warn(
+      `[updateTimerControl] isGamePausing undefined or null or not a boolean`
+    );
+  }
+};
+
+const unsetGameCountdownInterval = (game) => {
+  const { timerItem } = game;
+  const { gameDurationCountDownInterval } = timerItem;
+  // !!gameDurationCountDownInterval
+  if (!gameDurationCountDownInterval) {
+    throw new Error(
+      `[unsetGameCoundownInterval] should be called only if there is a countdown interval`
+    );
+  }
+  clearInterval(gameDurationCountDownInterval);
+  timerItem.gameDurationCountDownInterval = null;
+};
+
+const stopGameAndDisplayStopGame = (game) => {
+  unsetGameCountdownInterval(game);
+  flagGameStop(game);
+  displayStopGame(game);
+};
+
+const pauseTimer = (game) => {
+  flagGamePause(game);
+  updateDisplayTimerControl(game);
+  unsetGameCountdownInterval(game);
+};
+
+const setTimeDurationLeftAndUpdateDisplay = (timerItem) => {
+  // Set time left
+  setTimerValueLeft(timerItem);
+  // Displau time left
+  setTimerElementDurationLeft(timerItem);
+};
+
+const goTimer = (game) => {
+  const { timerItem, __timeSettings: timeSettings } = game;
+  const { timeCheckInterval } = timeSettings;
+
+  if (!isGamePause(game)) {
+    console.warn(`[goTimer] Game should be paused for game to go again`);
+  }
+  if (timerItem.gameDurationCountDownInterval) {
+    throw new Error(`[goTimer] Must have one game countdown timer only`);
+  }
+
+  deflagGamePause(game);
+  updateDisplayTimerControl(game);
+
+  setTimeDurationLeftAndUpdateDisplay(timerItem);
+
+  timerItem.gameDurationCountDownInterval = setInterval(() => {
+    setTimeDurationLeftAndUpdateDisplay(timerItem);
+    if (exceedTime(timerItem)) {
+      stopGameAndDisplayStopGame(game);
+    }
+  }, timeCheckInterval);
+};
+
+const readyTimer = (game) => {
+  const { timerItem, __timeSettings: timeSettings } = game;
+  const { gameDuration } = timeSettings;
+  // Set end time as offset of now
+  const endTime = new Date();
+  endTime.setMilliseconds(endTime.getMilliseconds() + gameDuration);
+  timerItem.value.endTime = endTime;
+};
+
+const playTimer = (game) => {
+  readyTimer(game);
+  goTimer(game);
+};
+
 /*        <----- GAME PHASE ----> */
 
 // Reconciliation after every two clicks.
@@ -557,32 +658,67 @@ const settle = (game) => {
   console.groupEnd();
 };
 
-const unsetGameCoundownInterval = (game) => {
-  const { timerItem } = game;
-  const { gameDurationCountDownInterval } = timerItem;
-  // !!gameDurationCountDownInterval
-  if (!gameDurationCountDownInterval) {
-    throw new Error(
-      `[unsetGameCoundownInterval] should be called only if there is a countdown interval`
-    );
-  }
-  clearInterval(gameDurationCountDownInterval);
-  timerItem.gameDurationCountDownInterval = null;
-};
-const stopGameAndDisplayStopGame = (game) => {
-  unsetGameCoundownInterval(game);
-  flagGameStop(game);
-  displayStopGame(game);
-};
-
-const setTimeDurationLeftAndUpdateDisplay = (timerItem) => {
-  // Set time left
-  setTimerValueLeft(timerItem);
-  // Displau time left
-  setTimerElementDurationLeft(timerItem);
-};
-
 /* <----- DRIVER ----> */
+
+/*                            <----- MAIN PHASE ----> */
+
+const startGame = (game) => {
+  const {
+    cardGridItems,
+    timerItem,
+    nameItem: { element: nameElements },
+    clickables,
+    __elementRoot: elementRoot,
+    __defaultElements,
+  } = game;
+
+  const { elementGameDesc } = __defaultElements;
+  const { display: elementNameDisplay } = nameElements;
+  const { inGameTimeControlElements } = clickables;
+  const { value: cardGrid } = cardGridItems;
+
+  flagGameStart(game);
+  // !elementRoot.firstChild
+  const elementDurationTimeLeft = newElementDurationTime(game);
+  timerItem.element = elementDurationTimeLeft;
+
+  // Create Card Elements
+  const elementCardItemsWrapper = newElementCardItemsWrapper();
+  cardGridItems.element = elementCardItemsWrapper;
+  for (const cardRow of cardGrid) {
+    const elementCardRow = document.createElement(`div`);
+    elementCardRow.className += ` ${CLASS_CARD_ROW}`;
+    for (const cardItem of cardRow) {
+      const elementCard = newElementCardAndSetClickHandle(cardItem, game);
+      elementCardRow.appendChild(elementCard);
+    }
+    elementCardItemsWrapper.appendChild(elementCardRow);
+  }
+
+  // Create Time Control Buttons
+  const elementInGameButtonWrapper = newElementInGameButtonsWrapper();
+  inGameTimeControlElements.wrapper = elementInGameButtonWrapper;
+
+  const elementButtonPause = newElementButtonPause();
+  inGameTimeControlElements.buttonPause = elementButtonPause;
+
+  elementButtonPause.addEventListener(`click`, () => {
+    pauseTimer(game);
+  });
+  const elementButtonPlay = newElementButtonPlay();
+  inGameTimeControlElements.buttonPlay = elementButtonPlay;
+  elementButtonPlay.addEventListener(`click`, () => {
+    playTimer(game);
+  });
+
+  elementRoot.appendChild(elementNameDisplay);
+  elementRoot.appendChild(elementDurationTimeLeft);
+  elementRoot.appendChild(elementInGameButtonWrapper);
+  elementRoot.appendChild(elementCardItemsWrapper);
+  elementRoot.appendChild(elementGameDesc);
+
+  startTimer(game);
+};
 
 const commencePreGame = (game) => {
   const {
@@ -620,119 +756,8 @@ const commencePreGame = (game) => {
   elementButtonStart.addEventListener(`click`, onClickStartHandler);
 };
 
-const readyTimer = (game) => {
-  const { timerItem, __timeSettings: timeSettings } = game;
-  const { gameDuration } = timeSettings;
-  // Set end time
-  const endTime = new Date();
-  endTime.setMilliseconds(endTime.getMilliseconds() + gameDuration);
-  timerItem.value.endTime = endTime;
-};
-
-const goTimer = (game) => {
-  const { timerItem, __timeSettings: timeSettings } = game;
-  const { timeCheckInterval } = timeSettings;
-  deflagGamePause(game);
-
-  setTimeDurationLeftAndUpdateDisplay(timerItem);
-
-  if (timerItem.gameDurationCountDownInterval) {
-    throw `Should have one game countdown timer only`;
-  }
-  timerItem.gameDurationCountDownInterval = setInterval(() => {
-    setTimeDurationLeftAndUpdateDisplay(timerItem);
-    if (exceedTime(timerItem)) {
-      stopGameAndDisplayStopGame(game);
-    }
-  }, timeCheckInterval);
-};
-
-const pauseTimer = (game) => {
-  flagGamePause(game);
-  unsetGameCoundownInterval(game);
-};
-
-const playTimer = (game) => {
-  readyTimer(game);
-  goTimer(game);
-};
-
-const displayTimer = (game) => {
-  const { clickables } = game;
-  const { inGameElements } = clickables;
-  const { wrapper: elementButtonWrapper } = inGameElements;
-
-  // !!elementButtonWrapper
-
-  const elementButtonPause = newElementButtonPause();
-  inGameElements.buttonPause = elementButtonPause;
-
-  elementButtonPause.addEventListener(`click`, () => {
-    pauseTimer(game);
-  });
-
-  const elementButtonPlay = newElementButtonPlay();
-  inGameElements.buttonReset = elementButtonPlay;
-  elementButtonPlay.addEventListener(`click`, () => {
-    playTimer(game);
-  });
-  elementButtonWrapper.appendChild(elementButtonPause);
-  elementButtonWrapper.appendChild(elementButtonPlay);
-};
-const startTimer = (game) => {
-  displayTimer(game);
-  playTimer(game);
-};
-
-const newElementCardItemsWrapper = () => {
-  const element = document.createElement(`div`);
-  element.className += ` ${CLASS_CARD_ITEMS}`;
-  return element;
-};
-const startGame = (game) => {
-  const {
-    cardGridItems,
-    timerItem,
-    nameItem: { element: nameElements },
-    clickables,
-    __elementRoot: elementRoot,
-    __defaultElements,
-  } = game;
-
-  const { elementGameDesc } = __defaultElements;
-  const { display: elementNameDisplay } = nameElements;
-  const { inGameElements } = clickables;
-  const { value: cardGrid } = cardGridItems;
-
-  flagGameStart(game);
-  // !elementRoot.firstChild
-  const elementDurationTimeLeft = newElementDurationTime(game);
-  timerItem.element = elementDurationTimeLeft;
-
-  // Create Card Elements
-  const elementCardItemsWrapper = newElementCardItemsWrapper();
-  cardGridItems.element = elementCardItemsWrapper;
-  for (const cardRow of cardGrid) {
-    const elementCardRow = document.createElement(`div`);
-    elementCardRow.className += ` ${CLASS_CARD_ROW}`;
-    for (const cardItem of cardRow) {
-      const elementCard = newElementCardAndSetClickHandle(cardItem, game);
-      elementCardRow.appendChild(elementCard);
-    }
-    elementCardItemsWrapper.appendChild(elementCardRow);
-  }
-
-  const elementInGameButtonWrapper = newElementInGameButtonsWrapper();
-  inGameElements.wrapper = elementInGameButtonWrapper;
-
-  elementRoot.appendChild(elementNameDisplay);
-  elementRoot.appendChild(elementDurationTimeLeft);
-  elementRoot.appendChild(elementInGameButtonWrapper);
-  elementRoot.appendChild(elementCardItemsWrapper);
-  elementRoot.appendChild(elementGameDesc);
-
-  startTimer(game);
-};
+// Alias
+const startTimer = playTimer;
 
 const newGame = (gameConfig) => {
   const { boardSide, timeSettings, elementRoot } = gameConfig;
@@ -760,10 +785,10 @@ const newGame = (gameConfig) => {
     },
     clickables: {
       preCommenceElements: { buttonStart: null },
-      inGameElements: {
+      inGameTimeControlElements: {
         wrapper: null,
         buttonPause: null,
-        buttonReset: null,
+        buttonPlay: null,
       },
     },
     // Game state
