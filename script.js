@@ -160,23 +160,6 @@ const updateDisplayGameDescGameEnds = (game) => {
 
 const getGameConfig = (game) => game._gameData;
 
-const displayStopGameElements = (game) => {
-  const isCompleted = isGameCompleted(game);
-  undisplayTimeBanner(game);
-  // show grid only if completed
-  if (!isCompleted) {
-  }
-
-  updateDisplayGameDescGameEnds(game);
-
-  const buttonRestart = document.createElement(`button`);
-  buttonRestart.addEventListener(`click`, () => {
-    onClickRestartHandler(game);
-  });
-
-  game.__elementRoot.appendChild(buttonRestart);
-};
-
 const undisplayTimeBanner = (game) => {
   const {
     timerItem: {
@@ -205,7 +188,7 @@ const updateDisplayDurationLeft = (timerItem) => {
 
 const newDefaultElementHeader = () => {
   const element = document.createElement(`h1`);
-  setElementInnerText(element, `SWE101! 🚀 Matchee Mutchee`);
+  setElementInnerText(element, `Match Game`);
   return element;
 };
 const newElementDurationTime = () => {
@@ -309,48 +292,59 @@ const newElementCardAndSetClickHandle = (cardItem, game) => {
   return element;
 };
 
-const hideElement = (element) => (element.style.display = `none`);
-const hideStartButton = (game) => {
+const toggleDisplayButtonStart = (game, shouldDisplay) => {
   const { clickables } = game;
-  const { startElements } = clickables;
-  const { elementButtonStart } = startElements;
+  const { preCommenceElements } = clickables;
+  const { buttonStart: elementButtonStart } = preCommenceElements;
   // !!elementButtonStart
-  hideElement(elementButtonStart);
+
+  if (shouldDisplay === true) {
+    elementButtonStart.style.display = `flex`;
+  } else if (shouldDisplay === false) {
+    elementButtonStart.style.display = `none`;
+  } else {
+    console.warn(`[toggleDisplayButtonStart] shouldDisplay not defined`);
+  }
+};
+const hideStartButton = (game) => {
+  toggleDisplayButtonStart(game, false);
 };
 
-const showElement = (element) => (element.style.display = `flex`);
-
 const showStartButton = (game) => {
-  const { clickables } = game;
-  const { startElements } = clickables;
-  const { elementButtonStart } = startElements;
-  // !!elementButtonStart
-  showElement(elementButtonStart);
+  toggleDisplayButtonStart(game, true);
 };
 
 const newElementNameInputAndSetClickHandler = (game) => {
   const {
-    nameItem: { value: name },
+    _gameData: { playerName },
   } = game;
 
   const element = document.createElement(`input`);
   element.className += ` ${CLASS_NAME_INPUT}`;
   element.setAttribute(`type`, `text`);
 
-  // Show placeholder name on start screen
-  let firstName = name || `-`;
-  element.setAttribute(`value`, firstName);
-  updateNameValueAndDisplay(game, firstName);
+  // !!playerName
+
+  console.warn(`playerName should have a value ${playerName}`);
+  element.setAttribute(`value`, playerName);
+  updateAndDisplayPlayerName(game, playerName);
 
   element.addEventListener(`input`, (event) => {
     const value = event.target.value;
-    updateNameValueAndDisplay(game, value);
+    updateAndDisplayPlayerName(game, value);
     if (value === ``) {
       hideStartButton(game);
     } else {
       showStartButton(game);
     }
   });
+
+  return element;
+};
+
+const newElementButtonStartAndSetClickHandler = (game) => {
+  const element = newElementButtonStart();
+  element.addEventListener(`click`, () => onClickStartHandler(game));
 
   return element;
 };
@@ -492,14 +486,14 @@ const exceedTime = (timerItem) => timerItem.value.durationLeft < 0;
 
 /*                                                        <----- UI-LH:STATS / GENERAL INFO ----> */
 
-const updateNameValueAndDisplay = (game, newValue) => {
+const updateAndDisplayPlayerName = (game, newValue) => {
   const { nameItem } = game;
   const {
     element: { display: elementNameDisplay },
   } = nameItem;
 
   // update name value
-  nameItem.value = newValue;
+  game._gameData.playerName = newValue;
 
   // display
   setElementInnerText(elementNameDisplay, newValue);
@@ -581,15 +575,24 @@ const clearDisplayAndStartGame = (game) => {
   clearGameDisplay(game);
   startGame(game);
 };
+
 const onClickStartHandler = (game) => {
   clearDisplayAndStartGame(game);
 };
 
 const onClickRestartHandler = (prevGame) => {
   const gameConfig = getGameConfig(prevGame);
-  console.log(gameConfig);
   const game = newGame(gameConfig);
   clearDisplayAndStartGame(game);
+};
+
+const clearDisplayAndViewStatistics = (game) => {
+  clearGameDisplay(game);
+  const gameConfig = getGameConfig(game);
+  clearDisplayAndViewStatistics(gameConfig);
+};
+const onClickStatisticsHandler = (prevGame) => {
+  clearDisplayAndViewStatistics(prevGame);
 };
 
 const updateDisplayTimerControl = (game) => {
@@ -688,7 +691,8 @@ const runGameReport = (game) => {
 const stopGameAndDisplayStopGame = (game) => {
   unsetGameCountdownInterval(game);
   flagGameStop(game);
-  displayStopGameElements(game);
+
+  displayGameStop(game);
 };
 
 const pauseTimer = (game) => {
@@ -857,7 +861,32 @@ const startGame = (game) => {
   startTimer(game);
 };
 
-const commencePreGame = (game) => {
+const displayGameStop = (game) => {
+  const isCompleted = isGameCompleted(game);
+  undisplayTimeBanner(game);
+  // show grid only if completed
+  if (!isCompleted) {
+  }
+
+  updateDisplayGameDescGameEnds(game);
+
+  const buttonRestart = document.createElement(`button`);
+  buttonRestart.innerHTML = `Restart`;
+  buttonRestart.addEventListener(`click`, () => {
+    onClickRestartHandler(game);
+  });
+
+  const buttonStatistics = document.createElement(`button`);
+  buttonStatistics.innerHTML = `Statistics`;
+  buttonStatistics.addEventListener(`click`, () => {
+    onClickStatisticsHandler(game);
+  });
+
+  game.__elementRoot.appendChild(buttonRestart);
+  game.__elementRoot.appendChild(buttonStatistics);
+};
+
+const displayGamePreGameConfig = (game) => {
   const {
     __elementRoot: elementRoot,
     __defaultElements,
@@ -880,8 +909,6 @@ const commencePreGame = (game) => {
   elementRoot.appendChild(elementNameWrapper);
   elementRoot.appendChild(elementButtonStart);
   elementRoot.appendChild(elementGameDesc);
-
-  elementButtonStart.addEventListener(`click`, () => onClickStartHandler(game));
 };
 
 // Alias
@@ -889,7 +916,7 @@ const startTimer = playTimer;
 
 const newGame = (gameConfig) => {
   console.group(`[newGame] Constructing a game object.`);
-  const { boardSide, timeSettings, elementRoot } = gameConfig;
+  const { boardSide, timeSettings, elementRoot, playerName } = gameConfig;
   // Get a grid of cards
   const [cardsIn2DArray, totalCardsCount] = newCardGrid(boardSide);
   const game = {
@@ -914,7 +941,6 @@ const newGame = (gameConfig) => {
     },
     nameItem: {
       element: { field: null, display: null, wrapper: null }, // wrapper hugs the field and display elements.
-      value: DEFAULT_PLAYER_NAME,
     },
     clickables: {
       preCommenceElements: { buttonStart: null },
@@ -949,7 +975,8 @@ const newGame = (gameConfig) => {
   game.nameItem.element.display = newElementNameDisplay();
   game.nameItem.element.field = newElementNameInputAndSetClickHandler(game);
 
-  game.clickables.preCommenceElements.buttonStart = newElementButtonStart();
+  game.clickables.preCommenceElements.buttonStart =
+    newElementButtonStartAndSetClickHandler(game);
 
   console.groupEnd();
   return game;
@@ -958,7 +985,7 @@ const main = (gameConfig) => {
   // Initialize Game
   const game = newGame(gameConfig);
   // Commence
-  commencePreGame(game);
+  displayGamePreGameConfig(game);
 };
 
 // <!-- EXECUTION -->
@@ -973,6 +1000,7 @@ const gameConfig = {
   boardSide: BOARD_SIDE_DEFAULT,
   timeSettings: TIME_DEFAULT_SETTINGS,
   stats: { mostRecentGame: null, tally: [] },
+  playerName: DEFAULT_PLAYER_NAME,
 };
 
 // Flow: main -> commencePreGame -> onClickStartHandler:startGame -> (exceedTime OR isAllPairsMatch): stopGameAndDisplayStopGame
