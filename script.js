@@ -610,22 +610,30 @@ const displayGameStatistics = (gameConfig) => {
   const elementTableHead = document.createElement(`thead`);
   const elementTableBody = document.createElement(`tbody`);
 
-  const propCompleted = { value: `durationElapsed`, desc: `Time Taken (ms)` };
-  const propDurationElapsed = { value: `isCompleted`, desc: `Completed` };
+  const propCompleted = {
+    value: `durationElapsed`,
+    colName: `Time Taken (ms)`,
+    format: (v) => v,
+  };
+  const propDurationElapsed = {
+    value: `isCompleted`,
+    colName: `Completed`,
+    format: (is) => (is === true ? `T` : is === false ? `F` : `?`),
+  };
 
   const properties = [propCompleted, propDurationElapsed];
   const th = document.createElement(`th`);
 
-  for (const { desc: prop } of properties) {
-    const td = newElementTableData(prop);
+  for (const { colName } of properties) {
+    const td = newElementTableData(colName);
     th.appendChild(td);
     elementTableHead.appendChild(td);
   }
 
   for (const stat of tally) {
     const tr = document.createElement(`tr`);
-    for (const { value: prop } of properties) {
-      const td = newElementTableData(stat[prop]);
+    for (const { value: prop, format } of properties) {
+      const td = newElementTableData(format(stat[prop]));
       tr.appendChild(td);
     }
     elementTableBody.appendChild(tr);
