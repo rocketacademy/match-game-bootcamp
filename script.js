@@ -6,7 +6,7 @@ const CLASS_CARD = `match-card`;
 const CLASS_CARD_SUIT = `match-card-suit`;
 const CLASS_CARD_NAME = `match-card-name`;
 
-const CLASS_BANNER = `match-banner`;
+const CLASS_HEADER_BANNER = `match-header-banner`;
 
 const CLASS_GAME_DESC = `match-game-desc`;
 
@@ -22,6 +22,8 @@ const CLASS_IMG_BUTTON_IN_GAME = `match-img-button-in-game`;
 const CLASS_NAME_WRAPPER = `match-name-wrapper`;
 const CLASS_NAME_INPUT = `match-name-input`;
 const CLASS_NAME_DISPLAY = `match-name-display`;
+
+const CLASS_MATCH_HIT = `match-hit`;
 
 /* <----- DEFAULT CONFIG ----> */
 
@@ -155,6 +157,9 @@ const updateDisplayGameDescGameEnds = (game) => {
   } = game;
   setElementInnerText(elementGameDesc, `Game Ended`);
 };
+
+const getGameConfig = (game) => game._gameData;
+
 const displayStopGameElements = (game) => {
   const isCompleted = isGameCompleted(game);
   undisplayTimeBanner(game);
@@ -163,6 +168,13 @@ const displayStopGameElements = (game) => {
   }
 
   updateDisplayGameDescGameEnds(game);
+
+  const buttonRestart = document.createElement(`button`);
+  buttonRestart.addEventListener(`click`, () => {
+    onClickRestartHandler(game);
+  });
+
+  game.__elementRoot.appendChild(buttonRestart);
 };
 
 const undisplayTimeBanner = (game) => {
@@ -184,9 +196,11 @@ const clearGameDisplay = (game) => {
 const updateDisplayDurationLeft = (timerItem) => {
   const {
     elements: { durationLeft: elementDurationLeft },
+    value: { durationLeft: valueDurationLeft },
   } = timerItem;
-  setElementInnerText(elementDurationLeft, `${timerItem.value.durationLeft}ms`);
+  setElementInnerText(elementDurationLeft, `${valueDurationLeft}ms`);
 };
+
 /*        <----- ELEMENT: PLAIN ----> */
 
 const newDefaultElementHeader = () => {
@@ -270,8 +284,9 @@ const newElementCardGrid = () => {
 /*        <----- ELEMENT: NOT PLAIN ----> */
 
 const onCardClickHandler = (cardItem, game) => {
+  console.group(`[onCardClickHandler] isCardClickable`);
   const [is, msg] = isCardClickable(cardItem, game);
-
+  console.groupEnd();
   if (is === false) {
     console.warn(msg);
     return;
@@ -392,7 +407,7 @@ const isGamePause = (game) => {
     );
     return;
   }
-  console.log(`isGamePause ${game.state.isPause}`);
+  console.log(`[isGamePause] ${game.state.isPause}`);
   return game.state.isPause;
 };
 
@@ -401,8 +416,9 @@ const flagGamePause = (game) => {
     console.warn(`[flagGamePause] behavior not executed. game has stopped`);
     return;
   }
-  console.log(`[flagGamePause] set.`);
-  game.state.isPause = true;
+  const is = true;
+  console.log(`[flagGamePause] set to ${is}`);
+  game.state.isPause = is;
 };
 
 const deflagGamePause = (game) => {
@@ -410,7 +426,9 @@ const deflagGamePause = (game) => {
     console.warn(`[deflagGamePause] behavior not executed. game has stopped`);
     return;
   }
-  game.state.isPause = false;
+  const is = false;
+  console.log(`[flagGamePause] set to ${is}`);
+  game.state.isPause = is;
 };
 
 /*                                                        <----- LH:STATE: cardcooldown ----> */
@@ -526,13 +544,25 @@ const showMatcheeMatchee = (game) => {
 
   const { delayOnMatched } = timeSettings;
   const element = document.createElement(`div`);
-  element.className += ` match-hit`;
+  element.className += ` ${CLASS_MATCH_HIT}`;
   element.innerText = `HITTO`;
 
   elementParent.appendChild(element);
   setTimeout(() => {
     elementParent.removeChild(element);
   }, delayOnMatched);
+};
+/*                                                        <----- UI-LH:ACTION CONTROL ----> */
+const activateCoolDown = (game) => {
+  const { state, __timeSettings: timeSettings } = game;
+  const { activeCardItemsFlipped } = state;
+
+  flagMissCoolDown(game);
+  setTimeout(() => {
+    deflagMissCoolDown(game);
+    flipDownCards(activeCardItemsFlipped);
+    deactiveActiveCardItems(game);
+  }, timeSettings.delayPause);
 };
 
 // Clean up function after every two clicks
@@ -547,7 +577,23 @@ const deactiveActiveCardItems = (game) => {
 
 /*                                                        <----- UI-LH:TIME CONTROL ----> */
 
+const clearDisplayAndStartGame = (game) => {
+  clearGameDisplay(game);
+  startGame(game);
+};
+const onClickStartHandler = (game) => {
+  clearDisplayAndStartGame(game);
+};
+
+const onClickRestartHandler = (prevGame) => {
+  const gameConfig = getGameConfig(prevGame);
+  console.log(gameConfig);
+  const game = newGame(gameConfig);
+  clearDisplayAndStartGame(game);
+};
+
 const updateDisplayTimerControl = (game) => {
+  console.group(`[updateDisplayTimerControl]`);
   const { clickables } = game;
   const { inGameTimeControlElements } = clickables;
   const {
@@ -567,6 +613,7 @@ const updateDisplayTimerControl = (game) => {
       `[updateTimerControl] isGamePausing undefined or null or not a boolean`
     );
   }
+  console.groupEnd();
 };
 
 const unsetGameCountdownInterval = (game) => {
@@ -645,9 +692,11 @@ const stopGameAndDisplayStopGame = (game) => {
 };
 
 const pauseTimer = (game) => {
+  console.group(`[pauseTimer]`);
   flagGamePause(game);
   updateDisplayTimerControl(game);
   unsetGameCountdownInterval(game);
+  console.groupEnd();
 };
 
 const setTimeDurationLeftAndUpdateDisplay = (timerItem) => {
@@ -658,6 +707,7 @@ const setTimeDurationLeftAndUpdateDisplay = (timerItem) => {
 };
 
 const goTimer = (game) => {
+  console.group(`[goTimer]`);
   const { timerItem, __timeSettings: timeSettings } = game;
 
   if (!isGamePause(game)) {
@@ -669,10 +719,9 @@ const goTimer = (game) => {
 
   deflagGamePause(game);
   updateDisplayTimerControl(game);
-
   setTimeDurationLeftAndUpdateDisplay(timerItem);
-
   setGameCountdownInterval(game);
+  console.groupEnd();
 };
 
 const setStartTime = (game, time) => (game.state.startTime = time);
@@ -699,8 +748,10 @@ const playTimer = (game) => {
 // Reconciliation after every two clicks.
 const settle = (game) => {
   console.group(`[settle] Two cards clicked.`);
-  const { state, __timeSettings: timeSettings, __defaultElements } = game;
-  const { activeCardItemsFlipped } = state;
+  const {
+    state: { activeCardItemsFlipped },
+    __defaultElements,
+  } = game;
 
   // activeCardItemsFlipped.length === 2;
 
@@ -722,17 +773,14 @@ const settle = (game) => {
       setGameCompleted(game);
       stopGameAndDisplayStopGame(game);
     } else {
-      console.log(`Showing flash hit on ${cardItemA.value.rank}`);
+      console.log(
+        `Showing flash hit on ${cardItemA.value.rank}${cardItemA.value.suit}`
+      );
       showMatcheeMatchee(game);
     }
   } else {
     console.log(`Not Matching!`);
-    flagMissCoolDown(game);
-    setTimeout(() => {
-      deflagMissCoolDown(game);
-      flipDownCards(activeCardItemsFlipped);
-      deactiveActiveCardItems(game);
-    }, timeSettings.delayPause);
+    activateCoolDown(game);
   }
 
   console.groupEnd();
@@ -816,19 +864,14 @@ const commencePreGame = (game) => {
     nameItem,
     clickables,
   } = game;
+
   const { elementGameDesc, elementHeader } = __defaultElements;
 
-  const elementNameWrapper = newElementNameWrapper();
-  nameItem.element.wrapper = elementNameWrapper;
+  const elementNameWrapper = nameItem.element.wrapper;
+  const elementNameDisplay = nameItem.element.display;
+  const elementNameInputField = nameItem.element.field;
 
-  const elementNameDisplay = newElementNameDisplay();
-  nameItem.element.display = elementNameDisplay;
-
-  const elementNameInputField = newElementNameInputAndSetClickHandler(game);
-  nameItem.element.field = elementNameInputField;
-
-  const elementButtonStart = newElementButtonStart();
-  clickables.preCommenceElements.buttonStart = elementButtonStart;
+  const elementButtonStart = clickables.preCommenceElements.buttonStart;
 
   elementNameWrapper.appendChild(elementNameInputField);
   elementNameWrapper.appendChild(elementNameDisplay);
@@ -838,17 +881,14 @@ const commencePreGame = (game) => {
   elementRoot.appendChild(elementButtonStart);
   elementRoot.appendChild(elementGameDesc);
 
-  const onClickStartHandler = () => {
-    clearGameDisplay(game);
-    startGame(game);
-  };
-  elementButtonStart.addEventListener(`click`, onClickStartHandler);
+  elementButtonStart.addEventListener(`click`, () => onClickStartHandler(game));
 };
 
 // Alias
 const startTimer = playTimer;
 
 const newGame = (gameConfig) => {
+  console.group(`[newGame] Constructing a game object.`);
   const { boardSide, timeSettings, elementRoot } = gameConfig;
   // Get a grid of cards
   const [cardsIn2DArray, totalCardsCount] = newCardGrid(boardSide);
@@ -905,11 +945,18 @@ const newGame = (gameConfig) => {
     _gameData: gameConfig,
   };
 
+  game.nameItem.element.wrapper = newElementNameWrapper();
+  game.nameItem.element.display = newElementNameDisplay();
+  game.nameItem.element.field = newElementNameInputAndSetClickHandler(game);
+
+  game.clickables.preCommenceElements.buttonStart = newElementButtonStart();
+
+  console.groupEnd();
   return game;
 };
-const main = (gameData) => {
+const main = (gameConfig) => {
   // Initialize Game
-  const game = newGame(gameData);
+  const game = newGame(gameConfig);
   // Commence
   commencePreGame(game);
 };

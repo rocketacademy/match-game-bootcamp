@@ -16,7 +16,7 @@ body {
   justify-content: space-evenly;
   height: 100%;
 }
-.match-banner {
+.match-header-banner {
   display: flex;
   justify-content: center;
   text-align: center;
