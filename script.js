@@ -62,11 +62,6 @@ let firstCard = null;
 let cardElement;
 let deck;
 
-let milliseconds = 5000;
-const delayInMilliseconds = 1;
-const output = document.createElement('div');
-output.innerText = milliseconds;
-document.body.appendChild(output);
 
 //#################### PLAYER ACTION CALLBACKS ####################//
 const squareClick = (messageBoard, cardElement, column, row) => {
@@ -135,18 +130,35 @@ const buildBoardElements = (board) => {
   // give it a class for CSS purposes
   boardElement.classList.add('board');
   
-  //timer
-  const timer = setInterval(() => {
-  output.innerText = milliseconds;
-  if (milliseconds <= 0) {
-    clearInterval(timer);
-  }
-  milliseconds -= 1;
-}, delayInMilliseconds);
+  // timer
+const formatTime = (time) =>{
+  const minutes = Math.floor(time/60)
 
-setInterval(() => {
-  messageBoard.innerText = 'Time is up!';
-},milliseconds);
+  let seconds = time%60;
+  if (seconds <10){
+    seconds = `0${seconds}`
+  }
+  return `${minutes}:${seconds}`
+}
+
+//set timer for 3 minutes
+const timeContainer = document.createElement("div");
+ let seconds = 180
+
+const ref = setInterval(() =>{
+  timeContainer.innerHTML = formatTime(seconds)
+seconds-=1
+},1000)
+timeContainer.classList.add("timer");
+
+if(seconds<=0){
+  clearInterval(ref);
+  timeContainer.innerHTML = ""
+}
+
+boardElement.appendChild(timeContainer);
+
+
 
   //message board
   const messageBoard = document.createElement('div');
