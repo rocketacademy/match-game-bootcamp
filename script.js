@@ -61,7 +61,7 @@ const board = [];
 let firstCard = null;
 let cardElement;
 let deck;
-
+let canClick = false;
 
 //#################### PLAYER ACTION CALLBACKS ####################//
 const squareClick = (messageBoard, cardElement, column, row) => {
@@ -130,41 +130,40 @@ const buildBoardElements = (board) => {
   // give it a class for CSS purposes
   boardElement.classList.add('board');
   
-  // timer
-const formatTime = (time) =>{
-  const minutes = Math.floor(time/60)
-
-  let seconds = time%60;
-  if (seconds <10){
-    seconds = `0${seconds}`
-  }
-  return `${minutes}:${seconds}`
-}
-
-//set timer for 3 minutes
-const timeContainer = document.createElement("div");
- let seconds = 180
-
-const ref = setInterval(() =>{
-  timeContainer.innerHTML = formatTime(seconds)
-seconds-=1
-},1000)
-timeContainer.classList.add("timer");
-
-if(seconds<=0){
-  clearInterval(ref);
-  timeContainer.innerHTML = ""
-}
-
-boardElement.appendChild(timeContainer);
-
-
-
   //message board
   const messageBoard = document.createElement('div');
   messageBoard.classList.add('messages');
   messageBoard.innerText = 'click on a square';
   boardElement.appendChild(messageBoard);
+
+  let seconds = 10
+  //set timer for 3 minutes
+  const formatTime = (time) =>{
+    const minutes = Math.floor(time/60)
+    seconds = time%60;
+    if (seconds <10){
+      seconds = `0${seconds}`
+    }
+    return `${minutes}:${seconds}`
+  }
+  const timeContainer = document.createElement("div");
+
+  const ref = setInterval(() =>{
+    timeContainer.innerHTML = formatTime(seconds)
+  seconds-=1;
+  if(seconds<0){
+    clearInterval(ref);
+    timeContainer.innerHTML = "Time is up";
+  }
+  boardElement.appendChild(timeContainer);
+  },1000)
+
+  timeContainer.classList.add("timer");
+   //prevent user from clicking button
+
+  //classList.add is added to html and call css styling "timer" accordingly
+ 
+
 
   // use the board data structure we passed in to create the correct size board
   for (let i = 0; i < board.length; i += 1) {
@@ -179,16 +178,11 @@ boardElement.appendChild(timeContainer);
     for (let j = 0; j < row.length; j += 1) {
       // create the square element
       const square = document.createElement('div');
-
-      // set a class for CSS purposes
       square.classList.add('square');
 
       // set the click event
       // eslint-disable-next-line
       square.addEventListener('click', (event) => {
-        // we will want to pass in the card element so
-        // that we can change how it looks on screen, i.e.,
-        // "turn the card over"
         squareClick(messageBoard, event.currentTarget, i, j);
       });
       rowElement.appendChild(square);
