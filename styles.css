@@ -82,11 +82,18 @@ body {
   cursor: pointer;
 }
 
-.square {
+#row-div {
+  display: flex;
+  justify-content: center;
+}
+
+#square {
   padding: 50px;
   margin: 10px;
   background-color: white;
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border-radius: 8px;
   height: 50px;
   width: 10px;
@@ -113,6 +120,26 @@ body {
   border-radius: 8px;
   display: inline-block;
   cursor: pointer;
+}
+
+.back-image {
+  position: absolute;
+  width: 110px;
+  height: 150px;
+  background-image: url(./images/cards/PNG-cards/back.png);
+}
+
+/* // card-front div */
+.card-front {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.card-pic {
+  position: absolute;
+  width: 110px;
+  height: 150px;
 }
 
 .card:hover {

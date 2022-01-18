@@ -23,8 +23,12 @@ let canClick = true;
 let boardElement;
 // const userName = '';
 // const boardElement = document.createElement('div');
+
 // declared timer globally
 let timer;
+
+// declare frontImage globally
+let backImage;
 
 // ADDED-v1: add a gameStart to change the t/f mode of game
 let gameStart = false;
@@ -117,13 +121,15 @@ const squareClick = (messageBoard, cardElement, column, row) => {
   // console.log(row);
 
   const clickedCard = board[column][row];
+  // clickedCard.cardPath
+
   // console.log(userName);
 
   // the user already clicked on this square or game has not started
   // ADDED-v1: check the condition of canClick here;
   // ADDED-v1: include the gameStart here
   if (cardElement.innerText !== '' || canClick !== true || gameStart !== true) {
-    return;
+    return null;
   }
 
   // first turn
@@ -133,7 +139,8 @@ const squareClick = (messageBoard, cardElement, column, row) => {
     // turn this card over
     // !!! reference codes to add both suitSymbol and displayName details
     cardElement.classList.add('card');
-    cardElement.innerHTML = `${firstCard.suitSymbol}<br>${firstCard.displayName}`;
+
+    cardElement.innerHTML = `<img src="${clickedCard.cardPath}"/>`;
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
@@ -153,7 +160,10 @@ const squareClick = (messageBoard, cardElement, column, row) => {
       console.log(firstCard);
 
       // !!! reference codes to add cardDisplay details
-      cardElement.innerHTML = `${clickedCard.suitSymbol}<BR>${clickedCard.displayName}`;
+      // cardElement.innerHTML = `${clickedCard.suitSymbol}<BR>${clickedCard.displayName}`;
+      cardElement.innerHTML = `<img src="${clickedCard.cardPath}"/>`;
+
+      // cardElement.innerHTML = `<img src="${clickedCard.cardPath}"/>`;
 
       // !!! display message when user open the second card
       messageBoard.innerText = `You opened ${clickedCard.displayName} of ${clickedCard.suitSymbol}. Click on another card and see if it matches!`;
@@ -178,7 +188,9 @@ const squareClick = (messageBoard, cardElement, column, row) => {
       console.log('NOT a match');
 
       // !!! reference codes to add cardDisplay details
-      cardElement.innerHTML = `${clickedCard.suitSymbol}<BR>${clickedCard.displayName}`;
+      // cardElement.innerHTML = `${clickedCard.suitSymbol}<BR>${clickedCard.displayName}`;
+      cardElement.innerHTML = `<img src="${clickedCard.cardPath}"/>`;
+
       // ### display not-match meesage
       messageBoard.innerText = 'Sorry! Its not a match!';
 
@@ -188,8 +200,10 @@ const squareClick = (messageBoard, cardElement, column, row) => {
       // add setTimeout function to turn both cards over when they are not a match
       setTimeout(() => {
         // both functions inside setTimeout are to turn the cards back over
-        firstCardElement.innerText = '';
+        // firstCardElement.innerHTML = 'images / others / PNG - cards / back.png/>';
+        firstCardElement.innerHTML = '';
         secondCardElement.innerText = '';
+        backImage.classList.add('back-image');
         // ### no-match message to disappear after 3s
         messageBoard.innerText = '';
         // ADDED-v1 change the canClick state to allow user to click again
@@ -204,6 +218,11 @@ const squareClick = (messageBoard, cardElement, column, row) => {
 // ===================================================
 //  Helper Functions
 // ===================================================
+
+// // ADDED-v2: create helper function to display card image
+const displayFrontCard = (name, suit) => `./images/cards/PNG-cards/${name}_of_${suit}.png`
+
+;
 
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
 const getRandomIndex = (max) => Math.floor(Math.random() * max);
@@ -270,16 +289,37 @@ const makeDeck = () => {
         cardName = 'king';
       }
 
+      // set the color of the card
+      // (used later to determine the css class which in turn determines the color)
+      // does not directly set the color of the card
+      // let cardColor;
+      // if (currentSuitSymbol === '♥️' || currentSuitSymbol === '♦️') {
+      //   currentColour = 'red';
+      // } else {
+      //   currentColour = 'black';
+      // }
+
+      // // create a image element
+      // const picOfCard = document.createElement('img');
+      // picOfCard.classList.add('front-card');
+      // cardElement.appendChild(picOfCard);
+
       // make a single card object variable
       const card = {
         name: cardName,
         suit: currentSuit,
         rank: rankCounter,
         colour: currentColour,
-        // pic: `./images/cards/${cardName}_of_${currentSuit}.png`,
+        cardPath: displayFrontCard(cardName, currentSuit),
         displayName,
         suitSymbol: currentSuitSymbol,
+        // suitSymbol: displayFrontCard(cardName, currentSuit, card),
       };
+
+      // // create a cardFront element
+      // card = document.createElement('img');
+      // card.id = 'card-front';
+      // card.src = `./images/cards/PNG-cards/${cardName}_of_${currentSuit}.png`;
 
       console.log(`rank: ${rankCounter}`);
 
@@ -306,7 +346,7 @@ const resetGame = () => {
   // console.log('reset?');
 
   // reload the whole page
-  location.reload();
+  window.location.reload();
 
   // initGame();
 };
@@ -326,29 +366,6 @@ const buildBoardElements = (board) => {
   // give it a class for CSS purposes
   boardElement.classList.add('board');
   boardElement.id = 'gameBoard';
-
-  // // #### create a element for player to enter the name
-  // const inputMessage = document.createElement('box');
-  // inputMessage.classList.add('input');
-  // inputMessage.innerText = 'Please enter your name: ';
-  // boardElement.appendChild(inputMessage);
-
-  // // #### create an input box for userName
-  // const userName = document.createElement('input');
-  // userName.classList.add('name');
-  // boardElement.appendChild(userName);
-
-  // // ### create a button to store the userName
-  // // user input the name and press the button to store the name into the userName global variable
-  // const storeNameBtn = document.createElement('button');
-  // storeNameBtn.innerText = 'Submit';
-  // boardElement.appendChild(storeNameBtn);
-  // // add eventListener to store the name when button is clicked
-
-  // // create an overall game-div
-  // const gameDiv = document.createElement('div');
-  // // set an id to the game-div
-  // gameDiv.id = 'game';
 
   // ### create a messageboard element
   const messageBoard = document.createElement('div');
@@ -372,41 +389,25 @@ const buildBoardElements = (board) => {
 
     // make all the squares for this row
     for (let j = 0; j < row.length; j += 1) {
-      // create a card Div
-      // const card = document.createElement('div');
-      // card.classList.add('card');
-
-      // // create a card-inner Div
-      // const cardInner = document.createElement('div');
-      // cardInner.classList.add('card-inner');
-      // cardInner.id = board[i][j].id;
-
-      // // create a backCard Div
-      // const cardBack = document.createElement('div');
-      // cardBack.classList.add('card-back');
-      // cardBack.innerHTML = '<img src="./images/cards/back.png" class="card-pic" />';
-
-      // // create a frontCard Div
-      // const cardFront = document.createElement('div');
-      // cardFront.classList.add('card-front');
-      // cardFront.innerHTML = `<img src="${board[i][j].pic}" class="card-pic" />`;
-
-      // // append the cards
-
-      // cardInner.appendChild(cardBack);
-      // cardInner.appendChild(cardFront);
-      // card.appendChild(cardInner);
-
       // create the square element
       const square = document.createElement('div');
 
       // set a class for CSS purposes
-      square.classList.add('square');
-      square.innerHTML = '<img src="./images/cards/back.png" ';
+      // square.classList.add('square');
+      square.setAttribute('id', 'square');
+
+      // ADDED-v2: create element for backside of Image
+      backImage = document.createElement('img');
+      backImage.classList.add('back-image');
+      backImage.setAttribute('id', 'back-image');
+      backImage.src = './images/cards/PNG-cards/back.png';
+      square.appendChild(backImage);
 
       // set the click event
       // eslint-disable-next-line
       square.addEventListener('click', (event) => {
+
+        backImage.classList.remove('back-image');
         // we will want to pass in the card element so
         // that we can change how it looks on screen, i.e.,
         // "turn the card over"
@@ -422,7 +423,6 @@ const buildBoardElements = (board) => {
   }
 
   return boardElement;
-  // }
 };
 
 // ===================================================
@@ -446,7 +446,6 @@ const initGame = () => {
       board[i].push(deck.pop());
     }
   }
-
   const boardEl = buildBoardElements(board);
   document.body.appendChild(boardEl);
 };
