@@ -45,7 +45,7 @@ const squareClick = (cardElement, row, column) => {
     } else {
       console.log("second turn");
 
-      // if there is a match
+      // if there is a match for 2 cards
       if (
         clickedCard.name === firstCard.name &&
         clickedCard.suit === firstCard.suit
@@ -55,6 +55,9 @@ const squareClick = (cardElement, row, column) => {
         // turn this card over
         const cardDisplay = drawCard(clickedCard);
         cardElement.append(cardDisplay);
+
+        //display matching message for 3s
+        setInterval(displayMessage("match"), 3000);
 
         // if there is no match
       } else {
@@ -66,6 +69,9 @@ const squareClick = (cardElement, row, column) => {
         // freeze the game for 1 second
         canClick = false;
         console.log(canClick);
+
+        //display matching message for 3s
+        setInterval(displayMessage("nomatch"), 3000);
 
         // turn both cards over after 1 sec
         setTimeout(() => {
@@ -83,7 +89,6 @@ const squareClick = (cardElement, row, column) => {
   }
 };
 
-//Game init
 // create all the board elements that will go on the screen
 // return the built board
 const buildBoardElements = (board) => {
@@ -216,6 +221,20 @@ const makeDeck = (cardAmount) => {
   return newDeck;
 };
 
+// display message
+function displayMessage(status) {
+  let displayContainer = document.createElement("div");
+  displayContainer.classList.add("display");
+
+  if (status === "match") {
+    displayContainer.innerHTML = "It's a match! Awesome!";
+  } else {
+    displayContainer.innerHTML = "Not matching :( Try again!";
+  }
+  document.body.appendChild(displayContainer);
+}
+
+//Game init
 const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards

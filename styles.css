@@ -43,3 +43,8 @@ body {
 .black {
   color: black;
 }
+
+.display {
+  font-size: 24px;
+  background-color: white;
+}
