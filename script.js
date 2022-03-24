@@ -1,5 +1,6 @@
 // Please implement exercise logic here
 
+
 // =====GLOBAL VARIABLES=====
 
 const boardSize = 4;
@@ -7,6 +8,14 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+
+const delayInMilliseconds = 1000; // this is 1 second
+let counter = 180; // setting 3 minutes for the game
+let firstTurn = true;
+let endOfGame = false; // to signify end of game
+
+const timerContainer = document.createElement('div');
+document.body.appendChild(timerContainer)
 
 const messageBoard = document.createElement('div');
 messageBoard.classList.add('messages');
@@ -84,61 +93,90 @@ const shuffleCards = (cards) => {
   return cards;
 }
 
+function setTimer() {
+  
+  const ref = setInterval(() => {
+  timerContainer.innerText = 'Timer: ' + counter;    
+  counter -= 1
+  console.log('counter')
+
+  if (counter < 0) {
+    clearInterval(ref);  
+    messageBoard.innerText = 'You ran out of time!'
+    endOfGame = true;
+  }
+
+  }, delayInMilliseconds);
+};
+
+
+
+
 // =====GAME PLAY LOGIC=====
 
 // game play logic for clicking onto square
 
 const squareClick = (cardElement, row, column) => {
-  // click on first card
 
-  const clickedCard = board[row][column];
-
-  // if user has already clicked on the same card
-  if (cardElement.innerText !== '') {
-    return;
+  // very first turn to start timer
+  if (firstTurn) {
+    setTimer();
+    firstTurn = false;
   }
 
-  // turn over first card
-  if (firstCard === null) {
-   
-    console.log('first turn');
-   
-    firstCard = clickedCard;
-    // turn card over
-    cardElement.classList.add('card');
-    cardElement.innerText = `${firstCard.name}${firstCard.symbol}`;
+  if (endOfGame === false) {
 
-    // leave card open and store it somewhere
-    firstCardElement = cardElement; 
-    messageBoard.innerText = "click second card";
-  } else {
-    // turn over second card
-    console.log('second turn');
-    cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
+    // click on first card
 
-    // if second card matches the first card
-    if (clickedCard.name === firstCard.name && clickedCard.suit === firstCard.suit) {
-      console.log('match');
-      messageBoard.innerText = "It's a match!";
-    } else {
-      console.log('NOT a match');
-      messageBoard.innerText = "Not a match! Try again.";
+    const clickedCard = board[row][column];
 
-      // if second card does not match the first card
-      // turn both cards over
-
-      setTimeout( () => {
-      firstCardElement.innerText = '';
-      cardElement.innerText = ''; 
-      }, 1500);
+    // if user has already clicked on the same card
+    if (cardElement.innerText !== '') {
+      return;
     }
 
-    // end of turn
-    // reset both cards input so that squareClick can run again
-    setTimeout( () => {
-      messageBoard.innerText = 'click on another card';
-    }, 1500);
-    firstCard = null;
+    // turn over first card
+    if (firstCard === null) {
+    
+      console.log('first turn');
+    
+      firstCard = clickedCard;
+      // turn card over
+      cardElement.classList.add('card');
+      cardElement.innerText = `${firstCard.name}${firstCard.symbol}`;
+
+      // leave card open and store it somewhere
+      firstCardElement = cardElement; 
+      messageBoard.innerText = "click second card";
+    } else {
+      // turn over second card
+      console.log('second turn');
+      cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
+
+      // if second card matches the first card
+      if (clickedCard.name === firstCard.name && clickedCard.suit === firstCard.suit) {
+        console.log('match');
+        messageBoard.innerText = "It's a match!";
+      } else {
+        console.log('NOT a match');
+        messageBoard.innerText = "Not a match! Try again.";
+
+        // if second card does not match the first card
+        // turn both cards over
+
+        setTimeout( () => {
+        firstCardElement.innerText = '';
+        cardElement.innerText = ''; 
+        }, 1500);
+      }
+
+      // end of turn
+      // reset both cards input so that squareClick can run again
+      setTimeout( () => {
+        messageBoard.innerText = 'click on another card';
+      }, 1500);
+      firstCard = null;
+    }
   }
 };
 
@@ -178,8 +216,8 @@ const buildBoardElements = (board) => {
 
 
 const initGame = () => {
-
-  messageBoard.innerText = "click on square to start";
+  
+  messageBoard.innerText = "click on square to start. You have 3 mins to finish the game";
   document.body.appendChild(messageBoard);
 
   let doubleDeck = makeDeck()
@@ -199,4 +237,5 @@ const initGame = () => {
 
 // start the game
 initGame();
+
 
