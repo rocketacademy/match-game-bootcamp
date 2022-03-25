@@ -11,9 +11,3 @@ body {
   width: 15px;
   vertical-align: top;
 }
-
-.popUp {
-  background-color: blue;
-  text-align: center;
-  visibility: hidden;
-}

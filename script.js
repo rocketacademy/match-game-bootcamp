@@ -6,15 +6,21 @@
 const boardSize = 4;
 const board = [];
 let firstCard = null;
-let firstCardElement;
+let firstCardElement; 
 let deck;
 
 const delayInMilliseconds = 1000; // this is 1 second
-let counter = 180; // setting 3 minutes for the game
+let minutes = 2; // setting 3 minutes for the game
+let seconds = 11;
 let firstTurn = true;
 let endOfGame = false; // to signify end of game
 
 const timerContainer = document.createElement('div');
+if (seconds >= 10 ) {
+timerContainer.innerText = 'Timer: ' + minutes+ ':' + seconds;
+} else {
+  timerContainer.innerText = 'Timer: ' + minutes+ ':0' + seconds;
+}
 document.body.appendChild(timerContainer)
 
 const messageBoard = document.createElement('div');
@@ -96,17 +102,26 @@ const shuffleCards = (cards) => {
 function setTimer() {
   
   const ref = setInterval(() => {
-  timerContainer.innerText = 'Timer: ' + counter;    
-  counter -= 1
-  console.log('counter')
-
-  if (counter < 0) {
-    clearInterval(ref);  
-    messageBoard.innerText = 'You ran out of time!'
-    endOfGame = true;
-  }
+    timerContainer.innerText = 'Timer: ' + minutes+ ':' + seconds; 
+    console.log('seconds: ', seconds);
+    
+    if (seconds >= 0 && seconds <= 9) { // to display 2 digits for seconds
+      timerContainer.innerText = 'Timer: ' + minutes+ ':0' + seconds;
+      if (seconds === 0 && minutes >= 1)  {
+        minutes -= 1;
+        seconds = 60;
+     }
+   }
+   
+    if (minutes === 0 & seconds === 0) {
+      clearInterval(ref);  
+      messageBoard.innerText = 'You ran out of time!'
+      endOfGame = true;
+    }
+    seconds -= 1;
 
   }, delayInMilliseconds);
+  
 };
 
 
