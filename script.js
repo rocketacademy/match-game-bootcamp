@@ -6,7 +6,9 @@
 const boardSize = 4;
 const board = [];
 let firstCard = null;
-let firstCardElement; 
+let firstCardElement;
+let secondCard = null;
+let secondCardElement; 
 let deck;
 
 const delayInMilliseconds = 1000; // this is 1 second
@@ -103,7 +105,7 @@ function setTimer() {
   
   const ref = setInterval(() => {
     timerContainer.innerText = 'Timer: ' + minutes+ ':' + seconds; 
-    console.log('seconds: ', seconds);
+    //console.log('seconds: ', seconds);
     
     if (seconds >= 0 && seconds <= 9) { // to display 2 digits for seconds
       timerContainer.innerText = 'Timer: ' + minutes+ ':0' + seconds;
@@ -139,11 +141,13 @@ const squareClick = (cardElement, row, column) => {
     firstTurn = false;
   }
 
+  // if timer has not run out
   if (endOfGame === false) {
 
     // click on first card
 
     const clickedCard = board[row][column];
+    console.log('clickedCard', clickedCard);
 
     // if user has already clicked on the same card
     if (cardElement.innerText !== '') {
@@ -151,7 +155,7 @@ const squareClick = (cardElement, row, column) => {
     }
 
     // turn over first card
-    if (firstCard === null) {
+    if (firstCard === null && secondCard === null) {
     
       console.log('first turn');
     
@@ -163,36 +167,46 @@ const squareClick = (cardElement, row, column) => {
       // leave card open and store it somewhere
       firstCardElement = cardElement; 
       messageBoard.innerText = "click second card";
-    } else {
-      // turn over second card
+
+    } else if (firstCard !== null && secondCard === null) {
+      
       console.log('second turn');
+      secondCard = clickedCard;
+      // turn over second card
+      cardElement.classList.add('card')
       cardElement.innerText = `${clickedCard.name}${clickedCard.symbol}`;
+      secondCardElement = cardElement;
 
       // if second card matches the first card
-      if (clickedCard.name === firstCard.name && clickedCard.suit === firstCard.suit) {
+      if (secondCard.name === firstCard.name && secondCard.suit === firstCard.suit) {
         console.log('match');
         messageBoard.innerText = "It's a match!";
       } else {
         console.log('NOT a match');
         messageBoard.innerText = "Not a match! Try again.";
 
+
         // if second card does not match the first card
         // turn both cards over
-
+        console.log('first and second card', firstCard, secondCard);
         setTimeout( () => {
         firstCardElement.innerText = '';
-        cardElement.innerText = ''; 
+        secondCardElement.innerText = ''; 
+        cardElement.innerText = '';
         }, 1500);
       }
-
+      //twoCardsDrawn = true;
       // end of turn
       // reset both cards input so that squareClick can run again
       setTimeout( () => {
         messageBoard.innerText = 'click on another card';
+        firstCard = null
+        secondCard = null;
       }, 1500);
-      firstCard = null;
+      
     }
   }
+
 };
 
 
