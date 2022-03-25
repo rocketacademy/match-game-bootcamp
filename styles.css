@@ -47,4 +47,6 @@ body {
 .display {
   font-size: 24px;
   background-color: white;
+  text-align: center;
+  display: static;
 }

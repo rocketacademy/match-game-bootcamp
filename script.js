@@ -10,6 +10,10 @@ let secondCardElement;
 let deck;
 let canClick = true;
 
+let displayContainer = document.createElement("div");
+displayContainer.classList.add("display");
+document.body.appendChild(displayContainer);
+
 //Gameplay logic
 const squareClick = (cardElement, row, column) => {
   console.log(cardElement);
@@ -56,8 +60,13 @@ const squareClick = (cardElement, row, column) => {
         const cardDisplay = drawCard(clickedCard);
         cardElement.append(cardDisplay);
 
-        //display matching message for 3s
-        setInterval(displayMessage("match"), 3000);
+        //display matching message
+        const message = displayMessage("match");
+
+        //Message disappears after 3s
+        setTimeout(() => {
+          displayContainer.innerHTML = "";
+        }, 3000);
 
         // if there is no match
       } else {
@@ -70,8 +79,13 @@ const squareClick = (cardElement, row, column) => {
         canClick = false;
         console.log(canClick);
 
-        //display matching message for 3s
-        setInterval(displayMessage("nomatch"), 3000);
+        //display not matching message
+        const message = displayMessage("nomatch");
+
+        //Message disappears after 3s
+        setTimeout(() => {
+          displayContainer.innerHTML = "";
+        }, 3000);
 
         // turn both cards over after 1 sec
         setTimeout(() => {
@@ -223,15 +237,11 @@ const makeDeck = (cardAmount) => {
 
 // display message
 function displayMessage(status) {
-  let displayContainer = document.createElement("div");
-  displayContainer.classList.add("display");
-
   if (status === "match") {
     displayContainer.innerHTML = "It's a match! Awesome!";
   } else {
     displayContainer.innerHTML = "Not matching :( Try again!";
   }
-  document.body.appendChild(displayContainer);
 }
 
 //Game init
