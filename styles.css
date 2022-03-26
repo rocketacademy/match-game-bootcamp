@@ -45,8 +45,23 @@ body {
 }
 
 .display {
+  margin: 10px;
+  padding: 10px;
   font-size: 24px;
   background-color: white;
   text-align: center;
   display: static;
+  align-content: center;
+}
+
+.left {
+  display: block;
+  padding: 10px;
+  background-color: green;
+}
+
+.right {
+  display: block;
+  padding: 10px;
+  background-color: yellow;
 }

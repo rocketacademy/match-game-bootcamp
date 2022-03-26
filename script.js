@@ -1,4 +1,4 @@
-// Please implement exercise logic here
+// // Please implement exercise logic here
 
 // Global variables
 // boardSize has to be an even number
@@ -8,28 +8,81 @@ let firstCard = null;
 let firstCardElement;
 let secondCardElement;
 let deck;
+
+// default the user can click anywhere to flip cards
 let canClick = true;
 
+//Timer button
+let timerDisplay = document.createElement("div");
+timerDisplay.classList.add("display");
+document.body.appendChild(timerDisplay);
+
+//Time duration set for 3 mins
+let totalTime = 180000;
+
+// timerDisplay.innerHTML =
+//   "Time Left: " + minute + ":" + ("0" + seconds).slice(-2);
+
+const timeInterval = setInterval(() => {
+  let minute = Math.floor((totalTime / 1000 / 60) % 60);
+  let seconds = Math.floor((totalTime / 1000) % 60);
+
+  totalTime -= 1000;
+
+  if (totalTime >= 0 && totalTime <= 10000) {
+    //display that game is ending soon at the last 10s
+    timerDisplay.classList.add("red");
+    timerDisplay.innerHTML =
+      "ENDING SOON!! " + minute + ":" + ("0" + seconds).slice(-2);
+
+    // restart timer
+  } else if (totalTime < 0) {
+    clearInterval(timeInterval);
+    resetGame();
+  }
+
+  timerDisplay.innerHTML =
+    "Time Left: " + minute + ":" + ("0" + seconds).slice(-2);
+}, 1000);
+
+//Score board for matches
+let matchScoreContainer = document.createElement("div");
+matchScoreContainer.classList.add("display");
+matchScoreContainer.classList.add("left");
+document.body.appendChild(matchScoreContainer);
+
+let matchScore = 0;
+matchScoreContainer.innerHTML = "Matches: " + matchScore;
+
+//Score board for misses
+let missScoreContainer = document.createElement("div");
+missScoreContainer.classList.add("display");
+missScoreContainer.classList.add("right");
+document.body.appendChild(missScoreContainer);
+
+let missScore = 0;
+missScoreContainer.innerHTML = "Misses: " + missScore;
+
+// message display container
 let displayContainer = document.createElement("div");
 displayContainer.classList.add("display");
 document.body.appendChild(displayContainer);
+displayContainer.innerHTML = "Click any boxes below";
 
 //Gameplay logic
 const squareClick = (cardElement, row, column) => {
   console.log(cardElement);
-
   console.log("FIRST CARD DOM ELEMENT", firstCard);
-
   console.log("BOARD CLICKED CARD", board[row][column]);
 
   const clickedCard = board[row][column];
 
   // the user already clicked on this square
-
   if (cardElement.innerText !== "") {
     return;
   }
 
+  // if the user has not clicked any cards previously
   if (canClick === true) {
     console.log(canClick);
 
@@ -63,10 +116,14 @@ const squareClick = (cardElement, row, column) => {
         //display matching message
         const message = displayMessage("match");
 
-        //Message disappears after 3s
+        //display message disappears after 3s
         setTimeout(() => {
-          displayContainer.innerHTML = "";
+          displayContainer.innerHTML = "Click any boxes below";
         }, 3000);
+
+        //Adding score
+        matchScore += 1;
+        matchScoreContainer.innerHTML = "Matches: " + matchScore;
 
         // if there is no match
       } else {
@@ -75,16 +132,20 @@ const squareClick = (cardElement, row, column) => {
         const secondCardDisplay = drawCard(clickedCard);
         cardElement.append(secondCardDisplay);
 
-        // freeze the game for 1 second
+        // freeze the entire game for 1 second (user would not be able to click to flip any cards)
         canClick = false;
         console.log(canClick);
+
+        //adding miss scores
+        missScore += 1;
+        missScoreContainer.innerHTML = "Misses: " + missScore;
 
         //display not matching message
         const message = displayMessage("nomatch");
 
-        //Message disappears after 3s
+        //Not matching message disappears after 3s
         setTimeout(() => {
-          displayContainer.innerHTML = "";
+          displayContainer.innerHTML = "Click any boxes below";
         }, 3000);
 
         // turn both cards over after 1 sec
@@ -92,7 +153,7 @@ const squareClick = (cardElement, row, column) => {
           console.log("counting down...");
           firstCardElement.innerHTML = "";
 
-          // only can click again after they both disappear after a set timer
+          // only can click again after they both disappear after 1s
           canClick = true;
           secondCardElement.innerHTML = "";
         }, 1000);
@@ -261,8 +322,8 @@ const initGame = () => {
   }
 
   const boardEl = buildBoardElements(board);
-
   document.body.appendChild(boardEl);
+  // timer();
 };
 
 //drawing cards
@@ -283,5 +344,16 @@ function drawCard(currentCard) {
 
   return card;
 }
+
+// //resetting game
+// const resetGame = () => {
+//   document.body.innerHTML = "";
+//   totalTime = 180000;
+//   missScore = 0;
+//   matchScore = 0;
+
+//   initGame();
+//   kickStartTimer();
+// };
 
 initGame();
