@@ -28,6 +28,16 @@ document.body.appendChild(timerContainer)
 const messageBoard = document.createElement('div');
 messageBoard.classList.add('messages');
 
+const inputName = document.createElement('input');
+document.body.appendChild(inputName);
+const submitButton = document.createElement('button');
+submitButton.innerText = 'Submit';
+document.body.appendChild(submitButton);
+
+submitButton.addEventListener('click', () => {
+  messageBoard.innerText = "Hello " + inputName.value + "! Click on square to start. You have 3 minutes to finish the game."
+})
+
 // =====HELPER FUNCTIONS=====
 
 const makeDeck = (cardAmount) => {
@@ -246,7 +256,7 @@ const buildBoardElements = (board) => {
 
 const initGame = () => {
   
-  messageBoard.innerText = "click on square to start. You have 3 mins to finish the game";
+  messageBoard.innerText = "Please input your name.";
   document.body.appendChild(messageBoard);
 
   let doubleDeck = makeDeck()
@@ -266,5 +276,4 @@ const initGame = () => {
 
 // start the game
 initGame();
-
 
