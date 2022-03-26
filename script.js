@@ -14,6 +14,7 @@ let boardEl;
 let winCount = 0;
 let matchedSets = 0;
 let winMessageTimer = 0;
+let reset = false;
 
 const delayInMilliseconds = 1000; // this is 1 second
 let minutes = 1; // setting 3 minutes for the game
@@ -161,6 +162,10 @@ function setTimer() {
   }
 
     seconds -= 1;
+    if (reset === true) {
+      clearInterval(ref);
+      reset = false;
+    }
 
   }, delayInMilliseconds);
   
@@ -168,6 +173,8 @@ function setTimer() {
 
 // reset game
 const resetGame = () => {
+
+  messageBoard.innerText = "click to play again."
   board = [];
   firstCard = null;
   firstCardElement = "";
@@ -335,7 +342,10 @@ const initGame = () => {
   document.body.appendChild(timerContainer);
 
   // setting up reset button
-  resetButton.addEventListener('click', () => resetGame());
+  resetButton.addEventListener('click', () => {
+    reset = true;
+    resetGame();
+  });
 
   // setting up win counter display
   winCounter.innerText = 'Win Count: ' + winCount;
