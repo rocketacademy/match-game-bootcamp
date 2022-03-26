@@ -11,6 +11,8 @@ let secondCard = null;
 let secondCardElement; 
 let deck;
 let boardEl;
+let winCount = 0;
+let matchedSets = 0;
 
 const delayInMilliseconds = 1000; // this is 1 second
 let minutes = 2; // setting 3 minutes for the game
@@ -32,6 +34,8 @@ document.body.appendChild(submitButton);
 const resetButton = document.createElement('button');
 resetButton.innerText = "Reset";
 document.body.appendChild(resetButton);
+
+const winCounter = document.createElement('div');
 
 
 // =====HELPER FUNCTIONS=====
@@ -141,9 +145,10 @@ const resetGame = () => {
   secondCard = null;
   secondCardElement = "";
   deck = "";
+  matchedSets = 0;
   
   minutes = 0;
-  seconds = 2;
+  seconds = 59;
   firstTurn = true;
   endOfGame = false;
 
@@ -206,6 +211,14 @@ const squareClick = (cardElement, row, column) => {
       if (secondCard.name === firstCard.name && secondCard.suit === firstCard.suit) {
         console.log('match');
         messageBoard.innerText = "It's a match!";
+        matchedSets += 1;
+
+        // when this is the last set of cards to match, player wins
+        if (matchedSets === 1 /*boardSize * boardSize / 2*/) {
+          winCount += 1;
+          winCounter.innerText = 'Win Count: ' + winCount;
+        }
+
       } else {
         console.log('NOT a match');
         messageBoard.innerText = "Not a match! Try again.";
@@ -289,6 +302,10 @@ const initGame = () => {
 
   // setting up reset button
   resetButton.addEventListener('click', () => resetGame());
+
+  // setting up win counter display
+  winCounter.innerText = 'Win Count: ' + winCount;
+  document.body.appendChild(winCounter);
 
   let doubleDeck = makeDeck()
   let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
