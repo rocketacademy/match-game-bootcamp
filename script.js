@@ -16,7 +16,7 @@ let matchedSets = 0;
 let winMessageTimer = 0;
 
 const delayInMilliseconds = 1000; // this is 1 second
-let minutes = 3; // setting 3 minutes for the game
+let minutes = 1; // setting 3 minutes for the game
 let seconds = 0;
 let firstTurn = true;
 let endOfGame = false; // to signify end of game
@@ -135,7 +135,11 @@ function setTimer() {
       messageBoard.innerText = 'You ran out of time!'
       endOfGame = true;
       seconds += 1 // to make sure that seconds remain at 0 when game ends
-    }
+      
+      setTimeout( () => {
+        resetGame();
+     },5000);
+  }
 
     if (matchedSets === boardSize * boardSize / 2) {
       clearInterval(ref);  
@@ -146,10 +150,12 @@ function setTimer() {
       const ref2 = setInterval( () => {
         messageBoard.innerText = 'Congratulations, You won!' 
         winMessageTimer += 1;
+        console.log('winMessageTimer: ', winMessageTimer);
 
         if(winMessageTimer >= 5) {
           clearInterval(ref2);
-          messageBoard.innerText = 'Click on reset button to play again'
+          //messageBoard.innerText = 'Click on reset button to play again'
+          resetGame();
       }
     }, 1000);
   }
@@ -171,7 +177,7 @@ const resetGame = () => {
   matchedSets = 0;
   winMessageTimer = 0;
   
-  minutes = 3;
+  minutes = 1;
   seconds = 0;
   firstTurn = true;
   endOfGame = false;
@@ -201,7 +207,7 @@ const squareClick = (cardElement, row, column) => {
     // click on first card
 
     const clickedCard = board[row][column];
-    console.log('clickedCard', clickedCard);
+    //console.log('clickedCard', clickedCard);
 
     // if user has already clicked on the same card
     if (cardElement.innerText !== '') {
@@ -251,7 +257,7 @@ const squareClick = (cardElement, row, column) => {
 
         // if second card does not match the first card
         // turn both cards over
-        console.log('first and second card', firstCard, secondCard);
+        //console.log('first and second card', firstCard, secondCard);
         setTimeout( () => {
         firstCardElement.innerText = '';
         secondCardElement.innerText = ''; 
@@ -265,7 +271,9 @@ const squareClick = (cardElement, row, column) => {
 
       if (matchedSets !== boardSize * boardSize / 2) {
         setTimeout( () => {
-          messageBoard.innerText = 'click on another card';
+          if (seconds !== 0 && minutes !== 0) {
+            messageBoard.innerText = 'click on another card';
+          }
           firstCard = null
           secondCard = null;
         }, 1500);
