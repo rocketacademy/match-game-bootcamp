@@ -4,12 +4,13 @@
 // =====GLOBAL VARIABLES=====
 
 const boardSize = 4;
-const board = [];
+let board = [];
 let firstCard = null;
 let firstCardElement;
 let secondCard = null;
 let secondCardElement; 
 let deck;
+let boardEl;
 
 const delayInMilliseconds = 1000; // this is 1 second
 let minutes = 2; // setting 3 minutes for the game
@@ -18,12 +19,6 @@ let firstTurn = true;
 let endOfGame = false; // to signify end of game
 
 const timerContainer = document.createElement('div');
-if (seconds >= 10 ) {
-timerContainer.innerText = 'Timer: ' + minutes+ ':' + seconds;
-} else {
-  timerContainer.innerText = 'Timer: ' + minutes+ ':0' + seconds;
-}
-document.body.appendChild(timerContainer)
 
 const messageBoard = document.createElement('div');
 messageBoard.classList.add('messages');
@@ -34,9 +29,10 @@ const submitButton = document.createElement('button');
 submitButton.innerText = 'Submit';
 document.body.appendChild(submitButton);
 
-submitButton.addEventListener('click', () => {
-  messageBoard.innerText = "Hello " + inputName.value + "! Click on square to start. You have 3 minutes to finish the game."
-})
+const resetButton = document.createElement('button');
+resetButton.innerText = "Reset";
+document.body.appendChild(resetButton);
+
 
 // =====HELPER FUNCTIONS=====
 
@@ -129,6 +125,7 @@ function setTimer() {
       clearInterval(ref);  
       messageBoard.innerText = 'You ran out of time!'
       endOfGame = true;
+      seconds += 1 // to make sure that seconds remain at 0 when game ends
     }
     seconds -= 1;
 
@@ -136,6 +133,24 @@ function setTimer() {
   
 };
 
+// reset game
+const resetGame = () => {
+  board = [];
+  firstCard = null;
+  firstCardElement = "";
+  secondCard = null;
+  secondCardElement = "";
+  deck = "";
+  
+  minutes = 0;
+  seconds = 2;
+  firstTurn = true;
+  endOfGame = false;
+
+  boardEl.innerText = "";
+  initGame();
+
+}
 
 
 
@@ -256,8 +271,24 @@ const buildBoardElements = (board) => {
 
 const initGame = () => {
   
+  // setting up message to input player name
   messageBoard.innerText = "Please input your name.";
   document.body.appendChild(messageBoard);
+
+  submitButton.addEventListener('click', () => {
+  messageBoard.innerText = "Hello " + inputName.value + "! Click on square to start. You have 3 minutes to finish the game."
+})
+
+  // setting up timer display before timer starts
+  if (seconds >= 10 ) {
+  timerContainer.innerText = 'Timer: ' + minutes+ ':' + seconds;
+  } else {
+    timerContainer.innerText = 'Timer: ' + minutes+ ':0' + seconds;
+  }
+  document.body.appendChild(timerContainer);
+
+  // setting up reset button
+  resetButton.addEventListener('click', () => resetGame());
 
   let doubleDeck = makeDeck()
   let deckSubset = doubleDeck.slice(0, boardSize * boardSize);
@@ -270,10 +301,9 @@ const initGame = () => {
       board[i].push(deck.pop());
     }
   }
-  const boardEl = buildBoardElements(board);
+  boardEl = buildBoardElements(board);
   document.body.appendChild(boardEl);
 }
 
 // start the game
 initGame();
-
