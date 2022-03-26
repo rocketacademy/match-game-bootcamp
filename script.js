@@ -17,7 +17,7 @@ let winMessageTimer = 0;
 let reset = false;
 
 const delayInMilliseconds = 1000; // this is 1 second
-let minutes = 1; // setting 3 minutes for the game
+let minutes = 3; // setting 3 minutes for the game
 let seconds = 0;
 let firstTurn = true;
 let endOfGame = false; // to signify end of game
@@ -184,7 +184,7 @@ const resetGame = () => {
   matchedSets = 0;
   winMessageTimer = 0;
   
-  minutes = 1;
+  minutes = 3;
   seconds = 0;
   firstTurn = true;
   endOfGame = false;
