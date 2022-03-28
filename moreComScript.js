@@ -76,6 +76,9 @@ const output = (message) => {
   gameInfo.innerText = message;
 };
 
+// const resetContainer = document.createElement('div');
+const resetButton = document.createElement('button');
+
 // ================================================================================================
 // ================================================================================================
 // ================================================================================================
@@ -85,10 +88,13 @@ const output = (message) => {
 // ================================================================================================
 // boardSize has to be an even number. this is the one that controls the array size!!
 const boardSize = 4;
-const board = [];
+let board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let canClick = true;
+let square;
+let deckSubset;
 
 // ================================================================================================
 // ================================================================================================
@@ -113,39 +119,50 @@ const squareClick = (cardElement, row, column) => {
   }
 
   // first turn
-  if (firstCard === null) {
+  if (firstCard === null && canClick === true) {
+    canClick = false;
     console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
-    cardElement.innerHTML = `${firstCard.name} <br> ${firstCard.name}`;
+    cardElement.innerText = firstCard.name;
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
+    canClick = true;
 
     // second turn
   } else {
+    canClick = false;
     console.log('second turn');
     if (
       clickedCard.name === firstCard.name
         && clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
-      output('MATCHHHHHHHHH!');
+      output('🎆MATCHHHHHHHHH!🎆');
+      setTimeout(() => {
+        canClick = true;
+        output('open two cards and see if they match!');
+      }, 1000);
 
       // turn this second card over
       cardElement.innerText = clickedCard.name;
     } else {
+      cardElement.innerText = clickedCard.name;
+      setTimeout(() => {
+        // turn both cards over after 3s
+        cardElement.innerText = '';
+        firstCardElement.innerText = '';
+        canClick = true;
+      }, 1000);
       console.log('NOT a match');
       output("It's not a match. Try again!");
-      firstCardElement.innerText = '';
     }
 
     // reset the first card
     firstCard = null;
   }
 };
-
-// setTimeout = if the second card != first card, show it to the user for 3s then turn it back over
 
 // ================================================================================================
 // ================================================================================================
@@ -175,7 +192,7 @@ const buildBoardElements = (theBoard) => {
     // make all the squares for this row
     for (let j = 0; j < row.length; j += 1) {
       // create the square element
-      const square = document.createElement('div');
+      square = document.createElement('div');
 
       // set a class for CSS purposes
       square.classList.add('square');
@@ -201,7 +218,7 @@ const initGame = () => {
   // create this special deck by getting the doubled cards and
   // making a smaller array that is ( boardSize squared ) number of cards
   const doubleDeck = makeDeck();
-  const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
+  deckSubset = doubleDeck.slice(0, boardSize * boardSize);
   deck = shuffleCards(deckSubset);
   // holy sheet this console.table is damn cool???
   console.table(deck);
@@ -220,5 +237,23 @@ const initGame = () => {
   gameInfo.innerHTML = 'Match Game - How to play? <br><br> 1. Click on the squares to reveal a number <br> 2. Click on another square to see if it matches with the first card!';
   document.body.appendChild(gameInfo);
 };
+
+// ================================================================================================
+// ================================================================================================
+// ================================================================================================
+//           ========================== RESET BUTTON ============================
+// ================================================================================================
+// ================================================================================================
+// ================================================================================================
+// build a reset button
+resetButton.innerText = 'Reset Game';
+document.body.appendChild(resetButton);
+const resetEvent = () => {
+  board = [];
+  document.querySelector('.board').remove();
+  canClick = true;
+  initGame();
+};
+resetButton.addEventListener('click', resetEvent);
 
 initGame();

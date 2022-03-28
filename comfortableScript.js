@@ -89,6 +89,7 @@ const board = [];
 let firstCard = null;
 let firstCardElement;
 let deck;
+let canClick = true;
 
 // ================================================================================================
 // ================================================================================================
@@ -98,7 +99,7 @@ let deck;
 // ================================================================================================
 // ================================================================================================
 const squareClick = (cardElement, row, column) => {
-  // how come i need not declare variable cardElement for it to be active? ie: 'let cardElement'
+  // cardElement was defined as a param in 1
   console.log(cardElement);
 
   console.log('FIRST CARD DOM ELEMENT', firstCard);
@@ -113,39 +114,50 @@ const squareClick = (cardElement, row, column) => {
   }
 
   // first turn
-  if (firstCard === null) {
+  if (firstCard === null && canClick === true) {
+    canClick = false;
     console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
-    cardElement.innerHTML = `${firstCard.name} <br> ${firstCard.name}`;
+    cardElement.innerText = firstCard.name;
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
+    canClick = true;
 
     // second turn
   } else {
+    canClick = false;
     console.log('second turn');
     if (
       clickedCard.name === firstCard.name
         && clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
-      output('MATCHHHHHHHHH!');
+      output('🎆MATCHHHHHHHHH!🎆');
+      setTimeout(() => {
+        canClick = true;
+        output('open two cards and see if they match!');
+      }, 3000);
 
       // turn this second card over
       cardElement.innerText = clickedCard.name;
     } else {
+      cardElement.innerText = clickedCard.name;
+      setTimeout(() => {
+        // turn both cards over after 3s
+        cardElement.innerText = '';
+        firstCardElement.innerText = '';
+        canClick = true;
+      }, 3000);
       console.log('NOT a match');
       output("It's not a match. Try again!");
-      firstCardElement.innerText = '';
     }
 
     // reset the first card
     firstCard = null;
   }
 };
-
-// setTimeout = if the second card != first card, show it to the user for 3s then turn it back over
 
 // ================================================================================================
 // ================================================================================================
