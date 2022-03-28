@@ -330,3 +330,4 @@ const resetEvent = () => {
 resetButton.addEventListener("click", resetEvent);
 
 initGame();
+//CHNAGES 2.0
