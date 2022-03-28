@@ -84,7 +84,7 @@ const output = (message) => {
 // ================================================================================================
 // ================================================================================================
 // boardSize has to be an even number. this is the one that controls the array size!!
-const boardSize = 6;
+const boardSize = 4;
 const board = [];
 let firstCard = null;
 let firstCardElement;
@@ -103,9 +103,9 @@ const squareClick = (cardElement, row, column) => {
 
   console.log('FIRST CARD DOM ELEMENT', firstCard);
 
-  console.log('BOARD CLICKED CARD', board[row][column]);
-
   const clickedCard = board[row][column];
+
+  console.log('BOARD CLICKED CARD', board[row][column]);
 
   // the user already clicked on this square
   if (cardElement.innerText !== '') {
@@ -117,7 +117,7 @@ const squareClick = (cardElement, row, column) => {
     console.log('first turn');
     firstCard = clickedCard;
     // turn this card over
-    cardElement.innerText = firstCard.name;
+    cardElement.innerHTML = `${firstCard.name} <br> ${firstCard.name}`;
 
     // hold onto this for later when it may not match
     firstCardElement = cardElement;
@@ -130,15 +130,13 @@ const squareClick = (cardElement, row, column) => {
         && clickedCard.suit === firstCard.suit
     ) {
       console.log('match');
-      output("It's a match!");
+      output('MATCHHHHHHHHH!');
 
-      // turn this card over
+      // turn this second card over
       cardElement.innerText = clickedCard.name;
     } else {
       console.log('NOT a match');
       output("It's not a match. Try again!");
-
-      // turn this card back over
       firstCardElement.innerText = '';
     }
 
@@ -146,6 +144,8 @@ const squareClick = (cardElement, row, column) => {
     firstCard = null;
   }
 };
+
+// setTimeout = if the second card != first card, show it to the user for 3s then turn it back over
 
 // ================================================================================================
 // ================================================================================================
@@ -203,7 +203,8 @@ const initGame = () => {
   const doubleDeck = makeDeck();
   const deckSubset = doubleDeck.slice(0, boardSize * boardSize);
   deck = shuffleCards(deckSubset);
-
+  // holy sheet this console.table is damn cool???
+  console.table(deck);
   // deal the cards out to the board data structure
   for (let i = 0; i < boardSize; i += 1) {
     board.push([]);
